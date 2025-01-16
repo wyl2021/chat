@@ -1,13 +1,14 @@
 <!-- 找回密码 -->
 <template>
   <el-dialog
+    :close-on-press-escape="false"
+    :close-on-click-modal="false"
     :visible.sync="dialogVisible"
     title="找回密码"
-    width="45%"
-    :before-close="handleClose"
+    width="370px"
     center
   >
-    <el-form :model="form" ref="ruleForm">
+    <el-form :model="form" ref="ruleForm" size="small">
       <el-form-item
         prop="userPhone"
         label="手机号"
@@ -42,16 +43,17 @@
             resCode
           }}</span>
         </el-input>
-        
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit">找回密码</el-button>
-        </span>
+      <el-button size="small" type="primary" @click="handleSubmit"
+        >找回密码</el-button
+      >
+    </span>
   </el-dialog>
 </template>
-  
-  <script>
+
+<script>
 import { recoverPassword, sendForgotPasswordCode } from "@/api/login";
 import ElementUI from "element-ui";
 export default {
@@ -74,22 +76,13 @@ export default {
     }
   },
   methods: {
-     // 重置表单数据
-     resetForm() {
+    // 重置表单数据
+    resetForm() {
       this.form = {
         userPhone: "",
         pwd: "",
         code: null,
       };
-    },
-    // 关闭
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then(() => {
-          this.resetForm();
-          done();
-        })
-        .catch(() => {});
     },
     //找回密码
     handleSubmit() {
@@ -143,22 +136,9 @@ export default {
   },
 };
 </script>
-  
-  <style lang="less" scoped>
-  ::v-deep(.el-dialog) {
-  background-color: #1e1e1e;
-}
-::v-deep(.el-dialog__title) {
-  color: #fff;
-}
-::v-deep(.el-input__inner) {
-  border: 1px solid #454545;
-  outline: none;
-  background-color: transparent !important; /* 去掉默认背景色 */
-}
 
+<style lang="less" scoped>
 .addr {
   cursor: pointer;
 }
 </style>
-  

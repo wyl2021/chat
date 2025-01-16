@@ -1,13 +1,14 @@
 <!-- 账号注册 -->
 <template>
   <el-dialog
+    :close-on-press-escape="false"
+    :close-on-click-modal="false"
     :visible.sync="dialogVisible"
     title="账号注册"
-    width="45%"
-    :before-close="handleClose"
+    width="370px"
     center
   >
-    <el-form :model="form" ref="ruleForm">
+    <el-form :model="form" ref="ruleForm" size="small">
       <el-form-item
         prop="userName"
         label="用户名"
@@ -90,13 +91,15 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="handleSubmit">注 册</el-button>
+      <el-button size="small" type="primary" @click="handleSubmit"
+        >注 册</el-button
+      >
     </span>
   </el-dialog>
 </template>
-<script >
+<script>
 import ElementUI from "element-ui";
-import { sendRegisterCode,register } from "@/api/login";
+import { sendRegisterCode, register } from "@/api/login";
 export default {
   data() {
     return {
@@ -126,15 +129,7 @@ export default {
         code: null,
       };
     },
-    // 关闭
-    handleClose(done) {
-      this.$confirm("确认关闭？")
-        .then(() => {
-          this.resetForm();
-          done();
-        })
-        .catch(() => {});
-    },
+
     // 先验证手机号
     handleCountdown() {
       this.$refs.ruleForm.validateField(
@@ -192,19 +187,7 @@ export default {
   },
 };
 </script>
-<style scoped lang='less'>
-::v-deep(.el-dialog) {
-  background-color: #1e1e1e;
-}
-::v-deep(.el-dialog__title) {
-  color: #fff;
-}
-::v-deep(.el-input__inner) {
-  border: 1px solid #454545;
-  outline: none;
-  background-color: transparent !important; /* 去掉默认背景色 */
-}
-
+<style scoped lang="less">
 .addr {
   cursor: pointer;
 }
