@@ -151,6 +151,7 @@ export default {
     justify-content: space-between;
     color: #218bda;
     cursor: pointer;
+    margin-top: 30px;
   }
 }
 .lg-submit {

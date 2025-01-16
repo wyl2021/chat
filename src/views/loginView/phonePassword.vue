@@ -3,7 +3,7 @@
     <el-form-item
       prop="userPhone"
       label="手机号"
-      :rules="[{ required: true, message: '请输入手机号', trigger: 'blur' }]"
+      :rules="verificate({ type: 'mobile', msg: '请输入手机号' })"
     >
       <el-input v-model.trim="form.userPhone" placeholder="请输入您的手机号">
         <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
@@ -12,7 +12,7 @@
     <el-form-item
       prop="pwd"
       label="密码"
-      :rules="[{ required: true, message: '请输入密码', trigger: 'blur' }]"
+      :rules="verificate({ type: 'password', msg: '请输入密码' })"
     >
       <el-input
         v-model.trim="form.pwd"
@@ -27,10 +27,12 @@
 </template>
 
 <script>
+import verificate from "@/utils/verificate";
 import { accountLogin } from "@/api/login";
 export default {
   data() {
     return {
+      verificate,
       form: {
         userPhone: "",
         pwd: "",
@@ -40,10 +42,9 @@ export default {
   methods: {
     // 提交
     submit() {
-        return new Promise((resolve, reject) => {
-        this.$refs.ruleForm
-          .validate(async (valid) => {
-            if (valid) {
+      return new Promise((resolve, reject) => {
+        this.$refs.ruleForm.validate(async (valid) => {
+          if (valid) {
             const res = await accountLogin(this.form);
             resolve(res);
           } else {
@@ -51,8 +52,7 @@ export default {
             reject(false);
             return false;
           }
-          })
-          ;
+        });
       });
     },
   },

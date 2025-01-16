@@ -3,7 +3,7 @@
     <el-form-item
       prop="userPhone"
       label="手机号"
-      :rules="[{ required: true, message: '请输入手机号', trigger: 'blur' }]"
+      :rules="verificate({ type: 'mobile', msg: '请输入手机号' })"
     >
       <el-input v-model.trim="form.userPhone" placeholder="请输入您的手机号">
         <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
@@ -12,7 +12,7 @@
     <el-form-item
       prop="code"
       label="验证码"
-      :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]"
+      :rules="verificate({ msg: '请输入验证码' })"
     >
       <el-input v-model.trim="form.code" placeholder="请输入验证码">
         <i slot="prefix" class="el-input__icon el-icon-lock"></i>
@@ -25,11 +25,12 @@
 </template>
 
 <script>
+import verificate from "@/utils/verificate";
 import { accountLogin, sendLogCode } from "@/api/login";
-import ElementUI from "element-ui";
 export default {
   data() {
     return {
+      verificate,
       resCode: "获取验证码",
       sLock: false,
       timer: null,
@@ -62,11 +63,15 @@ export default {
     },
     // 先验证手机号
     handleCountdown() {
-      this.$refs.ruleForm.validateField("userPhone", async (valid) => {
+      this.$refs.ruleForm.validateField("userPhone", (valid) => {
         if (!valid) {
-          const res = await sendLogCode({ userPhone: this.form.userPhone });
-          if (res.msg) return ElementUI.message.error(res.msg);
-          this.countdownFun();
+          this.countdownFun(async () => {
+            const res = await sendLogCode({ userPhone: this.form.userPhone });
+            if (res.msg) {
+              this.$message.error(res.msg);
+              return false;
+            }
+          });
         } else {
           console.log("error submit!!");
           return false;
@@ -74,7 +79,7 @@ export default {
       });
     },
     // 倒计时的方法
-    countdownFun() {
+    countdownFun(callback) {
       if (this.sLock) {
         return;
       }
@@ -91,6 +96,7 @@ export default {
           time--;
         }
       }, 1000);
+      if (callback) callback();
     },
   },
 };

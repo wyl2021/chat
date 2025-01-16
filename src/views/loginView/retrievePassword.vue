@@ -8,11 +8,11 @@
     width="370px"
     center
   >
-    <el-form :model="form" ref="ruleForm" size="small">
+    <el-form :model="form" ref="ruleForm" size="small" v-if="dialogVisible">
       <el-form-item
         prop="userPhone"
         label="手机号"
-        :rules="[{ required: true, message: '请输入手机号', trigger: 'blur' }]"
+        :rules="verificate({ type: 'mobile', msg: '请输入手机号' })"
       >
         <el-input v-model.trim="form.userPhone" placeholder="请输入您的手机号">
           <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
@@ -21,7 +21,7 @@
       <el-form-item
         prop="pwd"
         label="新密码"
-        :rules="[{ required: true, message: '请输入新密码', trigger: 'blur' }]"
+        :rules="verificate({ type: 'password', msg: '请输入密码' })"
       >
         <el-input
           v-model.trim="form.pwd"
@@ -35,7 +35,7 @@
       <el-form-item
         prop="code"
         label="验证码"
-        :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]"
+        :rules="verificate({ msg: '请输入验证码' })"
       >
         <el-input v-model.trim="form.code" placeholder="请输入验证码">
           <i slot="prefix" class="el-input__icon el-icon-lock"></i>
@@ -49,16 +49,18 @@
       <el-button size="small" type="primary" @click="handleSubmit"
         >找回密码</el-button
       >
+      <el-button size="small" @click="dialogVisible = false">取消</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+import verificate from "@/utils/verificate";
 import { recoverPassword, sendForgotPasswordCode } from "@/api/login";
-import ElementUI from "element-ui";
 export default {
   data() {
     return {
+      verificate,
       resCode: "获取验证码",
       sLock: false,
       timer: null,
@@ -89,7 +91,10 @@ export default {
       this.$refs.ruleForm.validate(async (valid) => {
         if (valid) {
           const res = await recoverPassword(this.form);
-          if (res.code !== 1) return ElementUI.Message.error(res.msg);
+          if (res.code !== 1) {
+            this.$message.error(res.msg);
+            return false;
+          }
           this.dialogVisible = false;
           // 用做找回密码后直接贴账号密码
           // this.$emit('register')
@@ -101,13 +106,17 @@ export default {
     },
     // 先验证手机号
     handleCountdown() {
-      this.$refs.ruleForm.validateField("userPhone", async (valid) => {
+      this.$refs.ruleForm.validateField("userPhone", (valid) => {
         if (!valid) {
-          const res = await sendForgotPasswordCode({
-            userPhone: this.form.userPhone,
+          this.countdownFun(async () => {
+            const res = await sendForgotPasswordCode({
+              userPhone: this.form.userPhone,
+            });
+            if (res.msg) {
+              this.$message.error(res.msg);
+              return;
+            }
           });
-          if (res.msg) return ElementUI.message.error(res.msg);
-          this.countdownFun();
         } else {
           console.log("error submit!!");
           return false;
@@ -115,7 +124,7 @@ export default {
       });
     },
     // 倒计时的方法
-    countdownFun() {
+    countdownFun(callback) {
       if (this.sLock) {
         return;
       }
@@ -132,6 +141,7 @@ export default {
           time--;
         }
       }, 1000);
+      callback && callback();
     },
   },
 };

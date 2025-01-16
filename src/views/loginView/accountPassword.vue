@@ -3,7 +3,7 @@
     <el-form-item
       prop="userName"
       label="账号"
-      :rules="[{ required: true, message: '请输入账号', trigger: 'blur' }]"
+      :rules="verificate({ type: 'account', msg: '请输入账号' })"
     >
       <el-input v-model.trim="form.userName" placeholder="请输入您的账号">
         <i slot="prefix" class="el-input__icon el-icon-user"></i>
@@ -12,7 +12,7 @@
     <el-form-item
       prop="pwd"
       label="密码"
-      :rules="[{ required: true, message: '请输入密码', trigger: 'blur' }]"
+      :rules="verificate({ type: 'password', msg: '请输入密码' })"
     >
       <el-input
         v-model.trim="form.pwd"
@@ -27,10 +27,12 @@
 </template>
 
 <script>
+import verificate from "@/utils/verificate";
 import { accountLogin } from "@/api/login";
 export default {
   data() {
     return {
+      verificate,
       form: {
         userName: "",
         pwd: "",
@@ -41,7 +43,7 @@ export default {
     // 提交
     submit() {
       return new Promise((resolve, reject) => {
-        this.$refs.ruleForm.validate(async(valid) => {
+        this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
             const res = await accountLogin(this.form);
             resolve(res);
