@@ -26,8 +26,9 @@
       <accountPassword ref="ap" v-if="activeIndex === 0"></accountPassword>
       <phonePassword ref="pp" v-if="activeIndex === 1"></phonePassword>
       <phoneCode ref="pc" v-if="activeIndex === 2"></phoneCode>
+    
       <div class="lg-iss">
-        <span v-if="[0, 1].includes(activeIndex)">账号注册</span>
+        <span v-if="[0, 1].includes(activeIndex)" @click="$refs['rv'].dialogVisible=true">账号注册</span>
         <span v-if="activeIndex === 0">找回密码</span>
         <span v-if="activeIndex === 1" @click="handleLoginType(2)"
           >验证码登录</span
@@ -41,6 +42,7 @@
         >登录</el-button
       >
     </div>
+    <registerView ref="rv"></registerView>
   </div>
 </template>
 
@@ -48,19 +50,24 @@
 import accountPassword from "./accountPassword.vue";
 import phonePassword from "./phonePassword.vue";
 import phoneCode from "./phoneCode.vue";
+import registerView from "./registerView.vue";
+import {accountLogin} from "@/api/login";
+import ElementUI from 'element-ui';
 export default {
   components: {
     accountPassword,
     phonePassword,
     phoneCode,
+    registerView
   },
   data() {
     return {
-      activeIndex: 0,
-      submitLoading: false,
+      activeIndex: 0,//0 账号登录  1 手机号登录  2 验证码登录
+       submitLoading: false,
     };
   },
   methods: {
+ 
     // 切换不同登录模式
     handleLoginType(n) {
       this.activeIndex = n;
@@ -71,13 +78,18 @@ export default {
       this.submitLoading = true;
       this.$refs[formName]
         .submit()
-        .then((res) => {
-          console.log(res);
+        .then(async(res) => {
+        const data=await accountLogin(res);
+          console.log("用户登录",data)
+        if(data.code!==1) return ElementUI.Message.error(data.msg);
+        localStorage.setItem("token",data.data.token);  
+        this.$router.push({
+          path: "/",
         })
-        .finally(() => {
+       }) .finally(() => {
           this.submitLoading = false;
         });
-    },
+      }
   },
 };
 </script>
