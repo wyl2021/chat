@@ -14,7 +14,7 @@
         :rules="[{ required: true, message: '请输入用户名', trigger: 'blur' }]"
       >
         <el-input v-model.trim="form.userName" placeholder="请输入您的用户名">
-          <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
+          <i slot="prefix" class="el-input__icon el-icon-user"></i>
         </el-input>
       </el-form-item>
       <el-form-item
@@ -30,7 +30,7 @@
         ]"
       >
         <el-input v-model.trim="form.userEmail" placeholder="请输入您的邮箱">
-          <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
+          <i slot="prefix" class="el-input__icon el-icon-message"></i>
         </el-input>
       </el-form-item>
       <el-form-item
@@ -58,7 +58,7 @@
           v-model.trim="form.userCompany"
           placeholder="请输入您的公司名"
         >
-          <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
+          <i slot="prefix" class="el-input__icon el-icon-discount"></i>
         </el-input>
       </el-form-item>
 
@@ -73,7 +73,7 @@
           show-password
           placeholder="请输入您的密码"
         >
-          <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
+          <i slot="prefix" class="el-input__icon el-icon-lock"></i>
         </el-input>
       </el-form-item>
       <el-form-item
@@ -82,7 +82,7 @@
         :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]"
       >
         <el-input v-model.trim="form.code" placeholder="请输入验证码">
-          <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
+          <i slot="prefix" class="el-input__icon el-icon-lock"></i>
           <span slot="append" class="addr" @click="handleCountdown">{{
             resCode
           }}</span>

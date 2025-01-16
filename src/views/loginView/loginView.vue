@@ -29,7 +29,7 @@
     
       <div class="lg-iss">
         <span v-if="[0, 1].includes(activeIndex)" @click="$refs['rv'].dialogVisible=true">账号注册</span>
-        <span v-if="activeIndex === 0">找回密码</span>
+        <span v-if="activeIndex === 0" @click="$refs['rp'].dialogVisible=true">找回密码</span>
         <span v-if="activeIndex === 1" @click="handleLoginType(2)"
           >验证码登录</span
         >
@@ -42,6 +42,7 @@
         >登录</el-button
       >
     </div>
+    <retrievePassword ref="rp"></retrievePassword>
     <registerView ref="rv"></registerView>
   </div>
 </template>
@@ -52,12 +53,14 @@ import phonePassword from "./phonePassword.vue";
 import phoneCode from "./phoneCode.vue";
 import registerView from "./registerView.vue";
 import ElementUI from "element-ui";
+import retrievePassword from "./retrievePassword.vue"
 export default {
   components: {
     accountPassword,
     phonePassword,
     phoneCode,
-    registerView
+    registerView,
+    retrievePassword
   },
   data() {
     return {
