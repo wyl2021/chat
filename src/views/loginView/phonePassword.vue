@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { accountLogin } from "@/api/login";
 export default {
   data() {
     return {
@@ -39,16 +40,19 @@ export default {
   methods: {
     // 提交
     submit() {
-      return new Promise((resolve, reject) => {
-        this.$refs.ruleForm.validate((valid) => {
-          if (valid) {
-            resolve(this.form);
+        return new Promise((resolve, reject) => {
+        this.$refs.ruleForm
+          .validate(async (valid) => {
+            if (valid) {
+            const res = await accountLogin(this.form);
+            resolve(res);
           } else {
             console.log("error submit!!");
             reject(false);
             return false;
           }
-        });
+          })
+          ;
       });
     },
   },

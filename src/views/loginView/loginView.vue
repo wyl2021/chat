@@ -51,8 +51,7 @@ import accountPassword from "./accountPassword.vue";
 import phonePassword from "./phonePassword.vue";
 import phoneCode from "./phoneCode.vue";
 import registerView from "./registerView.vue";
-import {accountLogin} from "@/api/login";
-import ElementUI from 'element-ui';
+import ElementUI from "element-ui";
 export default {
   components: {
     accountPassword,
@@ -79,10 +78,9 @@ export default {
       this.$refs[formName]
         .submit()
         .then(async(res) => {
-        const data=await accountLogin(res);
-          console.log("用户登录",data)
-        if(data.code!==1) return ElementUI.Message.error(data.msg);
-        localStorage.setItem("token",data.data.token);  
+      console.log(res)
+      if(res.msg) return ElementUI.Message.error(res.msg);
+        localStorage.setItem("token",res.data.token);  
         this.$router.push({
           path: "/",
         })

@@ -79,13 +79,13 @@
       <el-form-item
         prop="code"
         label="手机验证码"
-        :rules="[{ required: true, message: '请输入', trigger: 'blur' }]"
+        :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]"
       >
         <el-input v-model.trim="form.code" placeholder="请输入验证码">
           <i slot="prefix" class="el-input__icon el-icon-mobile"></i>
           <span slot="append" class="addr" @click="handleCountdown">{{
-          resCode
-        }}</span>
+            resCode
+          }}</span>
         </el-input>
       </el-form-item>
     </el-form>
@@ -95,6 +95,8 @@
   </el-dialog>
 </template>
 <script >
+import ElementUI from "element-ui";
+import { sendRegisterCode,register } from "@/api/login";
 export default {
   data() {
     return {
@@ -107,30 +109,50 @@ export default {
         code: null,
       },
       dialogVisible: false,
-      resCode:'获取验证码',
+      resCode: "获取验证码",
       sLock: false,
       timer: null,
     };
   },
   methods: {
+    // 重置表单数据
+    resetForm() {
+      this.form = {
+        userName: "",
+        userEmail: "",
+        userPhone: "",
+        userCompany: "",
+        pwd: "",
+        code: null,
+      };
+    },
     // 关闭
     handleClose(done) {
       this.$confirm("确认关闭？")
         .then(() => {
+          this.resetForm();
           done();
         })
         .catch(() => {});
     },
-      // 先验证手机号
-      handleCountdown() {
-      this.$refs.ruleForm.validateField("userPhone", (valid) => {
-        if (!valid) {
-          this.countdownFun();
-        } else {
-          console.log("error submit!!");
-          return false;
+    // 先验证手机号
+    handleCountdown() {
+      this.$refs.ruleForm.validateField(
+        ["userName", "userPhone"],
+        async (valid) => {
+          if (!valid) {
+            const res = await sendRegisterCode({
+              userName: this.form.userName,
+              userPhone: this.form.userPhone,
+            });
+            if (res.msg) return ElementUI.Message.error(res.msg);
+            this.countdownFun();
+          } else {
+            console.log("error submit!!");
+            return false;
+          }
         }
-      });
+      );
     },
     // 倒计时的方法
     countdownFun() {
@@ -151,17 +173,22 @@ export default {
         }
       }, 1000);
     },
-// 账号注册
-handleSubmit(){
-    this.$refs.ruleForm.validate((valid) => {
-      if (valid) {
-        console.log("账号注册",this.form);
-      } else {
-        console.log("error submit!!");
-        return false;
-      }
-    });
-}
+    // 账号注册
+    handleSubmit() {
+      this.$refs.ruleForm.validate(async (valid) => {
+        if (valid) {
+          console.log("账号注册", this.form);
+          const res = await register(this.form);
+          if (res.code !== 1) return ElementUI.Message.error(res.msg);
+          this.dialogVisible = false;
+          // 用做注册成功后直接贴账号密码
+          // this.$emit('register')
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
   },
 };
 </script>
@@ -169,13 +196,16 @@ handleSubmit(){
 ::v-deep(.el-dialog) {
   background-color: #1e1e1e;
 }
-::v-deep(.el-dialog__title){
-    color:#FFF
+::v-deep(.el-dialog__title) {
+  color: #fff;
 }
-::v-deep(.el-input__inner){
-   border: 1px solid #454545;
-  outline: none; 
+::v-deep(.el-input__inner) {
+  border: 1px solid #454545;
+  outline: none;
   background-color: transparent !important; /* 去掉默认背景色 */
 }
 
+.addr {
+  cursor: pointer;
+}
 </style>

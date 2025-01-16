@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { accountLogin, sendLogCode } from "@/api/login";
+import ElementUI from "element-ui";
 export default {
   data() {
     return {
@@ -46,9 +48,10 @@ export default {
     // 提交
     submit() {
       return new Promise((resolve, reject) => {
-        this.$refs.ruleForm.validate((valid) => {
+        this.$refs.ruleForm.validate(async (valid) => {
           if (valid) {
-            resolve(this.form);
+            const res = await accountLogin(this.form);
+            resolve(res);
           } else {
             console.log("error submit!!");
             reject(false);
@@ -59,8 +62,10 @@ export default {
     },
     // 先验证手机号
     handleCountdown() {
-      this.$refs.ruleForm.validateField("userPhone", (valid) => {
+      this.$refs.ruleForm.validateField("userPhone", async (valid) => {
         if (!valid) {
+          const res = await sendLogCode({ userPhone: this.form.userPhone });
+          if (res.msg) return ElementUI.message.error(res.msg);
           this.countdownFun();
         } else {
           console.log("error submit!!");
