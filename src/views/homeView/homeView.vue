@@ -3,7 +3,7 @@
     <div>2222</div>
     <div class="h-footer">
       <div></div>
-      <AIinput v-model="val"></AIinput>
+      <AIinput v-model="val" bar></AIinput>
     </div>
   </div>
 </template>

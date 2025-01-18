@@ -1,6 +1,6 @@
 <template>
   <div class="h-f-outter">
-    <div class="h-f-top">
+    <div class="h-f-top" v-if="bar">
       <span class="st" style="margin-left: 0px">
         <img src="@/assets/images/PublicRelationsAdvertising.png" /><span
           >公关广告</span
@@ -86,6 +86,10 @@ export default {
     modelValue: {
       type: String,
       default: "",
+    },
+    bar: {
+      type: Boolean,
+      default: false,
     },
   },
   model: {
