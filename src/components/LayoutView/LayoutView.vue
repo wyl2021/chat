@@ -24,10 +24,15 @@
         </div>
       </div>
       <div style="padding: 0px 13px">
-        <LyMenu></LyMenu>
+        <LyMenu :isCollapse="collose"></LyMenu>
       </div>
     </div>
-    <div class="ly-body"></div>
+    <div class="ly-body">
+      <div class="ly-b-header"></div>
+      <div class="ly-b-content">
+        <router-view></router-view>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -46,7 +51,7 @@ export default {
     handleCollose() {
       this.collose = !this.collose;
       if (this.collose) {
-        this.$refs.ls.style.width = "50px";
+        this.$refs.ls.style.width = "100px";
       } else {
         this.$refs.ls.style.width = "260px";
       }
@@ -70,6 +75,7 @@ export default {
   background: black;
   height: 100%;
   transition: all 0.3s;
+  flex-shrink: 0;
 }
 .ly-logo {
   display: flex;
@@ -90,5 +96,18 @@ export default {
       width: 100%;
     }
   }
+}
+.ly-body {
+  width: 100%;
+  height: 100%;
+}
+.ly-b-header {
+  display: flex;
+  height: 50px;
+  padding: 0px 13px;
+}
+.ly-b-content {
+  width: 100%;
+  height: calc(100% - 50px);
 }
 </style>

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import LayoutView from "@/components/LayoutView/LayoutView.vue"
+import LayoutView from "@/components/LayoutView/LayoutView.vue";
+import others from "./others.js";
 Vue.use(VueRouter);
 
 const routes = [
@@ -8,8 +9,8 @@ const routes = [
     path: '/',
     name: 'LayoutView',
     component: LayoutView,
-    // redirect: '/home',
-    children: []
+    redirect: '/home',
+    children: [...others]
   },
   {
     path: '/login',

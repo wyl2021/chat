@@ -7,6 +7,7 @@
     background-color="#000"
     text-color="#fff"
     active-text-color="#2f95eb"
+    :collapse="isCollapse"
   >
     <el-menu-item index="1">
       <i class="el-icon-plus"></i>
@@ -64,6 +65,12 @@
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 export default {
+  props: {
+    isCollapse: {
+      type: Boolean,
+      default: false,
+    },
+  },
   components: {
     TooltipTxt,
   },
@@ -71,13 +78,11 @@ export default {
     return {};
   },
   methods: {
-    methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      },
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
     },
   },
 };
