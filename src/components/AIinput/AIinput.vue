@@ -171,6 +171,7 @@ export default {
   position: relative;
   width: 100%;
   height: auto;
+  background: #222127;
 }
 .h-f-top {
   display: flex;
