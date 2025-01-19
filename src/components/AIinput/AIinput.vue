@@ -1,47 +1,23 @@
 <template>
   <div class="h-f-outter">
     <div class="h-f-top" v-if="bar">
-      <span class="st" style="margin-left: 0px">
-        <img src="@/assets/images/PublicRelationsAdvertising.png" /><span
-          >公关广告</span
-        ></span
+      <span
+        class="st"
+        v-for="(item, index) in barArr"
+        :key="index"
+        :style="item.style"
       >
-      <span class="st">
-        <img src="@/assets/images/car.png" />
-        <span>汽车媒体</span>
-      </span>
-      <span class="st">
-        <img src="@/assets/images/WeMedia.png" />
-        <span>自媒体人</span>
-      </span>
-      <span class="st">
-        <img src="@/assets/images/owner.png" />
-        <span>用户车主</span>
-      </span>
-      <span class="st">
-        <img src="@/assets/images/brand.png" />
-        <span>品牌官方</span>
-      </span>
-      <span class="st">
-        <img src="@/assets/images/intelligentSearch.png" />
-        <span>智能搜索</span>
-      </span>
-      <span class="st">
-        <img src="@/assets/images/Copywriting.png" />
-        <span>文案生成</span>
-      </span>
-      <span class="st" style="width: 10%">
-        <img src="@/assets/images/more.png" />
-        <span>更多</span>
-      </span>
+        <img :src="item.img" /><span>{{ item.label }}</span></span
+      >
     </div>
     <div class="h-f-inner">
       <div
         ref="ine"
         class="h-f-input"
         :class="leftIcon ? '' : 'h-f-input-text'"
-        contenteditable="true"
+        :contenteditable="!disabled"
         v-html="value"
+        :placeholder="placeholder"
         @blur="handleBlur"
         @input="handleInput"
         v-if="!isTab"
@@ -49,9 +25,11 @@
       <div
         ref="ine1"
         class="h-f-input1"
-        contenteditable="true"
+        :contenteditable="!disabled"
         v-html="value"
+        :placeholder="placeholder"
         @blur="handleBlur"
+        @input="handleInputX"
         v-else
       ></div>
       <div class="h-fi">
@@ -67,8 +45,9 @@
           <span class="op-btn">
             <img src="@/assets/images/line.png" />
           </span>
-          <span class="op-btn">
-            <img src="@/assets/images/upload.png" />
+          <span class="op-btn" @click="sendMsg">
+            <img v-if="!canSend" src="@/assets/images/upload.png" />
+            <img v-else src="@/assets/images/uploadWhite.png" />
           </span>
         </div>
       </div>
@@ -77,6 +56,7 @@
 </template>
 
 <script>
+import barArr from "./barArr";
 export default {
   props: {
     leftIcon: {
@@ -88,6 +68,14 @@ export default {
       default: "",
     },
     bar: {
+      type: Boolean,
+      default: false,
+    },
+    placeholder: {
+      type: String,
+      default: "请输入",
+    },
+    disabled: {
       type: Boolean,
       default: false,
     },
@@ -106,20 +94,33 @@ export default {
   },
   data() {
     return {
+      barArr,
       value: "",
       isTab: false,
       isFirst: true,
       secTop: 0,
+      canSend: false,
     };
   },
   methods: {
+    // 发送信息
+    sendMsg() {
+      if (!this.canSend) return;
+    },
     // 失去焦点的时候赋值
     handleBlur(e) {
       const val = e.target.innerHTML;
       this.$emit("change", val);
     },
     // 实时判断是否换个输入框
-    handleInput() {
+    handleInput(e) {
+      const val = e.target.innerHTML;
+      const ctx = val.replace(/<[^>]+>/g, "");
+      if (ctx) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
+      }
       const T = this.selectionPosition();
       if (this.isFirst) {
         this.secTop = T;
@@ -128,6 +129,15 @@ export default {
         if (this.secTop != T) {
           this.isTab = true;
         }
+      }
+    },
+    handleInputX(e) {
+      const val = e.target.innerHTML;
+      const ctx = val.replace(/<[^>]+>/g, "");
+      if (ctx) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
       }
     },
     // 计算光标的位置
@@ -179,7 +189,7 @@ export default {
     color: #5e5e5e;
     cursor: pointer;
     img {
-      width: 16px;
+      height: 14px;
     }
     span {
       display: inline-block;
@@ -230,6 +240,10 @@ export default {
   top: 14px;
   font-size: 14px;
 }
+.h-f-input:empty:before {
+  content: attr(placeholder);
+  color: #424242;
+}
 .h-f-input1 {
   position: relative;
   word-wrap: break-word;
@@ -237,6 +251,10 @@ export default {
   outline: none;
   font-size: 14px;
   margin-bottom: 7px;
+}
+.h-f-input1:empty:before {
+  content: attr(placeholder);
+  color: #424242;
 }
 .h-f-input-text {
   left: 13px;

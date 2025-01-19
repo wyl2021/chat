@@ -28,7 +28,13 @@
       </div>
     </div>
     <div class="ly-body">
-      <div class="ly-b-header"></div>
+      <div class="ly-b-header">
+        <div></div>
+        <div class="ly-b-h-r">
+          <span class="el-icon-bell" style="font-size: 15px"></span>
+          <userCp></userCp>
+        </div>
+      </div>
       <div class="ly-b-content">
         <router-view></router-view>
       </div>
@@ -37,10 +43,12 @@
 </template>
 
 <script>
+import userCp from "./userCp.vue";
 import LyMenu from "./LyMenu.vue";
 export default {
   components: {
     LyMenu,
+    userCp,
   },
   data() {
     return {
@@ -103,8 +111,15 @@ export default {
 }
 .ly-b-header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 50px;
   padding: 0px 13px;
+  .ly-b-h-r {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
 }
 .ly-b-content {
   width: 100%;
