@@ -9,7 +9,7 @@
     active-text-color="#2f95eb"
     :collapse="isCollapse"
   >
-    <el-menu-item index="1">
+    <el-menu-item index="/home">
       <i class="el-icon-plus"></i>
       <span slot="title">ChatCar</span>
     </el-menu-item>
@@ -17,7 +17,7 @@
       <i class="el-icon-search"></i>
       <span slot="title">智能搜索</span>
     </el-menu-item>
-    <el-menu-item index="3">
+    <el-menu-item index="/copyGeneration">
       <i class="el-icon-news"></i>
       <span slot="title">文案生成</span>
     </el-menu-item>

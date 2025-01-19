@@ -106,6 +106,7 @@ export default {
     // 发送信息
     sendMsg() {
       if (!this.canSend) return;
+      this.$emit("sendMsg");
     },
     // 失去焦点的时候赋值
     handleBlur(e) {
@@ -239,6 +240,7 @@ export default {
   left: 42px;
   top: 14px;
   font-size: 14px;
+  line-height: 1.2;
 }
 .h-f-input:empty:before {
   content: attr(placeholder);
@@ -251,6 +253,7 @@ export default {
   outline: none;
   font-size: 14px;
   margin-bottom: 7px;
+  line-height: 1.2;
 }
 .h-f-input1:empty:before {
   content: attr(placeholder);

@@ -12,7 +12,7 @@
     <el-form-item
       prop="pwd"
       label="密码"
-      :rules="verificate({ type: 'password', msg: '请输入密码' })"
+      :rules="verificate({ msg: '请输入密码' })"
     >
       <el-input
         v-model.trim="form.pwd"

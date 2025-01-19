@@ -9,7 +9,6 @@ const service = axios.create({
 
 // 拦截请求
 service.interceptors.request.use(config => {
-
   const token = store.getters.getToken;
   if (config.method === 'post') {
     config.data = {

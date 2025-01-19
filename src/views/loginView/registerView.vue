@@ -12,7 +12,7 @@
       <el-form-item
         prop="userName"
         label="用户名"
-        :rules="verificate({ type: 'account', msg: '请输入用户名' })"
+        :rules="verificate({ msg: '请输入用户名' })"
       >
         <el-input v-model.trim="form.userName" placeholder="请输入您的用户名">
           <i slot="prefix" class="el-input__icon el-icon-user"></i>
@@ -52,7 +52,7 @@
       <el-form-item
         prop="pwd"
         label="密码"
-        :rules="verificate({ type: 'password', msg: '请输入密码' })"
+        :rules="verificate({ msg: '请输入密码' })"
       >
         <el-input
           v-model.trim="form.pwd"

@@ -15,7 +15,7 @@
       </div>
       <div class="u-i-d1">
         <img src="@/assets/images/account.png" />
-        <span>账号：<TooltipTxt text="123456" len="6"></TooltipTxt></span>
+        <span>账号：<TooltipTxt text="123456" :len="6"></TooltipTxt></span>
       </div>
       <div class="u-i-footer">
         <div class="u-i-f-btn">

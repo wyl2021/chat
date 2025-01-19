@@ -69,6 +69,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import url("@/assets/styles/variable.less");
 .ly-container {
   display: flex;
   width: 100%;
@@ -77,6 +78,7 @@ export default {
   min-width: 1200px;
   min-height: 768px;
   overflow: auto;
+  background: @backgroundDark;
 }
 .ly-silder {
   width: 260px;

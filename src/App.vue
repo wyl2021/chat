@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="theme-dark">
+  <div id="app">
     <router-view></router-view>
   </div>
 </template>
@@ -17,12 +17,9 @@ export default {
 @import url("@/assets/styles/variable.less");
 @import url("@/assets/styles/elementDark.less");
 #app {
-  width: 100%;
+  min-width: 100%;
   height: 100%;
   color: @fontColorHighlightDark;
   font-size: @fontSize;
-}
-.theme-dark {
-  background: @backgroundDark;
 }
 </style>

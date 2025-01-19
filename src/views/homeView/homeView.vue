@@ -1,27 +1,8 @@
 <template>
   <div class="h-container">
     <div style="width: 100%">
-      <div
-        style="
-          font-size: 17px;
-          font-weight: 550;
-          letter-spacing: 2px;
-          margin-top: 100px;
-        "
-      >
-        你好，李某某
-      </div>
-      <div
-        style="
-          font-size: 17px;
-          font-weight: 550;
-          margin-top: 10px;
-          letter-spacing: 2px;
-          margin-bottom: 20px;
-        "
-      >
-        需要我怎么帮你呢？
-      </div>
+      <div class="h-t-1" style="margin-top: 100px">你好，李某某</div>
+      <div class="h-t-2">需要我怎么帮你呢？</div>
       <el-row :gutter="10">
         <el-col
           :span="12"
@@ -29,7 +10,7 @@
           :key="index"
           style="margin-bottom: 10px"
         >
-          <div class="h-ce-1">
+          <div class="h-ce-1" @click="jump(item)">
             <div class="h-ce-1-d1">
               <img :src="item.img" />
               <span class="label">{{ item.label }}</span>
@@ -64,27 +45,11 @@ export default {
       val: "",
     };
   },
+  methods: {
+    jump(item) {
+      this.$router.push(item.path);
+    },
+  },
 };
 </script>
-<style lang="less" scoped>
-.h-container {
-  // display: flex;
-  // justify-content: space-between;
-  // flex-direction: column;
-  // align-items: center;
-  position: relative;
-  width: 70%;
-  min-width: 460px;
-  max-width: 800px;
-  height: calc(100% - 1px);
-  margin: 0 auto;
-  border-top: 1px solid transparent;
-}
-
-.h-footer {
-  position: absolute;
-  bottom: 20px;
-  left: 0px;
-  width: 100%;
-}
-</style>
+<style lang="less" scoped></style>
