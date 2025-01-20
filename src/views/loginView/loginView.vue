@@ -90,6 +90,7 @@ export default {
             return;
           }
           this.setToken(res.data.token);
+          this.setUserInfo(res.data);
           // localStorage.setItem("token", res.data.token);
           this.$router.push({
             path: "/",

@@ -1,7 +1,7 @@
 <template>
   <div class="h-container">
     <div style="width: 100%">
-      <div class="h-t-1" style="margin-top: 100px">你好，李某某</div>
+      <div class="h-t-1" style="margin-top: 100px">你好，{{ store.getters.getUserInfo.user_name || "-"}}</div>
       <div class="h-t-2">需要我怎么帮你呢？</div>
       <el-row :gutter="10">
         <el-col
@@ -35,17 +35,25 @@
 <script>
 import advertisementMenu from "./advertisementMenu";
 import AIinput from "@/components/AIinput/AIinput";
+import store from "@/store/store";
+import {GetChatTempletV2 } from "@/api/chat";
 export default {
   components: {
     AIinput,
   },
   data() {
     return {
+      store,
       advertisementMenu,
       val: "",
     };
   },
   methods: {
+    // 获取后端模版列表
+    async getChatTemplet(){
+        const res =await GetChatTempletV2()
+        console.log('首页聊天模板',res)
+    },
     jump(item) {
       this.$router.push(item.path);
     },

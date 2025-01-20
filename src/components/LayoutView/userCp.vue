@@ -11,7 +11,7 @@
     >
       <div class="u-i-d1">
         <img src="@/assets/images/user.png" />
-        <span>用户：李某某</span>
+        <span>用户：{{ store.getters.getUserInfo.user_name || "-"}}</span>
       </div>
       <div class="u-i-d1">
         <img src="@/assets/images/account.png" />
@@ -28,13 +28,14 @@
 
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
-
+import store from "@/store/store";
 export default {
   components: {
     TooltipTxt,
   },
   data() {
     return {
+      store,
       showInfo: false,
     };
   },
