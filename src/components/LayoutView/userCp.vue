@@ -28,7 +28,7 @@
 
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
-import { Local } from '@/utils/storage'
+
 export default {
   components: {
     TooltipTxt,
@@ -40,8 +40,7 @@ export default {
   },
   methods: {
     handleOut(){
-      Local.clear()
-      this.$router.push('/login')
+      this.logout(this.$router);
     },
     handleMouseover() {
       this.showInfo = true;

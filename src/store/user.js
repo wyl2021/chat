@@ -10,7 +10,12 @@ const userState = {
     },
     setUserInfo ({ commit }, value) {
       commit('setUserInfo', value)
-    }
+    },
+    // 退出登录
+  logout({ commit },router) {
+    commit('clearUserInfo');  // 清空 token 和用户信息
+    router.push('/login');
+  }
   },
   mutations: {
     setToken (state, value) {
@@ -20,7 +25,13 @@ const userState = {
     setUserInfo (state, value) {
       state.userInfo = value;
       Local.set('userInfo', JSON.stringify(value));
-    }
+    },
+    // 清空用户信息和 token
+  clearUserInfo() {
+    Local.remove('token');
+    Local.remove('userInfo');
+  }
+   
   },
   getters: {
     getToken (state) {
