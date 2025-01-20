@@ -1,5 +1,5 @@
 <template>
-  <div class="h-f-outter">
+  <div class="h-f-outter" ref="aut">
     <div class="h-f-top" v-if="bar">
       <span
         class="st"
@@ -18,7 +18,7 @@
         :contenteditable="!disabled"
         v-html="value"
         :placeholder="placeholder"
-        @blur="handleBlur"
+        @blur="handleBlur('ine')"
         @input="handleInput"
         v-if="!isTab"
       ></div>
@@ -28,7 +28,7 @@
         :contenteditable="!disabled"
         v-html="value"
         :placeholder="placeholder"
-        @blur="handleBlur"
+        @blur="handleBlur('ine1')"
         @input="handleInputX"
         v-else
       ></div>
@@ -79,6 +79,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isTemplate: {
+      type: Boolean,
+      default: false,
+    },
   },
   model: {
     prop: "modelValue",
@@ -97,49 +101,74 @@ export default {
       barArr,
       value: "",
       isTab: false,
-      isFirst: true,
+      isSecond: false,
       secTop: 0,
       canSend: false,
+      xh: 17,
     };
   },
   methods: {
     // 发送信息
     sendMsg() {
       if (!this.canSend) return;
-      this.$emit("sendMsg");
+      let str = "";
+      if (this.isTab) {
+        str = this.$refs.ine1.innerHTML;
+      } else {
+        str = this.$refs.ine.innerHTML;
+      }
+      let ctx = "";
+      if (this.isTemplate) {
+        ctx = this.getHtmlContents(str);
+      } else {
+        ctx = str;
+      }
+      this.$emit("sendMsg", ctx);
     },
     // 失去焦点的时候赋值
-    handleBlur(e) {
-      const val = e.target.innerHTML;
+    handleBlur(name) {
+      const val = this.$refs[name].innerHTML;
       this.$emit("change", val);
     },
     // 实时判断是否换个输入框
-    handleInput(e) {
-      const val = e.target.innerHTML;
+    handleInput() {
+      const val = this.$refs.ine.innerHTML;
       const ctx = val.replace(/<[^>]+>/g, "");
       if (ctx) {
         this.canSend = true;
       } else {
         this.canSend = false;
       }
-      const T = this.selectionPosition();
-      if (this.isFirst) {
-        this.secTop = T;
-        this.isFirst = false;
-      } else {
-        if (this.secTop != T) {
-          this.isTab = true;
-        }
+      const h = this.$refs.ine.offsetHeight;
+      if (h > this.xh && !this.isSecond) {
+        this.isTab = true;
+        this.isSecond = true;
       }
+      this.changeAnswer();
     },
+    // 第二个input实时判断是否换个输入框
     handleInputX(e) {
-      const val = e.target.innerHTML;
+      if (e.target != this.$refs.ine1) {
+        e.target.setAttribute("txt", e.target.value);
+      }
+
+      const val = this.$refs.ine1.innerHTML;
       const ctx = val.replace(/<[^>]+>/g, "");
       if (ctx) {
         this.canSend = true;
       } else {
         this.canSend = false;
+        this.isSecond = false;
       }
+      const h = this.$refs.ine1.offsetHeight;
+      if (h <= this.xh && !this.isSecond) {
+        this.isTab = false;
+      }
+      this.changeAnswer();
+    },
+    //
+    changeAnswer() {
+      this.$emit("changeAnswer");
     },
     // 计算光标的位置
     selectionPosition() {
@@ -255,6 +284,8 @@ export default {
   font-size: 14px;
   margin-bottom: 7px;
   line-height: 1.2;
+  max-height: 200px;
+  overflow-y: auto;
 }
 .h-f-input1:empty:before {
   content: attr(placeholder);

@@ -1,11 +1,18 @@
 <template>
   <span>
-    <el-tooltip
-      v-if="showTip"
-      :effect="type"
-      :content="text"
-      :placement="position"
-    >
+    <el-tooltip v-if="showTip" :effect="type" :placement="position">
+      <template #content>
+        <pre
+          style="
+            max-width: 560px;
+            max-height: 270px;
+            overflow: auto;
+            white-space: pre-wrap;
+          "
+        >
+          {{ text }}
+        </pre>
+      </template>
       <span :style="{ color: color }">{{ value }}</span>
     </el-tooltip>
     <span :style="{ color: color }" v-else>

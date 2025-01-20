@@ -1,6 +1,11 @@
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 Vue.mixin({
+  data () {
+    return {
+
+    }
+  },
   computed: {
     ...mapGetters([
       'getToken',
@@ -9,7 +14,7 @@ Vue.mixin({
     ])
   },
   methods: {
-    ...mapActions(['setToken', 'setUserInfo','logout']),
+    ...mapActions(['setToken', 'setUserInfo', 'logout']),
     createAiScript (arr = []) {
       let result = '';
       arr.forEach(item => {
@@ -37,6 +42,31 @@ Vue.mixin({
 
       // 返回文本宽度
       return metrics.width;
+    },
+    getHtmlContents (htmlString) {
+      // 创建一个新的DOM解析器
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      // 使用querySelectorAll选择所有元素，然后遍历它们
+      const elements = doc.querySelectorAll('*');
+      let contents = '';
+      elements.forEach(function (el) {
+        // 将元素的内容（包括其后代）添加到数组中
+        let innerText = ''
+        if (el.tagName.toLowerCase() === 'input') {
+          if (el.getAttribute('txt')) {
+            innerText = el.getAttribute('txt');
+            contents += innerText;
+          }
+        } else if (el.tagName.toLowerCase() === 'span') {
+          if (el.innerText) {
+            innerText = el.innerText;
+            contents += innerText;
+          }
+        }
+
+      });
+      return contents;
     }
   }
 })

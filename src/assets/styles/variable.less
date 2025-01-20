@@ -5,6 +5,25 @@
 @fontSize: 13px;
 @borderPrimaryDark: #2f96ec;
 
+/* 为所有WebKit浏览器添加自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 7px; /* 设置滚动条的宽度 */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* 滚动条轨道的背景颜色 */
+  border-radius: 8px; /* 轨道圆角 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* 滚动条实际可拖动部分的颜色 */
+  border-radius: 8px; /* 轨道圆角 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* 鼠标悬浮时滚动条的颜色 */
+}
+
 img {
   user-select: none;
   pointer-events: none;
@@ -21,6 +40,7 @@ pre {
   color: #fff;
   border-radius: 8px;
   margin: 0 5px;
+  background-clip: border-box;
 }
 .inputTs::placeholder {
   color: #275680; /* 设置颜色 */

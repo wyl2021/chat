@@ -31,12 +31,19 @@
         </el-col>
       </el-row>
     </div>
-    <InfoDisplay v-if="answer"></InfoDisplay>
+    <InfoDisplay
+      v-if="answer"
+      :resizeHeight="resizeHeight"
+      :ques="answerText"
+    ></InfoDisplay>
     <div class="h-footer">
       <AIinput
         ref="aiInput"
+        :isTemplate="isTemplate"
         v-model="ctxVal"
         placeholder="输入您要撰写的主题"
+        @sendMsg="handleSendMsg"
+        @changeAnswer="changeAnswer"
       ></AIinput>
     </div>
   </div>
@@ -59,6 +66,9 @@ export default {
       ctxVal: "",
       tagActive: 0,
       answer: false,
+      answerText: "",
+      resizeHeight: 100,
+      isTemplate: false,
     };
   },
   mounted() {
@@ -80,7 +90,28 @@ export default {
           this.$refs.aiInput.isTab = true;
           this.$refs.aiInput.canSend = true;
           this.ctxVal = dom;
+          this.isTemplate = true;
         }
+      });
+    },
+    // 发送消息
+    handleSendMsg(val) {
+      this.answerText = val;
+      this.ctxVal = "";
+      this.$refs.aiInput.isTab = false;
+      this.$refs.aiInput.canSend = false;
+      this.isTemplate = false;
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
+      });
+    },
+    // 实时改变AI回答的高度
+    changeAnswer() {
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
       });
     },
   },
