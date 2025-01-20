@@ -35,7 +35,7 @@
       <div class="h-fi">
         <div class="h-f-lo">
           <span class="op-btn" v-if="leftIcon">
-            <img src="@/assets/images/input.png" />
+            <img src="https://www.swsai.com/style/dist/img/icon/Frame3.png" />
           </span>
         </div>
         <div class="h-f-ro">

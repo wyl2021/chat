@@ -9,7 +9,12 @@ export const Local = {
   // 获取永久缓存
   get (key) {
     let json = window.localStorage.getItem(key);
-    return JSON.parse(json);
+    try {
+      return JSON.parse(json); // 尝试解析 JSON
+    } catch (e) {
+      return json; // 如果解析失败，直接返回原始值
+    }
+    // return JSON.parse(json);
   },
   // 移除永久缓存
   remove (key) {

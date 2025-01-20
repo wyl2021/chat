@@ -11,10 +11,11 @@
           "
           v-if="!collose"
         >
-          <div class="logo">
+        <img class="logo-img" src="https://www.swsai.com/style/dist/img/icon/logo.png" />
+          <!-- <div class="logo">
             <img src="@/assets/images/logo.jpg" />
           </div>
-          <span style="font-size: 15px; font-weight: 500">硕为思ChatCar</span>
+          <span style="font-size: 15px; font-weight: 500">硕为思ChatCar</span> -->
         </div>
         <div style="cursor: pointer" @click="handleCollose">
           <span
@@ -92,20 +93,29 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 15px 13px;
-  .logo {
-    display: inline-block;
-    width: 26px;
-    height: 26px;
-    border-radius: 26px;
-    background: #212126;
+  .logo-img {
+      display: inline-block;
+    width: 177px;
+    height: 50px;
     overflow: hidden;
     text-align: center;
-    line-height: 26px;
-    margin-right: 10px;
-    img {
-      width: 100%;
+    line-height: 50px;
+    margin: auto;
     }
-  }
+  // .logo {
+  //   display: inline-block;
+  //   width: 26px;
+  //   height: 26px;
+  //   border-radius: 26px;
+  //   background: #212126;
+  //   overflow: hidden;
+  //   text-align: center;
+  //   line-height: 26px;
+  //   margin-right: 10px;
+  //   img {
+  //     width: 100%;
+  //   }
+  // }
 }
 .ly-body {
   width: 100%;

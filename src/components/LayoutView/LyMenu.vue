@@ -4,29 +4,38 @@
     class="el-menu-vertical-demo"
     @open="handleOpen"
     @close="handleClose"
+    @select="handleSelect"
     background-color="#000"
     text-color="#fff"
     active-text-color="#2f95eb"
     :collapse="isCollapse"
   >
     <el-menu-item index="/home">
-      <i class="el-icon-plus"></i>
+      <!-- <i class="el-icon-plus"></i> -->
+      <img class="icon-menu" :src="selectedIndex==='/home'?MenuIcon['ChatCar'].selectedImg:MenuIcon['ChatCar'].unselectedImg" />
       <span slot="title">ChatCar</span>
     </el-menu-item>
     <el-menu-item index="2">
-      <i class="el-icon-search"></i>
+      <!-- <i class="icon-search"  ></i> -->
+    <img class="icon-menu" :src="selectedIndex==='2'?MenuIcon['智能搜索'].selectedImg:MenuIcon['智能搜索'].unselectedImg" />
       <span slot="title">智能搜索</span>
     </el-menu-item>
     <el-menu-item index="/copyGeneration">
-      <i class="el-icon-news"></i>
+      <!-- <i class="el-icon-news"></i> -->
+      <img class="icon-menu" :src="selectedIndex==='/copyGeneration'?MenuIcon['文案生成'].selectedImg:MenuIcon['文案生成'].unselectedImg" />
+
       <span slot="title">文案生成</span>
     </el-menu-item>
     <el-menu-item index="4">
-      <i class="el-icon-picture-outline"></i>
+      <!-- <i class="el-icon-picture-outline"></i> -->
+      <img class="icon-menu" :src="selectedIndex==='4'?MenuIcon['图片生成'].selectedImg:MenuIcon['图片生成'].unselectedImg" />
+
       <span slot="title">图片生成</span>
     </el-menu-item>
     <el-menu-item index="5">
-      <i class="el-icon-video-play"></i>
+      <!-- <i class="el-icon-video-play"></i> -->
+      <img class="icon-menu" :src="selectedIndex==='5'?MenuIcon['视频生成'].selectedImg:MenuIcon['视频生成'].unselectedImg" />
+
       <span slot="title">视频生成</span>
     </el-menu-item>
     <el-submenu
@@ -34,7 +43,8 @@
       style="border-top: 1px solid #323232; border-bottom: 1px solid #323232"
     >
       <template slot="title">
-        <i class="el-icon-files"></i>
+        <!-- <i class="el-icon-files"></i> -->
+        <img class="icon-menu" :src="MenuIcon['最近生成'].unselectedImg" />
         <span>最近生成</span>
       </template>
       <el-menu-item index="6-1">
@@ -56,7 +66,8 @@
       </el-menu-item>
     </el-submenu>
     <el-menu-item index="7">
-      <i class="el-icon-star-off"></i>
+      <!-- <i class="el-icon-star-off"></i> -->
+      <img class="icon-menu" :src="selectedIndex==='7'?MenuIcon['收藏夹'].selectedImg:MenuIcon['收藏夹'].unselectedImg" />
       <span slot="title">收藏夹</span>
     </el-menu-item>
   </el-menu>
@@ -64,6 +75,7 @@
 
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
+import MenuIcon from "./LaMenuIcon";
 export default {
   props: {
     isCollapse: {
@@ -75,9 +87,16 @@ export default {
     TooltipTxt,
   },
   data() {
-    return {};
+    return {
+      MenuIcon,
+      selectedIndex:''
+    };
   },
   methods: {
+    handleSelect(index) {
+      this.selectedIndex=index
+
+    },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },
@@ -88,4 +107,15 @@ export default {
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.icon-menu{
+  // background-image:url('@/assets/images/search.svg'); ///url('https://www.swsai.com/style/dist/img/icon/Frame15_1.png'); /* 使用本地 SVG 图片 */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  margin-right:10px;
+}
+</style>
