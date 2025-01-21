@@ -2,7 +2,7 @@ import request from '@/utils/request.js'
 // 聊天模版
 
 // 聊天模版
-export const GetChatTempletV2 = () => {
+export const GetChatTempletList = () => {
   return request({
     method: 'post',
     action: 'GetChatTempletV2',

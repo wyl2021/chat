@@ -1,4 +1,5 @@
-export default [
+
+export default[
   {
     img: 'https://www.swsai.com/style/dist/img/icon/home1.png',
     label: '公关广告',

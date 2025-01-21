@@ -47,10 +47,10 @@
         <img class="icon-menu" :src="MenuIcon['最近生成'].unselectedImg" />
         <span>最近生成</span>
       </template>
-      <el-menu-item index="6-1">
-        <TooltipTxt text="奔驰s680" :len="10" color="#757575"></TooltipTxt>
+      <el-menu-item :index="`6-${index+1}`" v-for="(item,index) in recentlyChatList" :key="index">
+        <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
       </el-menu-item>
-      <el-menu-item index="6-2"
+      <!-- <el-menu-item index="6-2"
         ><TooltipTxt
           text="汽车洞察系统有什么令人舒适的"
           :len="10"
@@ -63,7 +63,7 @@
           :len="10"
           color="#757575"
         ></TooltipTxt>
-      </el-menu-item>
+      </el-menu-item> -->
     </el-submenu>
     <el-menu-item index="7">
       <!-- <i class="el-icon-star-off"></i> -->
@@ -76,6 +76,7 @@
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
+import {GetChatList} from "@/api/chat"
 export default {
   props: {
     isCollapse: {
@@ -89,16 +90,27 @@ export default {
   data() {
     return {
       MenuIcon,
-      selectedIndex:''
+      selectedIndex:'',
+      recentlyChatList:[],///最近生成列表
     };
   },
+ 
   methods: {
+    handleRecentlyChatList(){
+      GetChatList({pageIndex:1,pageSize:3,collect:0}).then((res)=>{
+        if(res.code===1){
+          this.recentlyChatList=res.data||[]
+        }else{
+          this.$message.error(res.msg)
+        }
+      })
+    },
     handleSelect(index) {
       this.selectedIndex=index
-
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
+      this.handleRecentlyChatList()
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);

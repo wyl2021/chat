@@ -57,6 +57,8 @@
 
 <script>
 import barArr from "./barArr";
+import { Session } from '@/utils/storage'
+import { CreateChatText } from "@/api/chat";
 export default {
   props: {
     leftIcon: {
@@ -82,6 +84,10 @@ export default {
     isTemplate: {
       type: Boolean,
       default: false,
+    },
+    templateId: {
+      type: Number,
+      default: 0,
     },
   },
   model: {
@@ -109,7 +115,7 @@ export default {
   },
   methods: {
     // 发送信息
-    sendMsg() {
+    async sendMsg() {
       if (!this.canSend) return;
       let str = "";
       if (this.isTab) {
@@ -123,7 +129,25 @@ export default {
       } else {
         ctx = str;
       }
-      this.$emit("sendMsg", ctx);
+      // 创建对话  只针对文本会话
+      const res = await CreateChatText({
+        sessionId: Session.get("sessionId") || "",
+        templetId: this.templateId,
+        data: [
+          {
+            type: "question",
+            role: "user",
+            content: ctx,
+          },
+        ],
+      });
+      if (res.code === 1) {
+        Session.set("sessionId", res.data.sessionId);
+        this.$emit("sendMsg", res.data);
+        // this.$emit("sendMsg", ctx);
+      } else {
+        this.$message.error(res.msg);
+      }
     },
     // 失去焦点的时候赋值
     handleBlur(name) {
