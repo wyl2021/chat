@@ -64,9 +64,14 @@ Vue.mixin({
             contents += innerText;
           }
         }
-
       });
-      return contents;
+      let str = ""
+      if (contents) {
+        str = contents;
+      } else {
+        str = htmlString.replace(/<[^>]*>/g, '');
+      }
+      return str;
     }
   }
 })

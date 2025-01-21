@@ -57,8 +57,6 @@
 
 <script>
 import barArr from "./barArr";
-import { Session } from '@/utils/storage'
-import { CreateChatText } from "@/api/chat";
 export default {
   props: {
     leftIcon: {
@@ -80,14 +78,6 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
-    },
-    isTemplate: {
-      type: Boolean,
-      default: false,
-    },
-    templateId: {
-      type: Number,
-      default: 0,
     },
   },
   model: {
@@ -123,30 +113,9 @@ export default {
       } else {
         str = this.$refs.ine.innerHTML;
       }
-      let ctx = "";
-      if (this.isTemplate) {
-        ctx = this.getHtmlContents(str);
-      } else {
-        ctx = str;
-      }
-      // 创建对话  只针对文本会话
-      const res = await CreateChatText({
-        sessionId: Session.get("sessionId") || "",
-        templetId: this.templateId,
-        data: [
-          {
-            type: "question",
-            role: "user",
-            content: ctx,
-          },
-        ],
-      });
-      if (res.code === 1) {
-        Session.set("sessionId", res.data.sessionId);
-        this.$emit("sendMsg", res.data);
-        // this.$emit("sendMsg", ctx);
-      } else {
-        this.$message.error(res.msg);
+      let ctx = this.getHtmlContents(str);
+      if (ctx) {
+        this.$emit("sendMsg", ctx);
       }
     },
     // 失去焦点的时候赋值
@@ -157,7 +126,7 @@ export default {
     // 实时判断是否换个输入框
     handleInput() {
       const val = this.$refs.ine.innerHTML;
-      const ctx = val.replace(/<[^>]+>/g, "");
+      const ctx = this.getHtmlContents(val);
       if (ctx) {
         this.canSend = true;
       } else {
@@ -175,9 +144,9 @@ export default {
       if (e.target != this.$refs.ine1) {
         e.target.setAttribute("txt", e.target.value);
       }
-
+      // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
-      const ctx = val.replace(/<[^>]+>/g, "");
+      const ctx = this.getHtmlContents(val);
       if (ctx) {
         this.canSend = true;
       } else {
@@ -190,7 +159,7 @@ export default {
       }
       this.changeAnswer();
     },
-    //
+    // 实时改变AI回答框高度
     changeAnswer() {
       this.$emit("changeAnswer");
     },

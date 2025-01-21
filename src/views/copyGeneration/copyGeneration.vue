@@ -25,7 +25,7 @@
         >
           <div class="h-ce-1" @click="handleChangeAiCtx(item)">
             <div class="h-ce-1-d2">
-              <img :src="item.icon"   />
+              <img :src="item.img" />
               <span class="label"> {{ item.title }}</span>
               <div class="desc">{{ item.note }}</div>
             </div>
@@ -41,12 +41,10 @@
     <div class="h-footer">
       <AIinput
         ref="aiInput"
-        :isTemplate="isTemplate"
         v-model="ctxVal"
         placeholder="输入您要撰写的主题"
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
-        :templateId="templateId"
       ></AIinput>
     </div>
   </div>
@@ -62,6 +60,13 @@ export default {
     AIinput,
     InfoDisplay,
   },
+  watch: {
+    ctxVal(val) {
+      if (!val) {
+        this.templateId = 0;
+      }
+    },
+  },
   data() {
     return {
       cgTag: [],
@@ -69,25 +74,33 @@ export default {
       ctxVal: "",
       tagActive: 0,
       answer: false,
-      answerText: "",
+      answerText: null,
       resizeHeight: 100,
-      isTemplate: false,
       templateInfo: null, ///页面传值
-      templateId: 0 // 模板 ID，可以根据需要动态设置
+      templateId: 0, // 模板 ID，可以根据需要动态设置
     };
   },
-  mounted() {
-    // this.handleCgTag(0);
-  },
+  mounted() {},
   async created() {
     await this.handleType();
     this.handleCgTag(0);
-    console.log(this.$route.query);
   },
   methods: {
+    // 发送消息
+    handleSendMsg(val) {
+      this.answerText = { templetId: this.templateId, txt: val };
+      this.$refs.aiInput.isTab = false;
+      this.$refs.aiInput.canSend = false;
+      this.ctxVal = "";
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
+      });
+    },
     handleImgError(event) {
       // 当图片加载失败时设置默认图片
-      event.target.src = require('@/assets/images/car.png');
+      event.target.src = require("@/assets/images/car.png");
     },
     // 按照类型
     async handleType() {
@@ -96,21 +109,33 @@ export default {
         this.$message.error("参数获取失败");
         return;
       }
-      const res = await GetChatTempletByType({ type: this.templateInfo.type });
-      if (res.code === 1) {
-        this.cgTag = res.data || [];
-      } else {
-        this.$message.error(res.msg);
+      try {
+        const res = await GetChatTempletByType({
+          type: this.templateInfo.type,
+        });
+        if (res.code === 1) {
+          const arr = res.data || [];
+          this.cgTag = arr;
+        } else {
+          this.$message.error(res.msg);
+        }
+      } catch (error) {
+        // TODO:
       }
-      console.log(this.cgTag);
     },
+    // 选择类型获取对应的内容
     handleCgTag(n) {
       this.tagActive = n;
       const row = this.cgTag[n];
-      this.ctxList = row.data || [];
+      const arr = row.data || [];
+      arr.forEach((ele) => {
+        ele.img = require("@/assets/images/icon_ctb.png"); // 图片路径
+      });
+      this.ctxList = arr;
     },
     // 获取模版
     handleChangeAiCtx(row) {
+      this.templateId = Number(row.id);
       // 获取 AI 文本
       GetChatTempletById({ id: row.id }).then((res) => {
         if (res.code === 1) {
@@ -119,25 +144,8 @@ export default {
           this.$refs.aiInput.isTab = true;
           this.$refs.aiInput.canSend = true;
           this.ctxVal = dom;
-          this.isTemplate = true;
-          this.templateId= Number(row.id)
         }
       });
-    },
-    // 发送消息
-    handleSendMsg(val) {
-      console.log(val)
-      // 获取创建对话参数
-      // this.answerText = val;
-      // this.ctxVal = "";
-      // this.$refs.aiInput.isTab = false;
-      // this.$refs.aiInput.canSend = false;
-      // this.isTemplate = false;
-      // this.$nextTick(() => {
-      //   const h = this.$refs.aiInput.$el.offsetHeight;
-      //   this.resizeHeight = h + 30;
-      //   this.answer = true;
-      // });
     },
     // 实时改变AI回答的高度
     changeAnswer() {

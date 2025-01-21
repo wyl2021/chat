@@ -1,4 +1,5 @@
 import request from '@/utils/request.js'
+
 // 聊天模版
 
 // 聊天模版
@@ -76,13 +77,14 @@ export const GetChatText = (data) => {
 }
 
 // 创建对话流式
-export const CreateChatTextStream = (data) => {
-  return request({
-    method: 'post',
-    action: 'CreateChatTextStream',
-    data
-  })
-}
+// export const CreateChatTextStream = (data) => {
+//   return requestAi({
+//     method: 'post',
+//     responseType: 'stream',
+//     action: 'CreateChatTextStream',
+//     data
+//   })
+// }
 
 // 创建图片对话
 export const CreateChatImg = (data) => {
