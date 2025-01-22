@@ -37,6 +37,7 @@
       v-if="answer"
       :resizeHeight="resizeHeight"
       :ques="answerText"
+      @close="answer = false"
     ></InfoDisplay>
     <div class="h-footer">
       <AIinput

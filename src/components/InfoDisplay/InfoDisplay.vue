@@ -4,13 +4,25 @@
       <TooltipTxt :text="ques?.txt" :len="298"></TooltipTxt>
     </div>
     <div class="d-c-body" ref="dcb">
+      <pre>{{ result }}</pre>
       <LoadingView v-if="loading"></LoadingView>
-      <pre v-else>
-        {{ result }}
-      </pre>
     </div>
     <div class="d-c-footer" v-if="fShow">
-      <span class="el-icon-delete"></span>
+      <el-tooltip class="item" effect="dark" content="复制" placement="top">
+        <span class="dfs">
+          <img src="@/assets/images/copy.png" />
+        </span>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+        <span class="dfs">
+          <img src="@/assets/images/collect.png" />
+        </span>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="删除" placement="top">
+        <span class="dfs" @click="handleDel">
+          <img src="@/assets/images/del.png" />
+        </span>
+      </el-tooltip>
     </div>
   </div>
 </template>
@@ -47,16 +59,23 @@ export default {
     // 问题参数
     ques: {
       handler(val) {
-        console.log(val);
-        if (!val) return
+        if (!val) return;
         this.$nextTick(() => {
           const h1 = this.$refs.dch.offsetHeight;
           this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
+          this.result = "";
           this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
         });
       },
       immediate: true,
       deep: true,
+    },
+    result: {
+      handler(val) {
+        if (val) {
+          this.fShow = true;
+        }
+      },
     },
   },
   data() {
@@ -65,6 +84,7 @@ export default {
       fShow: false,
       loading: false,
       result: "",
+      isDel: true,
     };
   },
   mounted() {},
@@ -74,7 +94,7 @@ export default {
       // 创建对话  只针对文本会话
       const url = "http://www.swsai.com:5003/api/v1";
       this.loading = true; // 标记正在加载
-
+      this.isDel = false;
       try {
         const response = await fetch(url, {
           method: "POST",
@@ -108,23 +128,22 @@ export default {
           const { done, value } = await reader.read();
           if (done) break;
           chunk += decoder.decode(value, { stream: true });
-          console.log("chunk", chunk);
           // 检查流结束标志
           if (chunk.endsWith("[DONE]")) {
+            this.isDel = true;
             chunk = chunk.replace("[DONE]", ""); // 移除结束标志
             this.loading = false; // 关闭加载状态
           }
-            // 尝试逐块解析 JSON
-            let boundary = chunk.indexOf("}{");
-            console.log(boundary, chunk);
-            while (boundary !== -1) {
-              const jsonChunk = chunk.slice(0, boundary + 1);
-              this.processJsonChunk(jsonChunk);
+          // 尝试逐块解析 JSON
+          let boundary = chunk.indexOf("}{");
+          while (boundary !== -1) {
+            const jsonChunk = chunk.slice(0, boundary + 1);
+            this.processJsonChunk(jsonChunk);
 
-              // 更新 chunk，移除已解析部分
-              chunk = chunk.slice(boundary + 1);
-              boundary = chunk.indexOf("}{");
-            }
+            // 更新 chunk，移除已解析部分
+            chunk = chunk.slice(boundary + 1);
+            boundary = chunk.indexOf("}{");
+          }
           // 尝试解析剩余的完整 JSON
           try {
             const jsonChunk = JSON.parse(chunk);
@@ -141,6 +160,7 @@ export default {
         console.error("Error:", error);
         this.$message.error("请求失败，请稍后重试！");
         this.loading = false;
+        this.isDel = true; // 标记删除状态
       }
     },
     // 处理解析后的 JSON 数据
@@ -152,7 +172,6 @@ export default {
         if (chunk.code === 1) {
           const content = chunk?.data?.data?.content || "";
           this.result += content; // 拼接内容
-          console.log(this.result);
           Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
         } else if (chunk.code === 0) {
           this.$message.error("请求失败：" + chunk.msg);
@@ -162,6 +181,13 @@ export default {
       } catch (err) {
         console.error("处理 JSON 块出错:", err);
       }
+    },
+    // 删除
+    handleDel() {
+      if (!this.isDel) return;
+      this.result = "";
+      this.fShow = false;
+      this.$emit("close");
     },
   },
 };
@@ -191,10 +217,23 @@ export default {
   white-space: pre-wrap;
   word-break: break-all;
   overflow-y: auto;
+  pre {
+    width: 100%;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    padding: 10px 0px 0px 0px;
+    margin-bottom: 10px;
+    color: #9fa2a6;
+  }
 }
 .d-c-footer {
-  span {
-    font-size: 15px;
+  .dfs {
+    display: inline-block;
+    margin-right: 7px;
+    cursor: pointer;
+    img {
+      width: 20px;
+    }
   }
 }
 </style>
