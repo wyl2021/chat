@@ -1,32 +1,6 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
-    <div  v-for="(message, index) in messages" :key="index">
-      <div class="d-c-header" ref="dch">
-      <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
-    </div>
-    <div class="d-c-body" ref="dcb">
-      <pre>{{ message.answer }}</pre>
-      <LoadingView v-if="loading && index === messages.length - 1"></LoadingView>
-    </div>
-    <div class="d-c-footer" v-if="fShow">
-      <el-tooltip class="item" effect="dark" content="复制" placement="top">
-        <span class="dfs" @click="handleCopy(message.answer)">
-          <img src="@/assets/images/copy.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="收藏" placement="top">
-        <span class="dfs" @click="handleCollect">
-          <img src="@/assets/images/collect.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="删除" placement="top">
-        <span class="dfs" @click="handleDel(message)">
-          <img src="@/assets/images/del.png" />
-        </span>
-      </el-tooltip>
-    </div>
-      </div>
-    <!-- <div class="d-c-header" ref="dch">
+    <div class="d-c-header" ref="dch">
       <TooltipTxt :text="ques?.txt" :len="298"></TooltipTxt>
     </div>
     <div class="d-c-body" ref="dcb">
@@ -49,7 +23,7 @@
           <img src="@/assets/images/del.png" />
         </span>
       </el-tooltip>
-    </div> -->
+    </div>
   </div>
 </template>
 <script>
@@ -87,14 +61,9 @@ export default {
     ques: {
       handler(val) {
         if (!val) return;
-        this.$nextTick(() => {
-          this.messages.push({
-            question: val?.txt,
-            answer: "", // AI 回复初始化为空
-          })
-          
-          // const h1 = this.$refs.dch.offsetHeight;
-          // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
+        this.$nextTick(() => {   
+          const h1 = this.$refs.dch.offsetHeight;
+          this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
           this.result = "";
           this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
         });
@@ -117,7 +86,7 @@ export default {
       loading: false,
       result: "",
       isDel: true,
-      messages:[]
+
     };
   },
   mounted() {},
@@ -128,7 +97,6 @@ export default {
       const url = "http://www.swsai.com:5003/api/v1";
       this.loading = true; // 标记正在加载
       this.isDel = false;
-      const currentIndex = this.messages.length - 1; // 当前消息索引
       try {
         const response = await fetch(url, {
           method: "POST",
@@ -188,8 +156,6 @@ export default {
             // 如果解析失败，保留 chunk 继续累加数据
           }
         }
-        this.$set(this.messages[currentIndex], "answer", this.result);
-        this.scrollToBottom()
         this.loading = false; // 完成后关闭加载状态
         // $("#result").append(result + "\n");
       } catch (error) {
@@ -219,11 +185,6 @@ export default {
       } catch (err) {
         console.error("处理 JSON 块出错:", err);
       }
-    },
-    // 滚动到页面底部
-    scrollToBottom(){
-      const container=this.$refs.answerRef;
-      container.scrollTop=container.scrollHeight;
     },
     // 删除
     handleDel() {
