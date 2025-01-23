@@ -9,12 +9,12 @@
     </div>
     <div class="d-c-footer" v-if="fShow">
       <el-tooltip class="item" effect="dark" content="复制" placement="top">
-        <span class="dfs">
+        <span class="dfs" @click="handleCopy">
           <img src="@/assets/images/copy.png" />
         </span>
       </el-tooltip>
       <el-tooltip class="item" effect="dark" content="收藏" placement="top">
-        <span class="dfs">
+        <span class="dfs" @click="handleCollect">
           <img src="@/assets/images/collect.png" />
         </span>
       </el-tooltip>
@@ -30,6 +30,7 @@
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
+import { SaveChatCollect } from "@/api/chat";
 export default {
   components: {
     TooltipTxt,
@@ -188,6 +189,23 @@ export default {
       this.result = "";
       this.fShow = false;
       this.$emit("close");
+    },
+    // 复制
+    async handleCopy() {
+      await navigator.clipboard.writeText(this.result);
+      this.$message.success("复制成功");
+    },
+    // 收藏
+    async handleCollect() {
+      const res = await SaveChatCollect({
+        sessionId: Session.get("sessionId"),
+        collect: 1,
+      });
+      if (res.code === 1) {
+        this.$message.success("收藏成功");
+      } else {
+        this.$message.error(res.msg);
+      }
     },
   },
 };

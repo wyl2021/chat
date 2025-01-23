@@ -65,9 +65,9 @@
         ></TooltipTxt>
       </el-menu-item> -->
     </el-submenu>
-    <el-menu-item index="7">
+    <el-menu-item index="/collectView">
       <!-- <i class="el-icon-star-off"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='7'?MenuIcon['收藏夹'].selectedImg:MenuIcon['收藏夹'].unselectedImg" />
+      <img class="icon-menu" :src="selectedIndex==='/collectView'?MenuIcon['收藏夹'].selectedImg:MenuIcon['收藏夹'].unselectedImg" />
       <span slot="title">收藏夹</span>
     </el-menu-item>
   </el-menu>
@@ -107,7 +107,8 @@ export default {
     },
     handleSelect(index) {
       this.selectedIndex=index
-    },
+      this.$router.push(index)
+      },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
       this.handleRecentlyChatList()

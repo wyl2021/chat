@@ -1,0 +1,194 @@
+/* 为所有WebKit浏览器添加自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 7px;
+  /* 设置滚动条的宽度 */
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* 滚动条轨道的背景颜色 */
+  border-radius: 8px;
+  /* 轨道圆角 */
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  /* 滚动条实际可拖动部分的颜色 */
+  border-radius: 8px;
+  /* 轨道圆角 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* 鼠标悬浮时滚动条的颜色 */
+}
+img {
+  user-select: none;
+  pointer-events: none;
+}
+pre {
+  margin: 0px;
+}
+.inputTs {
+  display: inline-block;
+  background-color: #242d3b;
+  outline: none;
+  border-style: none;
+  padding: 2px 5px;
+  color: #fff;
+  border-radius: 8px;
+  margin: 0 5px;
+  background-clip: border-box;
+}
+.inputTs::placeholder {
+  color: #275680;
+  /* 设置颜色 */
+}
+.h-container {
+  position: relative;
+  width: 70%;
+  min-width: 460px;
+  max-width: 800px;
+  height: calc(99%);
+  margin: 0 auto;
+  border-top: 1px solid transparent;
+}
+.h-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 0px;
+  width: 100%;
+}
+.h-t-1 {
+  font-size: 17px;
+  font-weight: 550;
+  letter-spacing: 2px;
+}
+.h-t-2 {
+  font-size: 17px;
+  font-weight: 550;
+  margin-top: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.h-t-3 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 14px;
+}
+.h-t-3 img {
+  width: 18px;
+  margin-right: 10px;
+}
+.h-c-tag {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+.h-c-tag .tag {
+  padding: 0px 13px;
+  font-size: 13px;
+  height: 30px;
+  line-height: 30px;
+  margin-right: 10px;
+  border: 1px solid #333335;
+  border-radius: 30px;
+  cursor: pointer;
+}
+.h-c-tag .tag-active {
+  background: #2f95eb;
+  color: #fff;
+}
+.h-ce-1 {
+  border: 1px solid #3b3b3d;
+  padding: 10px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.h-ce-1-d1 {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.h-ce-1-d1 img {
+  width: 16px;
+}
+.h-ce-1-d1 .label {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 10px;
+}
+.h-ce-1-d2 {
+  margin-bottom: 7px;
+}
+.h-ce-1-d2 img {
+  display: block;
+  width: 18px;
+}
+.h-ce-1-d2 .label {
+  display: block;
+  font-size: 14px;
+  margin-top: 5px;
+}
+.h-ce-1-d2 .desc {
+  width: 100%;
+  color: #757575;
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
+  text-overflow: ellipsis;
+  /* 使用省略号 */
+  font-size: 13px;
+  margin-top: 30px;
+}
+.h-ce-1-m {
+  color: #757575;
+  font-size: 13px;
+  padding-left: 28px;
+}
+.h-c-collect {
+  background: #1B1B1D;
+  border: 1px solid #454545;
+  border-radius: 10px;
+  padding: 10px 13px;
+}
+.h-c-collect .remark {
+  width: 100%;
+  color: #757575;
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
+  text-overflow: ellipsis;
+  /* 使用省略号 */
+  font-size: 13px;
+}
+.h-c-collect .templetName {
+  background: #2C2B32;
+  border-radius: 3px;
+  padding: 3px;
+  color: #EEEEEE;
+  font-size: 10px;
+  width: fit-content;
+  margin: 5px 0;
+}
+.h-c-collect .h-c-collect-d {
+  height: 104px;
+}
+.h-c-collect .h-c-collect-d .content {
+  color: linear-gradient(180deg, #EEEEEE 0%, rgba(238, 238, 238, 0) 100%);
+  font-size: 8px;
+  text-align: justify;
+  overflow: hidden;
+  /* 隐藏溢出内容 */
+  text-overflow: ellipsis;
+  /* 使用省略号 */
+}
+.h-c-collect .h-c-collect-d img {
+  width: 100px;
+  height: 100px;
+}
+.h-c-collect .h-c-collect-d video {
+  width: 100px;
+  height: 100px;
+}

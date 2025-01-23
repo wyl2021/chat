@@ -8,5 +8,10 @@ export default [
     path: '/copyGeneration',
     name: 'copyGeneration',
     component: () => import('@/views/copyGeneration/copyGeneration.vue')
+  },
+  {
+    path: '/collectView',
+    name: 'collectView',
+    component: () => import('@/views/collectView/collectView.vue')
   }
 ]
