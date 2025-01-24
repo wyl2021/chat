@@ -2,7 +2,7 @@
   <div class="h-container">
     <div style="width: 100%">
       <div class="h-t-1" style="margin-top: 100px">
-        你好，{{ store.getters.getUserInfo.user_name || "-" }}
+        你好，{{ getUserInfo.user_name || "-" }}
       </div>
       <div class="h-t-2">需要我怎么帮你呢？</div>
       <el-row :gutter="10">
@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       store,
-      advertisementMenu:[],
+      advertisementMenu: [],
       val: "",
     };
   },
@@ -72,7 +72,7 @@ export default {
         query: {
           title: item.title || "-",
           note: item.note || "-",
-          type: item.type ,
+          type: item.type,
         },
       });
     },

@@ -1,31 +1,33 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
-    <div  v-for="(message, index) in messages" :key="index">
+    <div v-for="(message, index) in messages" :key="index">
       <div class="d-c-header" ref="dch">
-      <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
-    </div>
-    <div class="d-c-body" ref="dcb">
-      <pre>{{ message.answer }}</pre>
-      <LoadingView v-if="loading && index === messages.length - 1"></LoadingView>
-    </div>
-    <div class="d-c-footer" v-if="fShow">
-      <el-tooltip class="item" effect="dark" content="复制" placement="top">
-        <span class="dfs" @click="handleCopy(message.answer)">
-          <img src="@/assets/images/copy.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="收藏" placement="top">
-        <span class="dfs" @click="handleCollect">
-          <img src="@/assets/images/collect.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="删除" placement="top">
-        <span class="dfs" @click="handleDel(message)">
-          <img src="@/assets/images/del.png" />
-        </span>
-      </el-tooltip>
-    </div>
+        <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
       </div>
+      <div class="d-c-body" ref="dcb">
+        <pre>{{ message.answer }}</pre>
+        <LoadingView
+          v-if="loading && index === messages.length - 1"
+        ></LoadingView>
+      </div>
+      <div class="d-c-footer" v-if="fShow">
+        <el-tooltip class="item" effect="dark" content="复制" placement="top">
+          <span class="dfs" @click="handleCopy(message.answer)">
+            <img src="@/assets/images/copy.png" />
+          </span>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+          <span class="dfs" @click="handleCollect">
+            <img src="@/assets/images/collect.png" />
+          </span>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="删除" placement="top">
+          <span class="dfs" @click="handleDel(message)">
+            <img src="@/assets/images/del.png" />
+          </span>
+        </el-tooltip>
+      </div>
+    </div>
     <!-- <div class="d-c-header" ref="dch">
       <TooltipTxt :text="ques?.txt" :len="298"></TooltipTxt>
     </div>
@@ -91,8 +93,8 @@ export default {
           this.messages.push({
             question: val?.txt,
             answer: "", // AI 回复初始化为空
-          })
-          
+          });
+
           // const h1 = this.$refs.dch.offsetHeight;
           // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
           this.result = "";
@@ -117,7 +119,7 @@ export default {
       loading: false,
       result: "",
       isDel: true,
-      messages:[]
+      messages: [],
     };
   },
   mounted() {},
@@ -157,7 +159,7 @@ export default {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let chunk = "";
-       
+
         /* eslint-disable */
         while (true) {
           const { done, value } = await reader.read();
@@ -189,7 +191,7 @@ export default {
           }
         }
         this.$set(this.messages[currentIndex], "answer", this.result);
-        this.scrollToBottom()
+        this.scrollToBottom();
         this.loading = false; // 完成后关闭加载状态
         // $("#result").append(result + "\n");
       } catch (error) {
@@ -202,13 +204,12 @@ export default {
     // 处理解析后的 JSON 数据
     processJsonChunk(chunk) {
       try {
-       
         if (typeof chunk === "string") {
           chunk = JSON.parse(chunk); // 确保是 JSON 对象
         }
         if (chunk.code === 1) {
           const content = chunk?.data?.data?.content || "";
-           // 更新当前消息的 AI 回复内容
+          // 更新当前消息的 AI 回复内容
           this.result += content; // 拼接内容
           Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
         } else if (chunk.code === 0) {
@@ -221,9 +222,9 @@ export default {
       }
     },
     // 滚动到页面底部
-    scrollToBottom(){
-      const container=this.$refs.answerRef;
-      container.scrollTop=container.scrollHeight;
+    scrollToBottom() {
+      const container = this.$refs.answerRef;
+      container.scrollTop = container.scrollHeight;
     },
     // 删除
     handleDel() {

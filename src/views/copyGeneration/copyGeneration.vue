@@ -1,16 +1,23 @@
 <template>
   <div class="h-container">
-    <div style="width: 100%">
+    <div
+      style="
+        width: 100%;
+        height: calc(100% - 80px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      "
+    >
       <div class="h-t-3">
-        <img src="@/assets/images/icon_13.png" />{{ templateInfo.title }}
+        <img src="@/assets/images/icon_13.png" />{{ title }}
       </div>
-      <div class="h-t-2">{{ templateInfo.note }}</div>
+      <div class="h-t-2">{{ note }}</div>
       <div class="h-c-tag">
         <div
           v-for="(item, index) in cgTag"
           :key="index"
           class="tag"
-          :class="tagActive === index ? 'tag-active' : ''"
+          :class="activeIndex === index ? 'tag-active' : ''"
           @click="handleCgTag(index)"
         >
           {{ item.title }}
@@ -68,22 +75,29 @@ export default {
       }
     },
   },
+
   data() {
     return {
+      type: "公关广告",
+      title: "公关广告",
       cgTag: [],
       ctxList: [],
       ctxVal: "",
-      tagActive: 0,
       answer: false,
       answerText: null,
       resizeHeight: 100,
-      templateInfo: null, ///页面传值
       templateId: 0, // 模板 ID，可以根据需要动态设置
+      note: "多种类型创作，一键成文",
+      activeIndex: 0,
     };
   },
   mounted() {},
   async created() {
-    await this.handleType();
+    const { type, note, title } = this.$route.query;
+    this.type = type || this.type;
+    this.note = note || this.note;
+    this.title = title || this.title;
+    await this.getList();
     this.handleCgTag(0);
   },
   methods: {
@@ -103,16 +117,11 @@ export default {
       // 当图片加载失败时设置默认图片
       event.target.src = require("@/assets/images/car.png");
     },
-    // 按照类型
-    async handleType() {
-      this.templateInfo = this.$route.query;
-      if (!this.templateInfo.type) {
-        this.$message.error("参数获取失败");
-        return;
-      }
+    // 获取内容list
+    async getList() {
       try {
         const res = await GetChatTempletByType({
-          type: this.templateInfo.type,
+          type: this.type,
         });
         if (res.code === 1) {
           const arr = res.data || [];
@@ -126,13 +135,15 @@ export default {
     },
     // 选择类型获取对应的内容
     handleCgTag(n) {
-      this.tagActive = n;
+      this.activeIndex = n;
       const row = this.cgTag[n];
-      const arr = row.data || [];
-      arr.forEach((ele) => {
-        ele.img = require("@/assets/images/icon_ctb.png"); // 图片路径
-      });
-      this.ctxList = arr;
+      if (row) {
+        const arr = row.data || [];
+        arr.forEach((ele) => {
+          ele.img = require("@/assets/images/icon_ctb.png"); // 图片路径
+        });
+        this.ctxList = arr;
+      }
     },
     // 获取模版
     handleChangeAiCtx(row) {

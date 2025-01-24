@@ -12,29 +12,64 @@
   >
     <el-menu-item index="/home">
       <!-- <i class="el-icon-plus"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='/home'?MenuIcon['ChatCar'].selectedImg:MenuIcon['ChatCar'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '/home'
+            ? MenuIcon['ChatCar'].selectedImg
+            : MenuIcon['ChatCar'].unselectedImg
+        "
+      />
       <span slot="title">ChatCar</span>
     </el-menu-item>
-    <el-menu-item index="2">
+    <el-menu-item index="/intelligentSearch">
       <!-- <i class="icon-search"  ></i> -->
-    <img class="icon-menu" :src="selectedIndex==='2'?MenuIcon['智能搜索'].selectedImg:MenuIcon['智能搜索'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '/intelligentSearch'
+            ? MenuIcon['智能搜索'].selectedImg
+            : MenuIcon['智能搜索'].unselectedImg
+        "
+      />
       <span slot="title">智能搜索</span>
     </el-menu-item>
     <el-menu-item index="/copyGeneration">
       <!-- <i class="el-icon-news"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='/copyGeneration'?MenuIcon['文案生成'].selectedImg:MenuIcon['文案生成'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '/copyGeneration'
+            ? MenuIcon['文案生成'].selectedImg
+            : MenuIcon['文案生成'].unselectedImg
+        "
+      />
 
       <span slot="title">文案生成</span>
     </el-menu-item>
     <el-menu-item index="4">
       <!-- <i class="el-icon-picture-outline"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='4'?MenuIcon['图片生成'].selectedImg:MenuIcon['图片生成'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '4'
+            ? MenuIcon['图片生成'].selectedImg
+            : MenuIcon['图片生成'].unselectedImg
+        "
+      />
 
       <span slot="title">图片生成</span>
     </el-menu-item>
     <el-menu-item index="5">
       <!-- <i class="el-icon-video-play"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='5'?MenuIcon['视频生成'].selectedImg:MenuIcon['视频生成'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '5'
+            ? MenuIcon['视频生成'].selectedImg
+            : MenuIcon['视频生成'].unselectedImg
+        "
+      />
 
       <span slot="title">视频生成</span>
     </el-menu-item>
@@ -47,7 +82,11 @@
         <img class="icon-menu" :src="MenuIcon['最近生成'].unselectedImg" />
         <span>最近生成</span>
       </template>
-      <el-menu-item :index="`6-${index+1}`" v-for="(item,index) in recentlyChatList" :key="index">
+      <el-menu-item
+        :index="`6-${index + 1}`"
+        v-for="(item, index) in recentlyChatList"
+        :key="index"
+      >
         <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
       </el-menu-item>
       <!-- <el-menu-item index="6-2"
@@ -67,7 +106,14 @@
     </el-submenu>
     <el-menu-item index="/collectView">
       <!-- <i class="el-icon-star-off"></i> -->
-      <img class="icon-menu" :src="selectedIndex==='/collectView'?MenuIcon['收藏夹'].selectedImg:MenuIcon['收藏夹'].unselectedImg" />
+      <img
+        class="icon-menu"
+        :src="
+          selectedIndex === '/collectView'
+            ? MenuIcon['收藏夹'].selectedImg
+            : MenuIcon['收藏夹'].unselectedImg
+        "
+      />
       <span slot="title">收藏夹</span>
     </el-menu-item>
   </el-menu>
@@ -76,7 +122,7 @@
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
-import {GetChatList} from "@/api/chat"
+import { GetChatList } from "@/api/chat";
 export default {
   props: {
     isCollapse: {
@@ -90,28 +136,28 @@ export default {
   data() {
     return {
       MenuIcon,
-      selectedIndex:'',
-      recentlyChatList:[],///最近生成列表
+      selectedIndex: "",
+      recentlyChatList: [], ///最近生成列表
     };
   },
- 
+
   methods: {
-    handleRecentlyChatList(){
-      GetChatList({pageIndex:1,pageSize:3,collect:0}).then((res)=>{
-        if(res.code===1){
-          this.recentlyChatList=res.data||[]
-        }else{
-          this.$message.error(res.msg)
+    handleRecentlyChatList() {
+      GetChatList({ pageIndex: 1, pageSize: 3, collect: 0 }).then((res) => {
+        if (res.code === 1) {
+          this.recentlyChatList = res.data || [];
+        } else {
+          this.$message.error(res.msg);
         }
-      })
+      });
     },
     handleSelect(index) {
-      this.selectedIndex=index
-      this.$router.push(index)
-      },
+      this.selectedIndex = index;
+      this.$router.push(index);
+    },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
-      this.handleRecentlyChatList()
+      this.handleRecentlyChatList();
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
@@ -121,7 +167,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.icon-menu{
+.icon-menu {
   // background-image:url('@/assets/images/search.svg'); ///url('https://www.swsai.com/style/dist/img/icon/Frame15_1.png'); /* 使用本地 SVG 图片 */
   background-size: contain;
   background-repeat: no-repeat;
@@ -129,6 +175,6 @@ export default {
   width: 18px;
   height: 18px;
   display: inline-block;
-  margin-right:10px;
+  margin-right: 10px;
 }
 </style>

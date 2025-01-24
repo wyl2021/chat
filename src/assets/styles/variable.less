@@ -90,6 +90,7 @@ pre {
 .h-c-tag {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
   margin-bottom: 15px;
   .tag {
     padding: 0px 13px;
@@ -97,6 +98,7 @@ pre {
     height: 30px;
     line-height: 30px;
     margin-right: 10px;
+    margin-top: 10px;
     border: 1px solid #333335;
     border-radius: 30px;
     cursor: pointer;
@@ -153,10 +155,9 @@ pre {
   padding-left: 28px;
 }
 
-
 // 收藏模版样式
 .h-c-collect {
-  background: #1B1B1D;
+  background: #1b1b1d;
   border: 1px solid #454545;
   border-radius: 10px;
   padding: 10px 13px;
@@ -168,32 +169,31 @@ pre {
     text-overflow: ellipsis; /* 使用省略号 */
     font-size: 13px;
   }
-  .templetName{
-    background:#2C2B32;
+  .templetName {
+    background: #2c2b32;
     border-radius: 3px;
     padding: 3px;
-    color:#EEEEEE;
+    color: #eeeeee;
     font-size: 10px;
     width: fit-content;
     margin: 5px 0;
   }
-  .h-c-collect-d{
+  .h-c-collect-d {
     height: 104px;
-    .content{
-      color: linear-gradient( 180deg, #EEEEEE 0%, rgba(238,238,238,0) 100%);
+    .content {
+      color: linear-gradient(180deg, #eeeeee 0%, rgba(238, 238, 238, 0) 100%);
       font-size: 8px;
       text-align: justify;
       overflow: hidden; /* 隐藏溢出内容 */
       text-overflow: ellipsis; /* 使用省略号 */
     }
-    img{
+    img {
       width: 100px;
       height: 100px;
     }
-    video{
+    video {
       width: 100px;
       height: 100px;
     }
   }
- 
 }

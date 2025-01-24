@@ -9,9 +9,8 @@
             overflow: auto;
             white-space: pre-wrap;
           "
+          >{{ text }}</pre
         >
-          {{ text }}
-        </pre>
       </template>
       <span :style="{ color: color }">{{ value }}</span>
     </el-tooltip>

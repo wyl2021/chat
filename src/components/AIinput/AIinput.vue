@@ -228,6 +228,7 @@ export default {
   border: 1px solid #333335;
   border-radius: 15px;
   padding: 10px 13px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
   .h-fi {
     display: flex;
     height: 26px;
@@ -279,6 +280,7 @@ export default {
   line-height: 1.2;
   max-height: 200px;
   overflow-y: auto;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 .h-f-input1:empty:before {
   content: attr(placeholder);
