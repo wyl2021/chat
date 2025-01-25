@@ -4,10 +4,12 @@
       <div class="is-h-d1">
         <img
           class="is-h-d1-m1"
-          src="https://www.swsai.com/style/dist/img/icon/Frame15_2.png"
-        /><span class="is-h-d1-s1">智能搜索</span>
+          src="https://www.swsai.com/style/dist/img/icon/Frame13_1.png"
+        /><span class="is-h-d1-s1">图片生成</span>
       </div>
-      <div style="text-align: center; font-size: 18px">汽车领域全能专家</div>
+      <div style="text-align: center; font-size: 18px">
+        AI绘画，模型创建，图生图
+      </div>
     </div>
     <InfoDisplay
       v-if="answer"
@@ -19,7 +21,8 @@
       <AIinput
         ref="aiInput"
         v-model="ctxVal"
-        placeholder="请输入您的问题，限3000字"
+        placeholder="描述你所想象的画面，角色，情绪，场景，风格..."
+        pic
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
       ></AIinput>

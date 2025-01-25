@@ -15,6 +15,11 @@ export default [
     component: () => import('@/views/intelligentSearch/intelligentSearch.vue')
   },
   {
+    path: '/imageGeneration',
+    name: 'imageGeneration',
+    component: () => import('@/views/imageGeneration/imageGeneration.vue')
+  },
+  {
     path: '/collectView',
     name: 'collectView',
     component: () => import('@/views/collectView/collectView.vue')

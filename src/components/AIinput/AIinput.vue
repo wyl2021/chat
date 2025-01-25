@@ -79,6 +79,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    pic: {
+      type: Boolean,
+      default: false,
+    },
   },
   model: {
     prop: "modelValue",
@@ -91,6 +95,16 @@ export default {
       },
       immediate: true,
     },
+    pic: {
+      handler(val) {
+        if (val) {
+          this.isTab = true;
+        } else {
+          this.isTab = false;
+        }
+      },
+      immediate: true,
+    },
   },
   data() {
     return {
@@ -100,7 +114,7 @@ export default {
       isSecond: false,
       secTop: 0,
       canSend: false,
-      xh: 17,
+      xh: 23,
     };
   },
   methods: {
@@ -131,6 +145,7 @@ export default {
         this.canSend = true;
       } else {
         this.canSend = false;
+        this.$refs.ine.innerText = "";
       }
       const h = this.$refs.ine.offsetHeight;
       if (h > this.xh && !this.isSecond) {
@@ -151,10 +166,11 @@ export default {
         this.canSend = true;
       } else {
         this.canSend = false;
+        this.$refs.ine1.innerText = "";
         this.isSecond = false;
       }
       const h = this.$refs.ine1.offsetHeight;
-      if (h <= this.xh && !this.isSecond) {
+      if (h <= this.xh && !this.isSecond && !this.pic) {
         this.isTab = false;
       }
       this.changeAnswer();
@@ -278,9 +294,10 @@ export default {
   font-size: 14px;
   margin-bottom: 7px;
   line-height: 1.2;
+  padding: 3px 0px;
+  height: auto;
   max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
 }
 .h-f-input1:empty:before {
   content: attr(placeholder);

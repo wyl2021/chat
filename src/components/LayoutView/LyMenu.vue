@@ -47,12 +47,12 @@
 
       <span slot="title">文案生成</span>
     </el-menu-item>
-    <el-menu-item index="4">
+    <el-menu-item index="/imageGeneration">
       <!-- <i class="el-icon-picture-outline"></i> -->
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '4'
+          selectedIndex === '/imageGeneration'
             ? MenuIcon['图片生成'].selectedImg
             : MenuIcon['图片生成'].unselectedImg
         "
