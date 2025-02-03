@@ -1,9 +1,32 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
+    <div style="display: flex; justify-content: flex-end">
+      <el-button
+        size="mini"
+        type="text"
+        icon="el-icon-arrow-left"
+        @click="handleBack"
+        >返回</el-button
+      >
+    </div>
     <div v-for="(message, index) in messages" :key="index">
-      <div class="d-c-header" ref="dch">
-        <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
+      <!--图片区域--->
+      <div style="display: flex; justify-content: flex-end; flex-wrap: wrap">
+        <div
+          class="d-c-pic"
+          v-for="(item, index) in message.imgList"
+          :key="index"
+        >
+          <img :src="item" />
+        </div>
       </div>
+      <!---文字区域-->
+      <div style="display: flex; justify-content: flex-end">
+        <div class="d-c-header" ref="dch">
+          <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
+        </div>
+      </div>
+      <!---回答区域-->
       <div class="d-c-body" ref="dcb">
         <pre>{{ message.answer }}</pre>
         <LoadingView
@@ -93,6 +116,7 @@ export default {
           this.messages.push({
             question: val?.txt,
             answer: "", // AI 回复初始化为空
+            imgList: val.imgList,
           });
 
           // const h1 = this.$refs.dch.offsetHeight;
@@ -226,6 +250,12 @@ export default {
       const container = this.$refs.answerRef;
       container.scrollTop = container.scrollHeight;
     },
+    // 返回
+    handleBack() {
+      this.result = "";
+      this.fShow = false;
+      this.$emit("close");
+    },
     // 删除
     handleDel() {
       if (!this.isDel) return;
@@ -297,6 +327,13 @@ export default {
     img {
       width: 20px;
     }
+  }
+}
+.d-c-pic {
+  margin-left: 7px;
+  margin-bottom: 5px;
+  img {
+    height: 110px;
   }
 }
 </style>

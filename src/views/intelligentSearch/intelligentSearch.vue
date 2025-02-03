@@ -48,7 +48,7 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
-      this.answerText = { templetId: 0, txt: val };
+      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";
       this.$nextTick(() => {

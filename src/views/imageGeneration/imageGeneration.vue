@@ -51,9 +51,10 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
-      this.answerText = { templetId: 0, txt: val };
+      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
       this.$refs.aiInput.canSend = false;
-      this.ctxVal = "";
+      this.$refs.aiInput.value = "";
+      this.$refs.aiInput.imgList = [];
       this.$nextTick(() => {
         const h = this.$refs.aiInput.$el.offsetHeight;
         this.resizeHeight = h + 30;

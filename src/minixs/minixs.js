@@ -53,12 +53,13 @@ Vue.mixin({
       elements.forEach(function (el) {
         // 将元素的内容（包括其后代）添加到数组中
         let innerText = ''
-        if (el.tagName.toLowerCase() === 'input') {
+        const domEle = el.tagName.toLowerCase();
+        if (['select', 'input'].includes(domEle)) {
           if (el.getAttribute('txt')) {
             innerText = el.getAttribute('txt');
             contents += innerText;
           }
-        } else if (el.tagName.toLowerCase() === 'span') {
+        } else if (domEle === 'span') {
           if (el.innerText) {
             innerText = el.innerText;
             contents += innerText;

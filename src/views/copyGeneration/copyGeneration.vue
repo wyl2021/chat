@@ -103,7 +103,7 @@ export default {
   methods: {
     // 发送消息
     handleSendMsg(val) {
-      this.answerText = { templetId: this.templateId, txt: val };
+      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";

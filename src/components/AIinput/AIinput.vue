@@ -10,6 +10,15 @@
         <img :src="item.img" /><span>{{ item.label }}</span></span
       >
     </div>
+    <div class="h-f-pic">
+      <div class="h-f-pic-d1" v-for="(item, index) in imgList" :key="index">
+        <img :src="item" />
+        <span
+          class="el-icon-error h-f-pic-d1-del"
+          @click="handleDelPic(index)"
+        ></span>
+      </div>
+    </div>
     <div class="h-f-inner">
       <div
         ref="ine"
@@ -34,6 +43,57 @@
       ></div>
       <div class="h-fi">
         <div class="h-f-lo">
+          <!--上传图片-->
+          <el-upload
+            v-if="pic"
+            class="upload-demo"
+            action=""
+            accept=".jpg, .jpeg, .png, .gif, .webp"
+            :before-upload="handleBeforeUpload"
+            multiple
+            :show-file-list="false"
+            :file-list="fileList"
+          >
+            <el-button size="mini" type="primary" icon="el-icon-picture"
+              >参考图</el-button
+            >
+          </el-upload>
+          <el-dropdown
+            class="dropdown-demo"
+            size="mini"
+            trigger="click"
+            @command="handleCommand"
+            v-if="pic"
+          >
+            <el-button
+              style="margin-left: 10px"
+              size="mini"
+              type="primary"
+              icon="el-icon-picture"
+              >比例</el-button
+            >
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="el-icon-crop" command="1:1"
+                >1:1 正方向，头像</el-dropdown-item
+              >
+              <el-dropdown-item icon="el-icon-crop" command="4:3"
+                >4:3</el-dropdown-item
+              >
+              <el-dropdown-item icon="el-icon-crop" command="3:4"
+                >3:4</el-dropdown-item
+              >
+              <el-dropdown-item icon="el-icon-crop" command="16:9"
+                >16:9</el-dropdown-item
+              >
+              <el-dropdown-item icon="el-icon-crop" command="9:16"
+                >9:16</el-dropdown-item
+              >
+              <el-dropdown-item icon="el-icon-crop" command="自定义"
+                >自定义</el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+          <!---------------------------------------------->
           <span class="op-btn" v-if="leftIcon">
             <img src="https://www.swsai.com/style/dist/img/icon/Frame3.png" />
           </span>
@@ -92,6 +152,7 @@ export default {
     modelValue: {
       handler(val) {
         this.value = val;
+        console.log("2222", this.value);
       },
       immediate: true,
     },
@@ -115,6 +176,8 @@ export default {
       secTop: 0,
       canSend: false,
       xh: 23,
+      fileList: [],
+      imgList: [],
     };
   },
   methods: {
@@ -129,7 +192,7 @@ export default {
       }
       let ctx = this.getHtmlContents(str);
       if (ctx) {
-        this.$emit("sendMsg", ctx);
+        this.$emit("sendMsg", { txt: ctx, imgList: this.imgList });
       }
     },
     // 失去焦点的时候赋值
@@ -175,9 +238,52 @@ export default {
       }
       this.changeAnswer();
     },
+    // 上传图片之前的操作
+    handleBeforeUpload(file) {
+      if (!file) return false;
+      const that = this;
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        this.$message.error("上传图片大小不能超过 5MB!");
+        return false;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const base64String = e.target.result; // Base64编码后的数据
+        that.imgList.push(base64String);
+      };
+      reader.readAsDataURL(file);
+      return false;
+    },
     // 实时改变AI回答框高度
     changeAnswer() {
       this.$emit("changeAnswer");
+    },
+    // 删除图片
+    handleDelPic(n) {
+      this.imgList.splice(n, 1);
+    },
+    // 选择比例的效果
+    handleCommand(val) {
+      let str = "<span>比例：</span>";
+      if (val === "自定义") {
+        const reg = new RegExp(/[^\d]/g);
+        str += `<span>长</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" /><span>宽</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" />`;
+        this.value = str;
+      } else {
+        const arr = ["1:1", "4:3", "3:4", "16:9", "9:16"];
+        str += `<select class="selectTs" txt="${val}">`;
+        arr.forEach((ele) => {
+          if (ele === val) {
+            str += `<option value="${ele}" selected>${ele}</option>`;
+          } else {
+            str += `<option value="${ele}">${ele}</option>`;
+          }
+        });
+        str += `</select>`;
+        this.canSend = true;
+        this.value = str;
+      }
     },
     // 计算光标的位置
     selectionPosition() {
@@ -251,6 +357,8 @@ export default {
     justify-content: space-between;
   }
   .h-f-lo {
+    display: flex;
+    align-items: center;
     height: 100%;
     .op-btn {
       cursor: pointer;
@@ -268,6 +376,28 @@ export default {
     }
     img {
       width: 24px;
+    }
+  }
+}
+.h-f-pic {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap; /* 允许子项换行 */
+  .h-f-pic-d1 {
+    position: relative;
+    margin-left: 7px;
+    margin-top: 5px;
+    img {
+      height: 110px;
+    }
+    .h-f-pic-d1-del {
+      position: absolute;
+      cursor: pointer;
+      top: 2px;
+      right: 3px;
+      color: #212126;
+      font-size: 14px;
     }
   }
 }
