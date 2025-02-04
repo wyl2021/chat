@@ -170,6 +170,16 @@ export default {
       if (ctx) {
         this.$emit("sendMsg", { txt: ctx, imgList: this.imgList });
       }
+      this.clearVal();
+    },
+    // 清空内容
+    clearVal() {
+      if (this.$refs.ine) {
+        this.$refs.ine.innerText = "";
+      }
+      if (this.$refs.ine1) {
+        this.$refs.ine1.innerText = "";
+      }
     },
     // 失去焦点的时候赋值
     handleBlur(name) {
