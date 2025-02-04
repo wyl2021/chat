@@ -196,6 +196,7 @@ export default {
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
       this.value = typeStr;
+      this.canSend = true;
     },
     // 上传文件
     handleUpload(img) {
