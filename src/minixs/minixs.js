@@ -24,6 +24,13 @@ Vue.mixin({
         } else if (item.type === 'input') {
           const len = this.textWidth(item.placeholder) + 10;
           result += `<input class="inputTs" style="width: ${len || 130}px" type="text" placeholder="[${item.placeholder}]" />`;
+        } else if (item.type === 'select') {
+          const arr = item.data || [];
+          result += `<select class="selectTs" txt="${arr[0].value}">`
+          arr.forEach(item => {
+            result += `<option value="${item.value}">${item.name}</option>`;
+          });
+          result += `</select>`;
         }
       });
       const txt = `<pre style="width: 100%;white-space: pre-wrap;line-height: 1.7">${result}</pre>`
