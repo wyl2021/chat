@@ -1,56 +1,90 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
-    <div class="d-c-inner" v-for="(message, index) in messages" :key="index">
-      <div class="d-c-r">
-        <!--提问区域-->
-        <div style="display: flex; justify-content: flex-end; flex-wrap: wrap">
-          <div
-            class="d-c-pic"
-            v-for="(item, inx) in message.imgList"
-            :key="inx"
-          >
-            <img :src="item" />
-          </div>
-        </div>
-        <div class="d-c-header">
-          <pre>{{ message?.question }}</pre>
+    <div style="display: flex; justify-content: flex-end">
+      <el-button
+        size="mini"
+        type="text"
+        icon="el-icon-arrow-left"
+        @click="handleBack"
+        >返回</el-button
+      >
+    </div>
+    <div v-for="(message, index) in messages" :key="index">
+      <!--图片区域--->
+      <div style="display: flex; justify-content: flex-end; flex-wrap: wrap">
+        <div
+          class="d-c-pic"
+          v-for="(item, index) in message.imgList"
+          :key="index"
+        >
+          <img :src="item" />
         </div>
       </div>
-      <!--回答区域-->
-      <div class="d-c-l">
-        <pre>{{ message?.answer }}</pre>
+      <!---文字区域-->
+      <div style="display: flex; justify-content: flex-end">
+        <div class="d-c-header" ref="dch">
+          <TooltipTxt :text="message?.question" :len="298"></TooltipTxt>
+        </div>
+      </div>
+      <!---回答区域-->
+      <div class="d-c-body" ref="dcb">
+        <pre>{{ message.answer }}</pre>
         <LoadingView
           v-if="loading && index === messages.length - 1"
         ></LoadingView>
-        <div class="d-c-footer" v-if="fShow">
-          <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <span class="dfs" @click="handleCopy(message.answer)">
-              <img src="@/assets/images/copy.png" />
-            </span>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="收藏" placement="top">
-            <span class="dfs" @click="handleCollect">
-              <img src="@/assets/images/collect.png" />
-            </span>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <span class="dfs" @click="handleDel(message)">
-              <img src="@/assets/images/del.png" />
-            </span>
-          </el-tooltip>
-        </div>
+      </div>
+      <div class="d-c-footer" v-if="fShow">
+        <el-tooltip class="item" effect="dark" content="复制" placement="top">
+          <span class="dfs" @click="handleCopy(message.answer)">
+            <img src="@/assets/images/copy.png" />
+          </span>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+          <span class="dfs" @click="handleCollect">
+            <img src="@/assets/images/collect.png" />
+          </span>
+        </el-tooltip>
+        <el-tooltip class="item" effect="dark" content="删除" placement="top">
+          <span class="dfs" @click="handleDel(message)">
+            <img src="@/assets/images/del.png" />
+          </span>
+        </el-tooltip>
       </div>
     </div>
+    <!-- <div class="d-c-header" ref="dch">
+      <TooltipTxt :text="ques?.txt" :len="298"></TooltipTxt>
+    </div>
+    <div class="d-c-body" ref="dcb">
+      <pre>{{ result }}</pre>
+      <LoadingView v-if="loading"></LoadingView>
+    </div>
+    <div class="d-c-footer" v-if="fShow">
+      <el-tooltip class="item" effect="dark" content="复制" placement="top">
+        <span class="dfs" @click="handleCopy">
+          <img src="@/assets/images/copy.png" />
+        </span>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+        <span class="dfs" @click="handleCollect">
+          <img src="@/assets/images/collect.png" />
+        </span>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="删除" placement="top">
+        <span class="dfs" @click="handleDel">
+          <img src="@/assets/images/del.png" />
+        </span>
+      </el-tooltip>
+    </div> -->
   </div>
 </template>
 <script>
-// import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
+import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
 import { SaveChatCollect } from "@/api/chat";
 export default {
   components: {
-    // TooltipTxt,
+    TooltipTxt,
     LoadingView,
   },
   props: {
@@ -261,22 +295,13 @@ export default {
   background: #222127;
   top: 0px;
 }
-.d-c-inner {
-}
-.d-c-r {
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-}
-.d-c-l {
-  display: flex;
-  flex-direction: column;
-}
 .d-c-header {
   background: black;
   color: #fff;
   padding: 5px 10px;
+  max-height: 80px;
   border-radius: 7px;
+  overflow: hidden;
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -285,6 +310,14 @@ export default {
   white-space: pre-wrap;
   word-break: break-all;
   overflow-y: auto;
+  pre {
+    width: 100%;
+    white-space: pre-wrap;
+    line-height: 1.3;
+    padding: 10px 0px 0px 0px;
+    margin-bottom: 10px;
+    color: #9fa2a6;
+  }
 }
 .d-c-footer {
   .dfs {
@@ -302,10 +335,5 @@ export default {
   img {
     height: 110px;
   }
-}
-pre {
-  width: 100%;
-  white-space: pre-wrap;
-  line-height: 1.3;
 }
 </style>

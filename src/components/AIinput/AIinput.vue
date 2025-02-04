@@ -218,7 +218,7 @@ export default {
         this.isSecond = false;
       }
       const h = this.$refs.ine1.offsetHeight;
-      if (h <= this.xh && !this.isSecond && !this.pic) {
+      if (h <= this.xh && !this.isSecond && !this.pic && !this.film) {
         this.isTab = false;
       }
       this.changeAnswer();
@@ -330,6 +330,8 @@ export default {
   justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap; /* 允许子项换行 */
+  max-height: 200px;
+  overflow-y: auto;
   .h-f-pic-d1 {
     position: relative;
     margin-left: 7px;
