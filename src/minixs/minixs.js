@@ -10,11 +10,12 @@ Vue.mixin({
     ...mapGetters([
       'getToken',
       'getUserInfo',
-      'clearUserInfo'
+      'clearUserInfo',
+      'getActivePath'
     ])
   },
   methods: {
-    ...mapActions(['setToken', 'setUserInfo', 'logout']),
+    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath']),
     createAiScript (arr = []) {
       let result = '';
       arr.forEach(item => {

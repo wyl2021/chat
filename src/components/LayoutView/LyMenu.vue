@@ -1,6 +1,6 @@
 <template>
   <el-menu
-    default-active="1"
+    :default-active="getActivePath"
     class="el-menu-vertical-demo"
     @open="handleOpen"
     @close="handleClose"
@@ -154,6 +154,7 @@ export default {
     handleSelect(index) {
       this.selectedIndex = index;
       this.$router.push(index);
+      this.setActivePath(index);
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
