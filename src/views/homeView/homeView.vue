@@ -23,13 +23,21 @@
         </el-col>
       </el-row>
     </div>
+    <InfoDisplay
+      v-if="answer"
+      :resizeHeight="resizeHeight"
+      :ques="answerText"
+      @close="answer = false"
+    ></InfoDisplay>
     <div class="h-footer">
-      <div></div>
       <AIinput
+        ref="aiInput"
         v-model="val"
         placeholder="发消息或选择类型创作"
         leftIcon
         bar
+        @sendMsg="handleSendMsg"
+        @changeAnswer="changeAnswer"
       ></AIinput>
     </div>
   </div>
@@ -37,11 +45,13 @@
 
 <script>
 // import advertisementMenu from "./advertisementMenu";
+import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import AIinput from "@/components/AIinput/AIinput";
 import store from "@/store/store";
 import { GetChatTempletList } from "@/api/chat";
 export default {
   components: {
+    InfoDisplay,
     AIinput,
   },
   data() {
@@ -49,12 +59,28 @@ export default {
       store,
       advertisementMenu: [],
       val: "",
+      answer: false,
+      answerText: null,
+      resizeHeight: 100,
     };
   },
   created() {
     this.getChatTemplet();
   },
   methods: {
+    // 发送消息
+    handleSendMsg(val) {
+      this.changeInputStyle = "absolute";
+      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      this.$refs.aiInput.canSend = false;
+      this.$refs.aiInput.value = "";
+      this.$refs.aiInput.imgList = [];
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
+      });
+    },
     // 获取后端模版列表
     getChatTemplet() {
       GetChatTempletList().then((res) => {
@@ -63,6 +89,18 @@ export default {
         } else {
           this.$message.error(res.msg);
         }
+      });
+    },
+    // 关闭回答
+    handleClose() {
+      this.answer = false;
+      this.changeInputStyle = "relative";
+    },
+    // 实时改变AI回答的高度
+    changeAnswer() {
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
       });
     },
     jump(item) {
