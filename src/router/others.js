@@ -20,6 +20,11 @@ export default [
     component: () => import('@/views/imageGeneration/imageGeneration.vue')
   },
   {
+    path: '/filmGeneration',
+    name: 'filmGeneration',
+    component: () => import('@/views/filmGeneration/filmGeneration.vue')
+  },
+  {
     path: '/collectView',
     name: 'collectView',
     component: () => import('@/views/collectView/collectView.vue')

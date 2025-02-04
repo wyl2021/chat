@@ -60,12 +60,12 @@
 
       <span slot="title">图片生成</span>
     </el-menu-item>
-    <el-menu-item index="5">
+    <el-menu-item index="/filmGeneration">
       <!-- <i class="el-icon-video-play"></i> -->
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '5'
+          selectedIndex === '/filmGeneration'
             ? MenuIcon['视频生成'].selectedImg
             : MenuIcon['视频生成'].unselectedImg
         "

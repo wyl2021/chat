@@ -27,7 +27,6 @@
         :contenteditable="!disabled"
         v-html="value"
         :placeholder="placeholder"
-        @blur="handleBlur('ine')"
         @input="handleInput"
         v-if="!isTab"
       ></div>
@@ -37,63 +36,24 @@
         :contenteditable="!disabled"
         v-html="value"
         :placeholder="placeholder"
-        @blur="handleBlur('ine1')"
         @input="handleInputX"
-        v-else
+        v-if="isTab"
       ></div>
       <div class="h-fi">
         <div class="h-f-lo">
-          <!--上传图片-->
-          <el-upload
+          <!--图片功能-->
+          <imageClass
             v-if="pic"
-            class="upload-demo"
-            action=""
-            accept=".jpg, .jpeg, .png, .gif, .webp"
-            :before-upload="handleBeforeUpload"
-            multiple
-            :show-file-list="false"
-            :file-list="fileList"
-          >
-            <el-button size="mini" type="primary" icon="el-icon-picture"
-              >参考图</el-button
-            >
-          </el-upload>
-          <el-dropdown
-            class="dropdown-demo"
-            size="mini"
-            trigger="click"
-            @command="handleCommand"
-            v-if="pic"
-          >
-            <el-button
-              style="margin-left: 10px"
-              size="mini"
-              type="primary"
-              icon="el-icon-picture"
-              >比例</el-button
-            >
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-crop" command="1:1"
-                >1:1 正方向，头像</el-dropdown-item
-              >
-              <el-dropdown-item icon="el-icon-crop" command="4:3"
-                >4:3</el-dropdown-item
-              >
-              <el-dropdown-item icon="el-icon-crop" command="3:4"
-                >3:4</el-dropdown-item
-              >
-              <el-dropdown-item icon="el-icon-crop" command="16:9"
-                >16:9</el-dropdown-item
-              >
-              <el-dropdown-item icon="el-icon-crop" command="9:16"
-                >9:16</el-dropdown-item
-              >
-              <el-dropdown-item icon="el-icon-crop" command="自定义"
-                >自定义</el-dropdown-item
-              >
-            </el-dropdown-menu>
-          </el-dropdown>
-          <!---------------------------------------------->
+            @upload="handleUpload"
+            @change="handleChangeTypeClass"
+          ></imageClass>
+          <!--视频功能-->
+          <filmClass
+            v-if="film"
+            @upload="handleUpload"
+            @change="handleChangeTypeClass"
+          ></filmClass>
+          <!---------------------------------------------------------->
           <span class="op-btn" v-if="leftIcon">
             <img src="https://www.swsai.com/style/dist/img/icon/Frame3.png" />
           </span>
@@ -117,7 +77,13 @@
 
 <script>
 import barArr from "./barArr";
+import filmClass from "./filmClass.vue";
+import imageClass from "./imageClass.vue";
 export default {
+  components: {
+    filmClass,
+    imageClass,
+  },
   props: {
     leftIcon: {
       type: Boolean,
@@ -143,22 +109,33 @@ export default {
       type: Boolean,
       default: false,
     },
+    film: {
+      type: Boolean,
+      default: false,
+    },
   },
   model: {
     prop: "modelValue",
     event: "change",
   },
+  computed: {
+    otherType() {
+      return {
+        pic: this.pic,
+        film: this.film,
+      };
+    },
+  },
   watch: {
     modelValue: {
       handler(val) {
         this.value = val;
-        console.log("2222", this.value);
       },
       immediate: true,
     },
-    pic: {
+    otherType: {
       handler(val) {
-        if (val) {
+        if (val.pic || val.film) {
           this.isTab = true;
         } else {
           this.isTab = false;
@@ -176,7 +153,6 @@ export default {
       secTop: 0,
       canSend: false,
       xh: 23,
-      fileList: [],
       imgList: [],
     };
   },
@@ -217,6 +193,14 @@ export default {
       }
       this.changeAnswer();
     },
+    // 上传类型的数据
+    handleChangeTypeClass(typeStr) {
+      this.value = typeStr;
+    },
+    // 上传文件
+    handleUpload(img) {
+      this.imgList.push(img);
+    },
     // 第二个input实时判断是否换个输入框
     handleInputX(e) {
       if (e.target != this.$refs.ine1) {
@@ -238,23 +222,6 @@ export default {
       }
       this.changeAnswer();
     },
-    // 上传图片之前的操作
-    handleBeforeUpload(file) {
-      if (!file) return false;
-      const that = this;
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if (!isLt5M) {
-        this.$message.error("上传图片大小不能超过 5MB!");
-        return false;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const base64String = e.target.result; // Base64编码后的数据
-        that.imgList.push(base64String);
-      };
-      reader.readAsDataURL(file);
-      return false;
-    },
     // 实时改变AI回答框高度
     changeAnswer() {
       this.$emit("changeAnswer");
@@ -263,28 +230,7 @@ export default {
     handleDelPic(n) {
       this.imgList.splice(n, 1);
     },
-    // 选择比例的效果
-    handleCommand(val) {
-      let str = "<span>比例：</span>";
-      if (val === "自定义") {
-        const reg = new RegExp(/[^\d]/g);
-        str += `<span>长</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" /><span>宽</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" />`;
-        this.value = str;
-      } else {
-        const arr = ["1:1", "4:3", "3:4", "16:9", "9:16"];
-        str += `<select class="selectTs" txt="${val}">`;
-        arr.forEach((ele) => {
-          if (ele === val) {
-            str += `<option value="${ele}" selected>${ele}</option>`;
-          } else {
-            str += `<option value="${ele}">${ele}</option>`;
-          }
-        });
-        str += `</select>`;
-        this.canSend = true;
-        this.value = str;
-      }
-    },
+
     // 计算光标的位置
     selectionPosition() {
       const selection = window.getSelection();
@@ -301,7 +247,6 @@ export default {
 
         // 移除临时的span元素
         span.parentNode.removeChild(span);
-
         // 打印光标相对于输入框顶部的位置
         return top;
       }
