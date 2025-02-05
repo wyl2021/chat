@@ -21,7 +21,11 @@
             <img :src="item" />
           </div>
         </div>
-        <div class="d-c-header">
+        <audioView
+          v-if="message.audioObj"
+          :srcObj="message.audioObj"
+        ></audioView>
+        <div class="d-c-header" v-if="message.question">
           <pre>{{ message?.question }}</pre>
         </div>
       </div>
@@ -80,10 +84,12 @@
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
 import { SaveChatCollect, CreateChatImg, GetChatImg } from "@/api/chat";
+import audioView from "./audioView.vue";
 export default {
   components: {
     // TooltipTxt,
     LoadingView,
+    audioView,
   },
   props: {
     resizeHeight: {
@@ -152,41 +158,41 @@ export default {
             question:
               val?.data.find((item) => item.type === "question")?.content || "",
             answer: "", // AI 回复初始化为空
+            audioObj: val.audioObj || null,
             imgList:
               val?.data
                 .filter((item) => item.type !== "question")
                 .map((item) => item.content) || [],
           });
           this.result = "";
-        this.aiImgAnswer(val);
-        }else{
-          this.$message.error('数据为空')
+          this.aiImgAnswer(val);
+        } else {
+          this.$message.error("数据为空");
         }
-       
-      }else if(this.getActivePath.includes("/collectView")) {
-        if (Array.isArray(val) && val.length > 0) { 
-          val.forEach((item)=>{
-            if(item.data.length>0){
-            //   this.messages.push({
-            //   question:,
-            //   answer:,
-              
-            // })
+      } else if (this.getActivePath.includes("/collectView")) {
+        if (Array.isArray(val) && val.length > 0) {
+          val.forEach((item) => {
+            if (item.data.length > 0) {
+              //   this.messages.push({
+              //   question:,
+              //   answer:,
+              // })
             }
-            
-          })
+          });
           this.messages.push({
-          question: val?.txt,
-          answer: "", // AI 回复初始化为空
-          imgList: val.imgList,
-        });
-        this.result = "";
+            question: val?.txt,
+            answer: "", // AI 回复初始化为空
+            imgList: val.imgList,
+            audioObj: val.audioObj || null,
+          });
+          this.result = "";
         }
       } else {
         this.messages.push({
           question: val?.txt,
           answer: "", // AI 回复初始化为空
           imgList: val.imgList,
+          audioObj: val.audioObj || null,
         });
         this.result = "";
         this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
@@ -288,9 +294,7 @@ export default {
               response.data.forEach((item) => {
                 const images = item.reduce(
                   (acc, item) => {
-                    if (
-                      item.type === "externalLinkImage" 
-                    ) {
+                    if (item.type === "externalLinkImage") {
                       acc.externalLinkImage = item.url;
                     } else if (item.type === "originalImage") {
                       acc.originalImage = item.url;

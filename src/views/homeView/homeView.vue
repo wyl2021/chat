@@ -71,7 +71,13 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
-      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      this.answerText = {
+        templetId: 0,
+        txt: val.txt,
+        imgList: val.imgList,
+        audioObj: val.audioObj,
+      };
+      console.log(this.answerText);
       this.$refs.aiInput.canSend = false;
       this.$refs.aiInput.value = "";
       this.$refs.aiInput.imgList = [];

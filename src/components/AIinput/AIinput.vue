@@ -59,7 +59,7 @@
           </span>
         </div>
         <div class="h-f-ro">
-          <span class="op-btn">
+          <span class="op-btn" @click="audioShow = true">
             <img src="@/assets/images/voice.png" />
           </span>
           <span class="op-btn">
@@ -72,6 +72,7 @@
         </div>
       </div>
     </div>
+    <AudioRecorder v-model="audioShow" @sendAudio="sendAudio"></AudioRecorder>
   </div>
 </template>
 
@@ -79,10 +80,12 @@
 import barArr from "./barArr";
 import filmClass from "./filmClass.vue";
 import imageClass from "./imageClass.vue";
+import AudioRecorder from "./AudioRecorderClass.vue";
 export default {
   components: {
     filmClass,
     imageClass,
+    AudioRecorder,
   },
   props: {
     leftIcon: {
@@ -154,6 +157,7 @@ export default {
       canSend: false,
       xh: 23,
       imgList: [],
+      audioShow: false,
     };
   },
   methods: {
@@ -192,12 +196,21 @@ export default {
           data: qList,
         });
       } else {
-        parameter={
-          txt: ctx, 
-          imgList: this.imgList
-        }
+        parameter = {
+          txt: ctx,
+          imgList: this.imgList,
+          audioObj: null,
+        };
       }
       return parameter;
+    },
+    // 发送语音
+    sendAudio(srcObj) {
+      this.$emit("sendMsg", {
+        txt: "",
+        imgList: this.imgList,
+        audioObj: srcObj,
+      });
     },
     // 清空内容
     clearVal() {
