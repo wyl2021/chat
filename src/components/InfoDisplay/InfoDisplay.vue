@@ -1,5 +1,14 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
+    <div style="display: flex; justify-content: flex-end">
+      <el-button
+        size="mini"
+        type="text"
+        icon="el-icon-arrow-left"
+        @click="handleBack"
+        >返回</el-button
+      >
+    </div>
     <div class="d-c-inner" v-for="(message, index) in messages" :key="index">
       <div class="d-c-r">
         <!--提问区域-->
@@ -18,7 +27,30 @@
       </div>
       <!--回答区域-->
       <div class="d-c-l">
-        <pre>{{ message?.answer }}</pre>
+        <pre v-if="typeof message?.answer === 'string'">{{
+          message?.answer
+        }}</pre>
+        <div
+          v-if="Array.isArray(message?.answer) && message?.answer.length > 0"
+        >
+          <div v-for="(item2, index2) in message?.answer" :key="index2">
+            <img
+              v-if="item2.type === 'imageUrl' && item2.data.externalLinkImage"
+              :src="
+                item2.data.thumbnail ||
+                item2.data.originalImage ||
+                item2.data.externalLinkImage
+              "
+            />
+            <video
+              v-if="item2.type === 'videoUrl' && item2.data.url"
+              :src="item2.data.url"
+              controls
+            ></video>
+            <!-- <pre  v-if="item2.type!==videoUrl' && item2.type!==imageUrl'"></pre> -->
+          </div>
+        </div>
+
         <LoadingView
           v-if="loading && index === messages.length - 1"
         ></LoadingView>
@@ -47,7 +79,7 @@
 // import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
-import { SaveChatCollect } from "@/api/chat";
+import { SaveChatCollect, CreateChatImg, GetChatImg } from "@/api/chat";
 export default {
   components: {
     // TooltipTxt,
@@ -79,16 +111,9 @@ export default {
       handler(val) {
         if (!val) return;
         this.$nextTick(() => {
-          this.messages.push({
-            question: val?.txt,
-            answer: "", // AI 回复初始化为空
-            imgList: val.imgList,
-          });
-
           // const h1 = this.$refs.dch.offsetHeight;
           // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
-          this.result = "";
-          this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
+          this.handleMessage(val);
         });
       },
       immediate: true,
@@ -114,6 +139,59 @@ export default {
   },
   mounted() {},
   methods: {
+    handleMessage(val) {
+      console.log(
+        "this.getActivePath",
+        this.getActivePath,
+        this.getActivePath.includes("/imageGeneration"),
+        val
+      );
+      if (this.getActivePath.includes("/imageGeneration")) {
+        if (Array.isArray(val.data) && val.data.length > 0) {
+          this.messages.push({
+            question:
+              val?.data.find((item) => item.type === "question")?.content || "",
+            answer: "", // AI 回复初始化为空
+            imgList:
+              val?.data
+                .filter((item) => item.type !== "question")
+                .map((item) => item.content) || [],
+          });
+          this.result = "";
+        this.aiImgAnswer(val);
+        }else{
+          this.$message.error('数据为空')
+        }
+       
+      }else if(this.getActivePath.includes("/collectView")) {
+        if (Array.isArray(val) && val.length > 0) { 
+          val.forEach((item)=>{
+            if(item.data.length>0){
+            //   this.messages.push({
+            //   question:,
+            //   answer:,
+              
+            // })
+            }
+            
+          })
+          this.messages.push({
+          question: val?.txt,
+          answer: "", // AI 回复初始化为空
+          imgList: val.imgList,
+        });
+        this.result = "";
+        }
+      } else {
+        this.messages.push({
+          question: val?.txt,
+          answer: "", // AI 回复初始化为空
+          imgList: val.imgList,
+        });
+        this.result = "";
+        this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
+      }
+    },
     /* eslint-disable */
     async aiAnswer({ templetId = 0, txt = "" }) {
       // 创建对话  只针对文本会话
@@ -191,6 +269,78 @@ export default {
         this.isDel = true; // 标记删除状态
       }
     },
+    // 图片会话
+    async aiImgAnswer(val) {
+      this.loading = true; // 标记正在加载
+      this.isDel = false;
+      let isPolling = 0;
+      try {
+        const poll = async () => {
+          if (isPolling == 4) return;
+          try {
+            const response = await GetChatImg({
+              id: Number(Session.get("sessionId")),
+            });
+
+            if (response.code !== 2) {
+              console.log("回复成功", response);
+              let answerList = [];
+              response.data.forEach((item) => {
+                const images = item.reduce(
+                  (acc, item) => {
+                    if (
+                      item.type === "externalLinkImage" 
+                    ) {
+                      acc.externalLinkImage = item.url;
+                    } else if (item.type === "originalImage") {
+                      acc.originalImage = item.url;
+                    } else if (item.type === "thumbnail") {
+                      acc.thumbnail = item.url;
+                    }
+                    return acc;
+                  },
+                  { externalLinkImage: "", originalImage: "", thumbnail: "" }
+                );
+                answerList.push({
+                  type: item.type,
+                  data: images,
+                });
+              });
+              this.$set(
+                this.messages[this.messages.length - 1],
+                "answer",
+                answerList
+              );
+              this.loading = false;
+            } else {
+              isPolling++;
+              setTimeout(poll, 1000); // 继续轮询
+            }
+          } catch (error) {
+            console.error("轮询失败", error);
+            isPolling = 4;
+          }
+        };
+        CreateChatImg({
+          templetId: val?.templetId || 1,
+          sessionId: Session.get("sessionId") || "",
+          ratio: val?.ratio,
+          data: val?.data,
+        }).then(async (res) => {
+          if (res.code === 1) {
+            await Session.set("sessionId", res.data.sessionId);
+            poll();
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        this.$message.error("请求失败，请稍后重试！");
+        this.loading = false;
+        this.isDel = true; // 标记删除状态
+      }
+    },
     // 处理解析后的 JSON 数据
     processJsonChunk(chunk) {
       try {
@@ -220,6 +370,7 @@ export default {
     handleBack() {
       this.result = "";
       this.fShow = false;
+      Session.remove("sessionId");
       this.$emit("close");
     },
     // 删除
@@ -271,6 +422,7 @@ export default {
 .d-c-l {
   display: flex;
   flex-direction: column;
+  margin: 24px 0;
 }
 .d-c-header {
   background: black;
@@ -287,6 +439,7 @@ export default {
   overflow-y: auto;
 }
 .d-c-footer {
+  margin: 5px 0;
   .dfs {
     display: inline-block;
     margin-right: 7px;

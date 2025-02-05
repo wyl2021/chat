@@ -107,11 +107,11 @@ export default {
     },
     pic: {
       type: Boolean,
-      default: false,
+      default: false, ///图片
     },
     film: {
       type: Boolean,
-      default: false,
+      default: false, //视频
     },
   },
   model: {
@@ -168,9 +168,36 @@ export default {
       }
       let ctx = this.getHtmlContents(str);
       if (ctx) {
-        this.$emit("sendMsg", { txt: ctx, imgList: this.imgList });
+        this.$emit("sendMsg", this.handleData(ctx));
       }
       this.clearVal();
+    },
+    handleData(ctx) {
+      let parameter = {};
+      if (this.getActivePath.includes("/imageGeneration")) {
+        const qList = this.imgList.map((item) => ({
+          type: "base64",
+          role: "user",
+          content: item,
+        }));
+
+        qList.push({
+          type: "question",
+          role: "user",
+          content: ctx,
+        });
+
+        Object.assign(parameter, {
+          ratio: ctx,
+          data: qList,
+        });
+      } else {
+        parameter={
+          txt: ctx, 
+          imgList: this.imgList
+        }
+      }
+      return parameter;
     },
     // 清空内容
     clearVal() {
@@ -205,7 +232,7 @@ export default {
     },
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
-      this.value = typeStr;
+      this.value += typeStr;
       this.canSend = true;
     },
     // 上传文件

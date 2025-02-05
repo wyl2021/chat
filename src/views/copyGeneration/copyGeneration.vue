@@ -32,7 +32,7 @@
         >
           <div class="h-ce-1" @click="handleChangeAiCtx(item)">
             <div class="h-ce-1-d2">
-              <img :src="item.img" />
+              <img :src="item.icon" />
               <span class="label"> {{ item.title }}</span>
               <div class="desc">{{ item.note }}</div>
             </div>
@@ -104,6 +104,7 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      console.log(' this.answerText', this.answerText)
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";

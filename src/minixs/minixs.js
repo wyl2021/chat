@@ -72,6 +72,13 @@ Vue.mixin({
             innerText = el.innerText;
             contents += innerText;
           }
+        }else if(domEle === 'select'){
+          if (el.innerText) {
+            innerText = el.querySelector('option:checked');
+            contents += innerText;
+
+          }
+
         }
       });
       let str = ""

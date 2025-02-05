@@ -15,7 +15,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/home'
+          getActivePath === '/home'
             ? MenuIcon['ChatCar'].selectedImg
             : MenuIcon['ChatCar'].unselectedImg
         "
@@ -27,7 +27,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/intelligentSearch'
+          getActivePath === '/intelligentSearch'
             ? MenuIcon['智能搜索'].selectedImg
             : MenuIcon['智能搜索'].unselectedImg
         "
@@ -39,7 +39,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/copyGeneration'
+          getActivePath === '/copyGeneration'
             ? MenuIcon['文案生成'].selectedImg
             : MenuIcon['文案生成'].unselectedImg
         "
@@ -52,7 +52,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/imageGeneration'
+          getActivePath === '/imageGeneration'
             ? MenuIcon['图片生成'].selectedImg
             : MenuIcon['图片生成'].unselectedImg
         "
@@ -65,7 +65,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/filmGeneration'
+          getActivePath === '/filmGeneration'
             ? MenuIcon['视频生成'].selectedImg
             : MenuIcon['视频生成'].unselectedImg
         "
@@ -109,7 +109,7 @@
       <img
         class="icon-menu"
         :src="
-          selectedIndex === '/collectView'
+          getActivePath === '/collectView'
             ? MenuIcon['收藏夹'].selectedImg
             : MenuIcon['收藏夹'].unselectedImg
         "
@@ -123,6 +123,7 @@
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
 import { GetChatList } from "@/api/chat";
+import { Session } from "@/utils/storage";
 export default {
   props: {
     isCollapse: {
@@ -152,9 +153,12 @@ export default {
       });
     },
     handleSelect(index) {
+      console.log(Session.get('sessionId'))
       this.selectedIndex = index;
       this.$router.push(index);
       this.setActivePath(index);
+      Session.remove('sessionId')
+
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);

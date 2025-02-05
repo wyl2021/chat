@@ -35,6 +35,11 @@ export const Session = {
   // 获取临时缓存
   get (key) {
     let json = window.sessionStorage.getItem(key);
+    // try {
+    //   return JSON.parse(json); // 尝试解析 JSON
+    // } catch (e) {
+    //   return json; // 如果解析失败，直接返回原始值
+    // }
     return JSON.parse(json);
   },
   // 移除临时缓存

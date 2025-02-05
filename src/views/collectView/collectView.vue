@@ -31,11 +31,34 @@
         </div>
       </el-col>
     </el-row>
+    <InfoDisplay
+    v-if="answer"
+      :resizeHeight="resizeHeight"
+      :ques="answerText"
+      @close="answer = false"
+    ></InfoDisplay>
+
+    <div class="h-footer" v-if="isJump">
+      <AIinput
+        ref="aiInput"
+        v-model="ctxVal"
+        placeholder="输入您要撰写的主题"
+        @sendMsg="handleSendMsg"
+        @changeAnswer="changeAnswer"
+      ></AIinput>
+    </div>
   </div>
 </template>
 <script >
+import AIinput from "@/components/AIinput/AIinput";
 import { GetChatList } from "@/api/chat";
+import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
+import { Session } from "@/utils/storage";
 export default {
+  components: {
+    AIinput,
+    InfoDisplay,
+  },
   data() {
     return {
       collectList: [],
@@ -44,12 +67,37 @@ export default {
         pageSize: 10,
         collect: 1,
       },
+      resizeHeight: 100,
+      isJump:false,
+      answerText:[]
     };
   },
   created() {
     this.handleCollect();
   },
   methods: {
+    jump(val){
+ // 发送消息
+ GetChatList({pageIndex:1,pageSize:10,sessionId:val?.id}).then((res)=>{
+  if(res.code===1){
+    this.answerText = res.data;
+    Session.set('sessionId',val?.id)
+      this.$refs.aiInput.isTab = false;
+      this.$refs.aiInput.canSend = false;
+      this.ctxVal = "";
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
+      });
+  }else{
+    this.$message.error(res.msg)
+  }
+ 
+ })
+     
+ 
+    },
     handleCollect() {
       GetChatList(this.prams).then((res) => {
         if (res.code === 1) {

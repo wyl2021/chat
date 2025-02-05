@@ -50,8 +50,9 @@ export default {
   methods: {
     // 发送消息
     handleSendMsg(val) {
+      console.log('val',val)
       this.changeInputStyle = "absolute";
-      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      this.answerText = val;
       this.$refs.aiInput.canSend = false;
       this.$refs.aiInput.value = "";
       this.$refs.aiInput.imgList = [];

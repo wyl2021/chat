@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { GetChatTempletByType } from "@/api/chat";
 export default {
   props: {
     size: {
@@ -52,7 +53,11 @@ export default {
   data() {
     return {
       fileList: [],
+      dropdownList: [], ///视频上传类型列表
     };
+  },
+  created() {
+    // this.handleDropdownList()
   },
   methods: {
     handleCommand(val) {
@@ -116,6 +121,15 @@ export default {
       };
       reader.readAsDataURL(file);
       return false;
+    },
+    handleDropdownList() {
+      GetChatTempletByType({ type: "二创类型" }).then((res) => {
+        if (res.code === 1) {
+          this.dropdownList = res.data || [];
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
     },
   },
 };
