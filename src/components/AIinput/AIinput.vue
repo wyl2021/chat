@@ -59,9 +59,9 @@
           </span>
         </div>
         <div class="h-f-ro">
-          <span class="op-btn" @click="audioShow = true">
+          <!-- <span class="op-btn" @click="audioShow = true">
             <img src="@/assets/images/voice.png" />
-          </span>
+          </span> -->
           <span class="op-btn">
             <img src="@/assets/images/line.png" />
           </span>
@@ -178,7 +178,7 @@ export default {
     },
     handleData(ctx) {
       let parameter = {};
-      if (this.getActivePath.includes("/imageGeneration")) {
+      if (this.pic) {
         const qList = this.imgList.map((item) => ({
           type: "base64",
           role: "user",
@@ -188,18 +188,19 @@ export default {
         qList.push({
           type: "question",
           role: "user",
-          content: ctx,
+          content: "生成相似图片",
         });
-
-        Object.assign(parameter, {
-          ratio: ctx,
-          data: qList,
-        });
+        const str = ctx.replace("比例：", "");
+        parameter = {
+          type: "image",
+          role: "user",
+          content: { txt: ctx, ratio: str, data: qList },
+        };
       } else {
         parameter = {
-          txt: ctx,
-          imgList: this.imgList,
-          audioObj: null,
+          type: "text",
+          content: ctx,
+          role: "user",
         };
       }
       return parameter;
@@ -207,9 +208,9 @@ export default {
     // 发送语音
     sendAudio(srcObj) {
       this.$emit("sendMsg", {
-        txt: "",
-        imgList: this.imgList,
-        audioObj: srcObj,
+        type: "audio",
+        role: "user",
+        content: srcObj,
       });
     },
     // 清空内容

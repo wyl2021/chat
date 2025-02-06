@@ -53,8 +53,10 @@ export default {
     if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
       this.mediaRecorder.stop(); // 确保停止录制（如果还在录制的话）
     }
-    const tracks = this.mediaStream.getTracks(); // 假设你已经将媒体流保存在了mediaStream变量中
-    tracks.forEach((track) => track.stop()); // 停止并释放媒体流轨道资源
+    if (this.mediaStream) {
+      const tracks = this.mediaStream.getTracks(); // 假设你已经将媒体流保存在了mediaStream变量中
+      tracks.forEach((track) => track.stop()); // 停止并释放媒体流轨道资源
+    }
   },
   methods: {
     // 开始录音

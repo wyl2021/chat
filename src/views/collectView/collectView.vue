@@ -49,9 +49,9 @@
     </div>
   </div>
 </template>
-<script >
+<script>
 import AIinput from "@/components/AIinput/AIinput";
-import { GetChatList,GetChatDetailsTextList } from "@/api/chat";
+import { GetChatList, GetChatDetailsTextList } from "@/api/chat";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import { Session } from "@/utils/storage";
 export default {
@@ -69,7 +69,7 @@ export default {
       },
       resizeHeight: 100,
       isJump: false,
-      answerText: [],
+      answerText: null,
       answer: false,
       ctxVal: "",
     };
@@ -80,40 +80,43 @@ export default {
   methods: {
     jump(val) {
       // 发送消息
-      GetChatDetailsTextList({ pageIndex: 1, pageSize: 10, sessionId: val?.id }).then(
-        (res) => {
-          if (res.code === 1) {
-            this.answerText = res.data;
-            Session.set("sessionId", val?.id);
-            this.isJump=true;
-            // this.$refs.aiInput.isTab = false;
-            // this.$refs.aiInput.canSend = false;
-            this.ctxVal = "";
-            this.$nextTick(() => {
-              const h = this.$refs.aiInput.$el.offsetHeight;
-              this.resizeHeight = h + 30;
-              this.answer = true;
-            });
-          } else {
-            this.$message.error(res.msg);
-          }
-        }
-      );
-    },
-    handleCollect() {
-      GetChatList(this.prams).then((res) => {
+      GetChatDetailsTextList({
+        pageIndex: 1,
+        pageSize: 10,
+        sessionId: val?.id,
+      }).then((res) => {
         if (res.code === 1) {
-          this.collectList = res.data || [];
-          console.log(this.collectList);
+          this.answerText = {
+            type: "history",
+            content: res.data,
+          };
+          Session.set("sessionId", val?.id);
+          this.isJump = true;
+          // this.$refs.aiInput.isTab = false;
+          // this.$refs.aiInput.canSend = false;
+          this.ctxVal = "";
+          this.$nextTick(() => {
+            const h = this.$refs.aiInput.$el.offsetHeight;
+            this.resizeHeight = h + 30;
+            this.answer = true;
+          });
         } else {
           this.$message.error(res.msg);
         }
       });
     },
-       // 发送消息
-       handleSendMsg(val) {
-      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
-      console.log(' this.answerText', this.answerText)
+    handleCollect() {
+      GetChatList(this.prams).then((res) => {
+        if (res.code === 1) {
+          this.collectList = res.data || [];
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    // 发送消息
+    handleSendMsg(val) {
+      this.answerText = val;
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";
@@ -123,8 +126,8 @@ export default {
         this.answer = true;
       });
     },
-      // 实时改变AI回答的高度
-      changeAnswer() {
+    // 实时改变AI回答的高度
+    changeAnswer() {
       this.$nextTick(() => {
         const h = this.$refs.aiInput.$el.offsetHeight;
         this.resizeHeight = h + 30;
@@ -133,5 +136,4 @@ export default {
   },
 };
 </script>
-<style scoped lang='less'>
-</style>
+<style scoped lang="less"></style>

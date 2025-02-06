@@ -34,7 +34,6 @@
         ref="aiInput"
         v-model="val"
         placeholder="发消息或选择类型创作"
-        leftIcon
         bar
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
@@ -71,16 +70,9 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
-      this.answerText = {
-        templetId: 0,
-        txt: val.txt,
-        imgList: val.imgList,
-        audioObj: val.audioObj,
-      };
-      console.log(this.answerText);
+      this.answerText = val;
+      this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
-      this.$refs.aiInput.value = "";
-      this.$refs.aiInput.imgList = [];
       this.$nextTick(() => {
         const h = this.$refs.aiInput.$el.offsetHeight;
         this.resizeHeight = h + 30;

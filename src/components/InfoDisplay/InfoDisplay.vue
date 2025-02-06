@@ -10,34 +10,37 @@
       >
     </div>
     <div class="d-c-inner" v-for="(message, index) in messages" :key="index">
-      <div class="d-c-r">
-        <!--提问区域-->
-        <div style="display: flex; justify-content: flex-end; flex-wrap: wrap">
+      <!--提问区域-->
+      <div class="d-c-r" v-if="message.type === 'question'">
+        <div
+          style="display: flex; justify-content: flex-end; flex-wrap: wrap"
+          v-if="message.dataType === 'image'"
+        >
           <div
             class="d-c-pic"
-            v-for="(item, inx) in message.imgList"
+            v-for="(item, inx) in message.content.imgList"
             :key="inx"
           >
-            <img :src="item" />
+            <img :src="item.content" />
           </div>
         </div>
-        <audioView
+        <!-- <audioView
           v-if="message.audioObj"
           :srcObj="message.audioObj"
-        ></audioView>
-        <div class="d-c-header" v-if="message.question">
-          <pre>{{ message?.question }}</pre>
+        ></audioView> -->
+        <div class="d-c-header">
+          <pre>{{ message?.content.text }}</pre>
         </div>
       </div>
       <!--回答区域-->
-      <div class="d-c-l">
-        <pre v-if="typeof message?.answer === 'string'">{{
-          message?.answer
+      <div class="d-c-l" v-if="message.type === 'answer'">
+        <pre v-if="typeof message?.content === 'string'">{{
+          message?.content
         }}</pre>
         <div
-          v-if="Array.isArray(message?.answer) && message?.answer.length > 0"
+          v-if="Array.isArray(message?.content) && message?.content.length > 0"
         >
-          <div v-for="(item2, index2) in message?.answer" :key="index2">
+          <div v-for="(item2, index2) in message?.content" :key="index2">
             <img
               v-if="item2.type === 'imageUrl' && item2.data.externalLinkImage"
               :src="
@@ -54,10 +57,6 @@
             <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
           </div>
         </div>
-
-        <LoadingView
-          v-if="loading && index === messages.length - 1"
-        ></LoadingView>
         <div class="d-c-footer" v-if="fShow">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
             <span class="dfs" @click="handleCopy(message.answer)">
@@ -76,20 +75,31 @@
           </el-tooltip>
         </div>
       </div>
+      <LoadingView v-if="loading"></LoadingView>
     </div>
   </div>
 </template>
 <script>
 // import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
+import moment from "moment";
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
 import { SaveChatCollect, CreateChatImg, GetChatImg } from "@/api/chat";
-import audioView from "./audioView.vue";
+// import audioView from "./audioView.vue";
+/**
+ * 数据类型
+ * message: {
+ *   type: [question, answer],
+ *   dataType: [text, image, video, audio],
+ *   content:
+ *   time:
+ * }
+ */
 export default {
   components: {
     // TooltipTxt,
     LoadingView,
-    audioView,
+    // audioView,
   },
   props: {
     resizeHeight: {
@@ -97,8 +107,8 @@ export default {
       default: 100,
     },
     ques: {
-      type: [Object,Array, null],
-      required: true
+      type: [Object, null],
+      required: true,
     },
   },
   watch: {
@@ -119,7 +129,9 @@ export default {
         this.$nextTick(() => {
           // const h1 = this.$refs.dch.offsetHeight;
           // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
-          this.handleMessage(val);
+          if (val) {
+            this.handleMessage(val);
+          }
         });
       },
       immediate: true,
@@ -146,88 +158,75 @@ export default {
   mounted() {},
   methods: {
     handleMessage(val) {
-      console.log(
-        "this.getActivePath",
-        this.getActivePath,
-        this.getActivePath.includes("/imageGeneration"),
-        val
-      );
-      if (this.getActivePath.includes("/imageGeneration")) {
-        if (Array.isArray(val.data) && val.data.length > 0) {
-          this.messages.push({
-            question:
-              val?.data.find((item) => item.type === "question")?.content || "",
-            answer: "", // AI 回复初始化为空
-            audioObj: val.audioObj || null,
-            imgList:
-              val?.data
-                .filter((item) => item.type !== "question")
-                .map((item) => item.content) || [],
-          });
-          this.result = "";
-          this.aiImgAnswer(val);
-        } else {
-          this.$message.error("数据为空");
-        }
+      const content = val.content;
+      this.result = "";
+      if (val.type === "image") {
+        this.messages.push({
+          type: "question",
+          dataType: "image",
+          content: {
+            imgList: content?.data.filter((e) => e.type === "base64"),
+            text: content.txt,
+          },
+          time: moment().format("YYYY-MM-DD HH:mm:ss"),
+        });
+        console.log(1111, this.messages);
+        this.aiImgAnswer(content);
       } else if (this.getActivePath.includes("/collectView")) {
         if (Array.isArray(val) && val.length > 0) {
           let messages = [];
           let currentQuestion = {
-            question:'',//文本问题
-            img:[],///图片
-            video:[]//视频
+            question: "", //文本问题
+            img: [], ///图片
+            video: [], //视频
           }; // 用于存储当前的提问
-       
-          val.forEach((item) => {
 
-              // 只处理已生成的数据
-              item.data.forEach((message) => {
-                if (message.role === "user" ) {
-                  if(message.type === "question"){
-                    currentQuestion.question = message.content; // 获取用户提问
-                  }else if(message.type === "imageUrl"){
-                    currentQuestion.img =message.data.map(dataItem => dataItem.content)
-                  }else if(message.type === "videoUrl"){
-                    currentQuestion.video=message.data.map(dataItem => dataItem.url)
-                  }
-                  
-                } else if (message.role === "assistant") {
-                  if (currentQuestion) {
-      
-                    // 当提问和回答都存在时，创建消息对象并添加到 messages 列表中
-                    messages.push({
-                      question: currentQuestion.question,
-                      answer: message.type==='answer'?message.content:message.type==='imageUrl'?'':'',
-                      imgList: currentQuestion.img, // 如果有图片，可以在这里处理
-                      videoList: currentQuestion.video, // 如果有视频，可以在这里处理
-                    });
-                    currentQuestion = ""; // 重置当前问题
-                  
-                 
-                 }
+          val.forEach((item) => {
+            // 只处理已生成的数据
+            item.data.forEach((message) => {
+              if (message.role === "user") {
+                if (message.type === "text") {
+                  currentQuestion.question = message.content; // 获取用户提问
+                } else if (message.type === "image") {
+                  currentQuestion.img = message.data.map(
+                    (dataItem) => dataItem.content
+                  );
+                } else if (message.type === "video") {
+                  currentQuestion.video = message.data.map(
+                    (dataItem) => dataItem.url
+                  );
                 }
-              });
+              } else if (message.role === "assistant") {
+                if (currentQuestion) {
+                  // 当提问和回答都存在时，创建消息对象并添加到 messages 列表中
+                  messages.push({
+                    question: currentQuestion.question,
+                    answer:
+                      message.type === "answer"
+                        ? message.content
+                        : message.type === "imageUrl"
+                        ? ""
+                        : "",
+                    imgList: currentQuestion.img, // 如果有图片，可以在这里处理
+                    videoList: currentQuestion.video, // 如果有视频，可以在这里处理
+                  });
+                  currentQuestion = ""; // 重置当前问题
+                }
+              }
+            });
           });
-          console.log(messages);
-          this.messages=messages
-          this.result = "";
-          // this.messages.push({
-          //   question: val?.txt,
-          //   answer: "", // AI 回复初始化为空
-          //   imgList: val.imgList,
-          //   audioObj: val.audioObj || null,
-          // });
-          // this.result = "";
+          this.messages = messages;
         }
       } else {
         this.messages.push({
-          question: val?.txt,
-          answer: "", // AI 回复初始化为空
-          imgList: val.imgList,
-          audioObj: val.audioObj || null,
+          type: "question",
+          dataType: "text",
+          content: {
+            text: val?.content,
+          },
+          time: moment().format("YYYY-MM-DD HH:mm:ss"),
         });
-        this.result = "";
-        this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
+        this.aiAnswer({ templetId: val?.templetId, txt: val?.content });
       }
     },
     /* eslint-disable */
@@ -236,7 +235,6 @@ export default {
       const url = "http://www.swsai.com:5003/api/v1";
       this.loading = true; // 标记正在加载
       this.isDel = false;
-      const currentIndex = this.messages.length - 1; // 当前消息索引
       try {
         const response = await fetch(url, {
           method: "POST",
@@ -261,7 +259,7 @@ export default {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        this.setChatList()
+        this.setChatList();
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let chunk = "";
@@ -296,9 +294,14 @@ export default {
             // 如果解析失败，保留 chunk 继续累加数据
           }
         }
-        this.$set(this.messages[currentIndex], "answer", this.result);
+        this.messages.push({
+          type: "answer",
+          dataType: "text",
+          content: this.result,
+          time: moment().format("YYYY-MM-DD HH:mm:ss"),
+        });
         this.scrollToBottom();
-        this.loading = false; // 完成后关闭加载状态
+        // this.loading = false; // 完成后关闭加载状态
         // $("#result").append(result + "\n");
       } catch (error) {
         console.error("Error:", error);
@@ -314,7 +317,11 @@ export default {
       let isPolling = 0;
       try {
         const poll = async () => {
-          if (isPolling == 4) return;
+          if (isPolling == 4) {
+            Session.set("sessionId", "");
+            this.loading = false;
+            return;
+          }
           try {
             const response = await GetChatImg({
               id: Number(Session.get("sessionId")),
@@ -342,11 +349,13 @@ export default {
                   data: images,
                 });
               });
-              this.$set(
-                this.messages[this.messages.length - 1],
-                "answer",
-                answerList
-              );
+              this.messages.push({
+                type: "answer",
+                dataType: "image",
+                content: answerList,
+                time: moment().format("YYYY-MM-DD HH:mm:ss"),
+              });
+              console.log(1111, this.messages);
               this.loading = false;
             } else {
               isPolling++;
