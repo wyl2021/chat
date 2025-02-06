@@ -51,7 +51,7 @@
               :src="item2.data.url"
               controls
             ></video>
-            <!-- <pre  v-if="item2.type!==videoUrl' && item2.type!==imageUrl'"></pre> -->
+            <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
           </div>
         </div>
 
@@ -97,8 +97,8 @@ export default {
       default: 100,
     },
     ques: {
-      type: [Object, null],
-      default: null,
+      type: [Object,Array, null],
+      required: true
     },
   },
   watch: {
@@ -171,21 +171,53 @@ export default {
         }
       } else if (this.getActivePath.includes("/collectView")) {
         if (Array.isArray(val) && val.length > 0) {
+          let messages = [];
+          let currentQuestion = {
+            question:'',//文本问题
+            img:[],///图片
+            video:[]//视频
+          }; // 用于存储当前的提问
+       
           val.forEach((item) => {
-            if (item.data.length > 0) {
-              //   this.messages.push({
-              //   question:,
-              //   answer:,
-              // })
-            }
+
+              // 只处理已生成的数据
+              item.data.forEach((message) => {
+                if (message.role === "user" ) {
+                  if(message.type === "question"){
+                    currentQuestion.question = message.content; // 获取用户提问
+                  }else if(message.type === "imageUrl"){
+                    currentQuestion.img =message.data.map(dataItem => dataItem.content)
+                  }else if(message.type === "videoUrl"){
+                    currentQuestion.video=message.data.map(dataItem => dataItem.url)
+                  }
+                  
+                } else if (message.role === "assistant") {
+                  if (currentQuestion) {
+      
+                    // 当提问和回答都存在时，创建消息对象并添加到 messages 列表中
+                    messages.push({
+                      question: currentQuestion.question,
+                      answer: message.type==='answer'?message.content:message.type==='imageUrl'?'':'',
+                      imgList: currentQuestion.img, // 如果有图片，可以在这里处理
+                      videoList: currentQuestion.video, // 如果有视频，可以在这里处理
+                    });
+                    currentQuestion = ""; // 重置当前问题
+                  
+                 
+                 }
+                }
+              });
           });
-          this.messages.push({
-            question: val?.txt,
-            answer: "", // AI 回复初始化为空
-            imgList: val.imgList,
-            audioObj: val.audioObj || null,
-          });
+          console.log(messages);
+          this.messages=messages
           this.result = "";
+          // this.messages.push({
+          //   question: val?.txt,
+          //   answer: "", // AI 回复初始化为空
+          //   imgList: val.imgList,
+          //   audioObj: val.audioObj || null,
+          // });
+          // this.result = "";
         }
       } else {
         this.messages.push({
@@ -229,7 +261,7 @@ export default {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-
+        this.setChatList()
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let chunk = "";

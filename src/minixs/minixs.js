@@ -11,11 +11,12 @@ Vue.mixin({
       'getToken',
       'getUserInfo',
       'clearUserInfo',
-      'getActivePath'
+      'getActivePath',
+      'getChatList'
     ])
   },
   methods: {
-    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath']),
+    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath','setChatList']),
     createAiScript (arr = []) {
       let result = '';
       arr.forEach(item => {

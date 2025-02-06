@@ -1,40 +1,95 @@
 <template>
   <div class="d-conrainer" ref="answerRef">
-    <div class="d-c-header" ref="dch">
-      <TooltipTxt :text="ques?.txt" :len="298"></TooltipTxt>
+    <div style="display: flex; justify-content: flex-end">
+      <el-button
+        size="mini"
+        type="text"
+        icon="el-icon-arrow-left"
+        @click="handleBack"
+        >返回</el-button
+      >
     </div>
-    <div class="d-c-body" ref="dcb">
-      <pre>{{ result }}</pre>
-      <LoadingView v-if="loading"></LoadingView>
-    </div>
-    <div class="d-c-footer" v-if="fShow">
-      <el-tooltip class="item" effect="dark" content="复制" placement="top">
-        <span class="dfs" @click="handleCopy">
-          <img src="@/assets/images/copy.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="收藏" placement="top">
-        <span class="dfs" @click="handleCollect">
-          <img src="@/assets/images/collect.png" />
-        </span>
-      </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="删除" placement="top">
-        <span class="dfs" @click="handleDel">
-          <img src="@/assets/images/del.png" />
-        </span>
-      </el-tooltip>
+    <div class="d-c-inner" v-for="(message, index) in messages" :key="index">
+      <div class="d-c-r">
+        <!--提问区域-->
+        <div style="display: flex; justify-content: flex-end; flex-wrap: wrap">
+          <div
+            class="d-c-pic"
+            v-for="(item, inx) in message.imgList"
+            :key="inx"
+          >
+            <img :src="item" />
+          </div>
+        </div>
+        <audioView
+          v-if="message.audioObj"
+          :srcObj="message.audioObj"
+        ></audioView>
+        <div class="d-c-header" v-if="message.question">
+          <pre>{{ message?.question }}</pre>
+        </div>
+      </div>
+      <!--回答区域-->
+      <div class="d-c-l">
+        <pre v-if="typeof message?.answer === 'string'">{{
+          message?.answer
+        }}</pre>
+        <div
+          v-if="Array.isArray(message?.answer) && message?.answer.length > 0"
+        >
+          <div v-for="(item2, index2) in message?.answer" :key="index2">
+            <img
+              v-if="item2.type === 'imageUrl' && item2.data.externalLinkImage"
+              :src="
+                item2.data.thumbnail ||
+                item2.data.originalImage ||
+                item2.data.externalLinkImage
+              "
+            />
+            <video
+              v-if="item2.type === 'videoUrl' && item2.data.url"
+              :src="item2.data.url"
+              controls
+            ></video>
+            <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
+          </div>
+        </div>
+
+        <LoadingView
+          v-if="loading && index === messages.length - 1"
+        ></LoadingView>
+        <div class="d-c-footer" v-if="fShow">
+          <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <span class="dfs" @click="handleCopy(message.answer)">
+              <img src="@/assets/images/copy.png" />
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+            <span class="dfs" @click="handleCollect">
+              <img src="@/assets/images/collect.png" />
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <span class="dfs" @click="handleDel(message)">
+              <img src="@/assets/images/del.png" />
+            </span>
+          </el-tooltip>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
-import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
+// import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
-import { SaveChatCollect } from "@/api/chat";
+import { SaveChatCollect, CreateChatImg, GetChatImg } from "@/api/chat";
+import audioView from "./audioView.vue";
 export default {
   components: {
-    TooltipTxt,
+    // TooltipTxt,
     LoadingView,
+    audioView,
   },
   props: {
     resizeHeight: {
@@ -42,8 +97,8 @@ export default {
       default: 100,
     },
     ques: {
-      type: [Object, null],
-      default: null,
+      type: [Object,Array, null],
+      required: true
     },
   },
   watch: {
@@ -61,11 +116,10 @@ export default {
     ques: {
       handler(val) {
         if (!val) return;
-        this.$nextTick(() => {   
-          const h1 = this.$refs.dch.offsetHeight;
-          this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
-          this.result = "";
-          this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
+        this.$nextTick(() => {
+          // const h1 = this.$refs.dch.offsetHeight;
+          // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
+          this.handleMessage(val);
         });
       },
       immediate: true,
@@ -86,17 +140,103 @@ export default {
       loading: false,
       result: "",
       isDel: true,
-
+      messages: [],
     };
   },
   mounted() {},
   methods: {
+    handleMessage(val) {
+      console.log(
+        "this.getActivePath",
+        this.getActivePath,
+        this.getActivePath.includes("/imageGeneration"),
+        val
+      );
+      if (this.getActivePath.includes("/imageGeneration")) {
+        if (Array.isArray(val.data) && val.data.length > 0) {
+          this.messages.push({
+            question:
+              val?.data.find((item) => item.type === "question")?.content || "",
+            answer: "", // AI 回复初始化为空
+            audioObj: val.audioObj || null,
+            imgList:
+              val?.data
+                .filter((item) => item.type !== "question")
+                .map((item) => item.content) || [],
+          });
+          this.result = "";
+          this.aiImgAnswer(val);
+        } else {
+          this.$message.error("数据为空");
+        }
+      } else if (this.getActivePath.includes("/collectView")) {
+        if (Array.isArray(val) && val.length > 0) {
+          let messages = [];
+          let currentQuestion = {
+            question:'',//文本问题
+            img:[],///图片
+            video:[]//视频
+          }; // 用于存储当前的提问
+       
+          val.forEach((item) => {
+
+              // 只处理已生成的数据
+              item.data.forEach((message) => {
+                if (message.role === "user" ) {
+                  if(message.type === "question"){
+                    currentQuestion.question = message.content; // 获取用户提问
+                  }else if(message.type === "imageUrl"){
+                    currentQuestion.img =message.data.map(dataItem => dataItem.content)
+                  }else if(message.type === "videoUrl"){
+                    currentQuestion.video=message.data.map(dataItem => dataItem.url)
+                  }
+                  
+                } else if (message.role === "assistant") {
+                  if (currentQuestion) {
+      
+                    // 当提问和回答都存在时，创建消息对象并添加到 messages 列表中
+                    messages.push({
+                      question: currentQuestion.question,
+                      answer: message.type==='answer'?message.content:message.type==='answer',
+                      imgList: currentQuestion.img, // 如果有图片，可以在这里处理
+                      videoList: currentQuestion.video, // 如果有视频，可以在这里处理
+                    });
+                    currentQuestion = ""; // 重置当前问题
+                  
+                 
+                 }
+                }
+              });
+          });
+          console.log(messages);
+          this.messages=messages
+          this.result = "";
+          // this.messages.push({
+          //   question: val?.txt,
+          //   answer: "", // AI 回复初始化为空
+          //   imgList: val.imgList,
+          //   audioObj: val.audioObj || null,
+          // });
+          // this.result = "";
+        }
+      } else {
+        this.messages.push({
+          question: val?.txt,
+          answer: "", // AI 回复初始化为空
+          imgList: val.imgList,
+          audioObj: val.audioObj || null,
+        });
+        this.result = "";
+        this.aiAnswer({ templetId: val?.templetId, txt: val?.txt });
+      }
+    },
     /* eslint-disable */
     async aiAnswer({ templetId = 0, txt = "" }) {
       // 创建对话  只针对文本会话
       const url = "http://www.swsai.com:5003/api/v1";
       this.loading = true; // 标记正在加载
       this.isDel = false;
+      const currentIndex = this.messages.length - 1; // 当前消息索引
       try {
         const response = await fetch(url, {
           method: "POST",
@@ -125,7 +265,7 @@ export default {
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let chunk = "";
-       
+
         /* eslint-disable */
         while (true) {
           const { done, value } = await reader.read();
@@ -156,8 +296,80 @@ export default {
             // 如果解析失败，保留 chunk 继续累加数据
           }
         }
+        this.$set(this.messages[currentIndex], "answer", this.result);
+        this.scrollToBottom();
         this.loading = false; // 完成后关闭加载状态
         // $("#result").append(result + "\n");
+      } catch (error) {
+        console.error("Error:", error);
+        this.$message.error("请求失败，请稍后重试！");
+        this.loading = false;
+        this.isDel = true; // 标记删除状态
+      }
+    },
+    // 图片会话
+    async aiImgAnswer(val) {
+      this.loading = true; // 标记正在加载
+      this.isDel = false;
+      let isPolling = 0;
+      try {
+        const poll = async () => {
+          if (isPolling == 4) return;
+          try {
+            const response = await GetChatImg({
+              id: Number(Session.get("sessionId")),
+            });
+
+            if (response.code !== 2) {
+              console.log("回复成功", response);
+              let answerList = [];
+              response.data.forEach((item) => {
+                const images = item.reduce(
+                  (acc, item) => {
+                    if (item.type === "externalLinkImage") {
+                      acc.externalLinkImage = item.url;
+                    } else if (item.type === "originalImage") {
+                      acc.originalImage = item.url;
+                    } else if (item.type === "thumbnail") {
+                      acc.thumbnail = item.url;
+                    }
+                    return acc;
+                  },
+                  { externalLinkImage: "", originalImage: "", thumbnail: "" }
+                );
+                answerList.push({
+                  type: item.type,
+                  data: images,
+                });
+              });
+              this.$set(
+                this.messages[this.messages.length - 1],
+                "answer",
+                answerList
+              );
+              this.loading = false;
+            } else {
+              isPolling++;
+              setTimeout(poll, 1000); // 继续轮询
+            }
+          } catch (error) {
+            console.error("轮询失败", error);
+            isPolling = 4;
+          }
+        };
+        CreateChatImg({
+          templetId: val?.templetId || 1,
+          sessionId: Session.get("sessionId") || "",
+          ratio: val?.ratio,
+          data: val?.data,
+        }).then(async (res) => {
+          if (res.code === 1) {
+            await Session.set("sessionId", res.data.sessionId);
+            poll();
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
       } catch (error) {
         console.error("Error:", error);
         this.$message.error("请求失败，请稍后重试！");
@@ -168,13 +380,12 @@ export default {
     // 处理解析后的 JSON 数据
     processJsonChunk(chunk) {
       try {
-       
         if (typeof chunk === "string") {
           chunk = JSON.parse(chunk); // 确保是 JSON 对象
         }
         if (chunk.code === 1) {
           const content = chunk?.data?.data?.content || "";
-           // 更新当前消息的 AI 回复内容
+          // 更新当前消息的 AI 回复内容
           this.result += content; // 拼接内容
           Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
         } else if (chunk.code === 0) {
@@ -185,6 +396,18 @@ export default {
       } catch (err) {
         console.error("处理 JSON 块出错:", err);
       }
+    },
+    // 滚动到页面底部
+    scrollToBottom() {
+      const container = this.$refs.answerRef;
+      container.scrollTop = container.scrollHeight;
+    },
+    // 返回
+    handleBack() {
+      this.result = "";
+      this.fShow = false;
+      Session.remove("sessionId");
+      this.$emit("close");
     },
     // 删除
     handleDel() {
@@ -225,13 +448,23 @@ export default {
   background: #222127;
   top: 0px;
 }
+.d-c-inner {
+}
+.d-c-r {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+.d-c-l {
+  display: flex;
+  flex-direction: column;
+  margin: 24px 0;
+}
 .d-c-header {
   background: black;
   color: #fff;
   padding: 5px 10px;
-  max-height: 80px;
   border-radius: 7px;
-  overflow: hidden;
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -240,16 +473,9 @@ export default {
   white-space: pre-wrap;
   word-break: break-all;
   overflow-y: auto;
-  pre {
-    width: 100%;
-    white-space: pre-wrap;
-    line-height: 1.3;
-    padding: 10px 0px 0px 0px;
-    margin-bottom: 10px;
-    color: #9fa2a6;
-  }
 }
 .d-c-footer {
+  margin: 5px 0;
   .dfs {
     display: inline-block;
     margin-right: 7px;
@@ -258,5 +484,17 @@ export default {
       width: 20px;
     }
   }
+}
+.d-c-pic {
+  margin-left: 7px;
+  margin-bottom: 5px;
+  img {
+    height: 110px;
+  }
+}
+pre {
+  width: 100%;
+  white-space: pre-wrap;
+  line-height: 1.3;
 }
 </style>

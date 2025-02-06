@@ -32,7 +32,7 @@
       </el-col>
     </el-row>
     <InfoDisplay
-    v-if="answer"
+      v-if="answer"
       :resizeHeight="resizeHeight"
       :ques="answerText"
       @close="answer = false"
@@ -51,7 +51,7 @@
 </template>
 <script >
 import AIinput from "@/components/AIinput/AIinput";
-import { GetChatList } from "@/api/chat";
+import { GetChatList,GetChatDetailsTextList } from "@/api/chat";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import { Session } from "@/utils/storage";
 export default {
@@ -68,35 +68,37 @@ export default {
         collect: 1,
       },
       resizeHeight: 100,
-      isJump:false,
-      answerText:[]
+      isJump: false,
+      answerText: [],
+      answer: false,
+      ctxVal: "",
     };
   },
   created() {
     this.handleCollect();
   },
   methods: {
-    jump(val){
- // 发送消息
- GetChatList({pageIndex:1,pageSize:10,sessionId:val?.id}).then((res)=>{
-  if(res.code===1){
-    this.answerText = res.data;
-    Session.set('sessionId',val?.id)
-      this.$refs.aiInput.isTab = false;
-      this.$refs.aiInput.canSend = false;
-      this.ctxVal = "";
-      this.$nextTick(() => {
-        const h = this.$refs.aiInput.$el.offsetHeight;
-        this.resizeHeight = h + 30;
-        this.answer = true;
-      });
-  }else{
-    this.$message.error(res.msg)
-  }
- 
- })
-     
- 
+    jump(val) {
+      // 发送消息
+      GetChatDetailsTextList({ pageIndex: 1, pageSize: 10, sessionId: val?.id }).then(
+        (res) => {
+          if (res.code === 1) {
+            this.answerText = res.data;
+            Session.set("sessionId", val?.id);
+            this.isJump=true;
+            // this.$refs.aiInput.isTab = false;
+            // this.$refs.aiInput.canSend = false;
+            this.ctxVal = "";
+            this.$nextTick(() => {
+              const h = this.$refs.aiInput.$el.offsetHeight;
+              this.resizeHeight = h + 30;
+              this.answer = true;
+            });
+          } else {
+            this.$message.error(res.msg);
+          }
+        }
+      );
     },
     handleCollect() {
       GetChatList(this.prams).then((res) => {
@@ -106,6 +108,26 @@ export default {
         } else {
           this.$message.error(res.msg);
         }
+      });
+    },
+       // 发送消息
+       handleSendMsg(val) {
+      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      console.log(' this.answerText', this.answerText)
+      this.$refs.aiInput.isTab = false;
+      this.$refs.aiInput.canSend = false;
+      this.ctxVal = "";
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
+      });
+    },
+      // 实时改变AI回答的高度
+      changeAnswer() {
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
       });
     },
   },

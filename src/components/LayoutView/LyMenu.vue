@@ -122,8 +122,9 @@
 <script>
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
-import { GetChatList } from "@/api/chat";
 import { Session } from "@/utils/storage";
+import { mapGetters } from 'vuex';
+
 export default {
   props: {
     isCollapse: {
@@ -141,17 +142,21 @@ export default {
       recentlyChatList: [], ///最近生成列表
     };
   },
-
-  methods: {
-    handleRecentlyChatList() {
-      GetChatList({ pageIndex: 1, pageSize: 3, collect: 0 }).then((res) => {
-        if (res.code === 1) {
-          this.recentlyChatList = res.data || [];
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
+  created() {
+    
+    this.recentlyChatList = this.getChatList;
+  },
+  computed: {
+    ...mapGetters(['getChatList']),
+  },
+    watch: {
+    
+    getChatList(newList) {
+      this.recentlyChatList = newList;
     },
+  },
+  methods: {
+   
     handleSelect(index) {
       console.log(Session.get('sessionId'))
       this.selectedIndex = index;
@@ -162,7 +167,7 @@ export default {
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
-      this.handleRecentlyChatList();
+      this.setChatList()
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
