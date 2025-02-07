@@ -49,10 +49,10 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
-      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      this.answerText = { templetId: 1,type:'video', count:val.count, content: val.data };
       this.$refs.aiInput.canSend = false;
       this.$refs.aiInput.value = "";
-      this.$refs.aiInput.imgList = [];
+      this.$refs.aiInput.videoList = [];
       this.$nextTick(() => {
         const h = this.$refs.aiInput.$el.offsetHeight;
         this.resizeHeight = h + 30;

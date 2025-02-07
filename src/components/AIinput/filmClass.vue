@@ -28,7 +28,6 @@
     <el-upload
       class="upload-demo"
       action=""
-      accept=".jpg, .jpeg, .png, .gif, .webp"
       multiple
       :before-upload="handleBeforeUpload"
       :show-file-list="false"
@@ -42,7 +41,13 @@
 </template>
 
 <script>
-import { GetChatTempletByType } from "@/api/chat";
+import {
+  GetChatTempletByType,
+  UploadFile,
+  GetUploadId,
+  CompleteMultipartUpload,
+  UploadPart,
+} from "@/api/chat";
 export default {
   props: {
     size: {
@@ -54,6 +59,7 @@ export default {
     return {
       fileList: [],
       dropdownList: [], ///视频上传类型列表
+      fileDateList: [],
     };
   },
   created() {
@@ -106,21 +112,135 @@ export default {
       this.$emit("change", str);
     },
     // 上传图片之前的操作
-    handleBeforeUpload(file) {
+    async handleBeforeUpload(file) {
+      console.log(file, this.fileList);
       if (!file) return false;
       const that = this;
       const isLt5M = file.size / 1024 / 1024 < this.size;
-      if (!isLt5M) {
-        this.$message.error("上传图片大小不能超过 5MB!");
-        return false;
+      const fileType = file.type.startsWith("image") ? "imageUrl" : "videoUrl";
+      //       const handleSuccess = (url) => {
+      //   that.fileDateList.push({
+      //     type: fileType,
+      //     role: "user",
+      //     data: [
+      //       {
+      //         type: fileType === "imageUrl" ? "originalImage" : "originalVideo",
+      //         url: url,
+      //       },
+      //     ],
+      //   });
+      //   that.$message.success("上传成功");
+      // };
+      if (isLt5M) {
+        // 小于5M
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", file.name);
+        try {
+          const response = await UploadFile(formData); // 上传文件接口
+          if (response.code === 1) {
+            // that.fileDateList.push({
+            //   type: fileType,
+            //   role: "user",
+            //   data: [
+            //     {
+            //       type:
+            //         fileType === "imageUrl" ? "originalImage" : "originalVideo",
+            //       url: response.data.address,
+            //     },
+            //   ], // 上传成功返回的地址
+            // });
+            // that.$message.success("上传成功");
+            const fileDateS = {
+              type: fileType,
+              role: "user",
+              data: [
+                {
+                  type:
+                    fileType === "imageUrl" ? "originalImage" : "originalVideo",
+                  url: response.data.address,
+                },
+              ],
+            };
+            that.$emit("upload", fileDateS);
+            that.$message.success("上传成功");
+          } else {
+            that.$message.error("上传失败：" + response.msg);
+          }
+        } catch (error) {
+          that.$message.error("上传错误，请重试");
+        }
+      } else {
+        // 大于 5MB：分片上传
+        try {
+          console.log("file.name", file.name);
+          const uploadIdResponse = await GetUploadId({ fileName: file.name }); // 创建分片 ID
+          if (uploadIdResponse.code !== 1) return;
+          const { uploadId, address } = uploadIdResponse.data;
+
+          const chunkSize = 5 * 1024 * 1024; // 每片 5MB
+          const chunks = Math.ceil(file.size / chunkSize);
+
+          for (let i = 0; i < chunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min(file.size, start + chunkSize);
+            const chunkFile = file.slice(start, end); // 生成分片
+
+            const formData = new FormData();
+            formData.append("address", address);
+            formData.append("uploadId", uploadId);
+            formData.append("chunk", i);
+            formData.append("chunks", chunks);
+            formData.append("file", chunkFile);
+
+            await UploadPart(formData); // 上传分片
+          }
+
+          // 所有分片上传完成后，合并分片
+          const mergeResponse = await CompleteMultipartUpload({
+            uploadId,
+            address,
+          });
+          if (mergeResponse.code === 1) {
+            const fileDateL = {
+              type: fileType,
+              role: "user",
+              data: [
+                {
+                  type:
+                    fileType === "imageUrl" ? "originalImage" : "originalVideo",
+                  url: mergeResponse.data.address,
+                },
+              ],
+            };
+            that.$emit("upload", fileDateL);
+            that.$message.success("上传成功");
+            // that.fileDateList.push({
+            //   type: fileType,
+            //   role: "user",
+            //   data: [
+            //   {  type:
+            //       fileType === "imageUrl" ? "originalImage" : "originalVideo",
+            //     url: mergeResponse.data.address,}
+            //   ],
+            // });
+          } else {
+            that.$message.error("合并失败：" + mergeResponse.msg);
+          }
+        } catch (error) {
+          that.$message.error("分片上传错误，请重试");
+        }
       }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const base64String = e.target.result; // Base64编码后的数据
-        that.$emit("upload", base64String);
-      };
-      reader.readAsDataURL(file);
-      return false;
+
+      console.log(that.fileDateList);
+
+      // const reader = new FileReader();
+      // reader.onload = function (e) {
+      //   const base64String = e.target.result; // Base64编码后的数据
+      //   that.$emit("upload", base64String);
+      // };
+      // reader.readAsDataURL(file);
+      // return false;
     },
     handleDropdownList() {
       GetChatTempletByType({ type: "二创类型" }).then((res) => {

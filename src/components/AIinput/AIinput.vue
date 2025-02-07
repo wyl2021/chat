@@ -10,6 +10,7 @@
         <img :src="item.img" /><span>{{ item.label }}</span></span
       >
     </div>
+    <!-- 图片 -->
     <div class="h-f-pic">
       <div class="h-f-pic-d1" v-for="(item, index) in imgList" :key="index">
         <img :src="item" />
@@ -17,6 +18,37 @@
           class="el-icon-error h-f-pic-d1-del"
           @click="handleDelPic(index)"
         ></span>
+      </div>
+    </div>
+    <!-- 视频 -->
+    <div class="h-f-film">
+      <div v-for="(item, index) in videoList" :key="index">
+        <div v-if="item.type === 'imageUrl'">
+          <div
+            class="h-f-pic-d1"
+            v-for="(item2, index2) in item.data"
+            :key="index2"
+          >
+            <img :src="item2.url" />
+            <span
+              class="el-icon-error h-f-pic-d1-del"
+              @click="handleDelVio(index)"
+            ></span>
+          </div>
+        </div>
+        <div v-if="item.type === 'videoUrl'">
+          <div
+            class="h-f-film-d1"
+            v-for="(item3, index3) in item.data"
+            :key="index3"
+          >
+            <video :src="item3.url" controls></video>
+            <span
+              class="el-icon-error h-f-film-d1-del"
+              @click="handleDelVio(index)"
+            ></span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="h-f-inner">
@@ -157,6 +189,7 @@ export default {
       canSend: false,
       xh: 23,
       imgList: [],
+      videoList: [],
       audioShow: false,
     };
   },
@@ -172,7 +205,7 @@ export default {
       }
       let ctx = this.getHtmlContents(str);
       if (ctx) {
-        this.$emit("sendMsg", this.handleData(ctx));
+        this.$emit("sendMsg",this.handleData(ctx));
       }
       this.clearVal();
     },
@@ -196,6 +229,21 @@ export default {
           role: "user",
           content: { txt: ctx, ratio: str, data: qList },
         };
+      }else if (this.film){
+        const fList=this.videoList
+        fList.push({
+          type:'question',
+          role:'user',
+          content:ctx,
+        })
+        const regex = /分裂数量(\d+)/;
+        const count = ctx.match(regex)[1] || "1"
+       
+        parameter={
+          count:count,
+          data:fList
+        }
+        console.log('parameter',parameter)
       } else {
         parameter = {
           type: "text",
@@ -251,7 +299,8 @@ export default {
     },
     // 上传文件
     handleUpload(img) {
-      this.imgList.push(img);
+      this.videoList.push(img);
+      console.log(this.videoList);
     },
     // 第二个input实时判断是否换个输入框
     handleInputX(e) {
@@ -282,7 +331,10 @@ export default {
     handleDelPic(n) {
       this.imgList.splice(n, 1);
     },
-
+    // 删除视频
+    handleDelVio(n){
+      this.videoList.splice(n, 1);
+    },
     // 计算光标的位置
     selectionPosition() {
       const selection = window.getSelection();
@@ -383,6 +435,46 @@ export default {
   flex-wrap: wrap; /* 允许子项换行 */
   max-height: 200px;
   overflow-y: auto;
+  .h-f-pic-d1 {
+    position: relative;
+    margin-left: 7px;
+    margin-top: 5px;
+    img {
+      height: 110px;
+    }
+    .h-f-pic-d1-del {
+      position: absolute;
+      cursor: pointer;
+      top: 2px;
+      right: 3px;
+      color: #212126;
+      font-size: 14px;
+    }
+  }
+}
+.h-f-film {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap; /* 允许子项换行 */
+  max-height: 200px;
+  overflow-y: auto;
+  .h-f-film-d1 {
+    position: relative;
+    margin-left: 7px;
+    margin-top: 5px;
+    video {
+      height: 100px;
+    }
+    .h-f-film-d1-del {
+      position: absolute;
+      cursor: pointer;
+      top: 2px;
+      right: 3px;
+      color: #212126;
+      font-size: 14px;
+    }
+  }
   .h-f-pic-d1 {
     position: relative;
     margin-left: 7px;

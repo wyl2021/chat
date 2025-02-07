@@ -10,12 +10,21 @@ const service = axios.create({
 // 拦截请求
 service.interceptors.request.use(config => {
   const token = store.getters.getToken;
+  if (!config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';  // 默认值
+  }
   if (config.method === 'post') {
-    config.data = {
-      ...config.data,
-      token: token,
-      action: config.action
-    };
+    if(config.data instanceof FormData){
+      config.data.append("token", token);
+      config.data.append("action", config.action);
+    }else{
+      config.data = {
+        ...config.data,
+        token: token,
+        action: config.action
+      };
+    }
+    
   } else {
     config.params = {
       ...config.params,

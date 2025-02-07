@@ -107,6 +107,7 @@ export const GetChatImg = (data) => {
 
 // 创建分片ID
 export const GetUploadId = (data) => {
+  console.log('创建分片ID',data)
   return request({
     method: 'post',
     action: 'GetUploadId',
@@ -119,7 +120,10 @@ export const UploadPart = (data) => {
   return request({
     method: 'post',
     action: 'UploadPart',
-    data
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',  // 设置文件上传的 Content-Type
+    }
   })
 }
 
@@ -136,7 +140,10 @@ export const UploadFile = (data) => {
   return request({
     method: 'post',
     action: 'UploadFile',
-    data
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data',  // 设置文件上传的 Content-Type
+    }
   })
 }
 
