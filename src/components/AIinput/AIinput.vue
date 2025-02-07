@@ -82,7 +82,7 @@
           <!--视频功能-->
           <filmClass
             v-if="film"
-            @upload="handleUpload"
+            @upload="handleUpload1"
             @change="handleChangeTypeClass"
           ></filmClass>
           <!---------------------------------------------------------->
@@ -191,6 +191,7 @@ export default {
       imgList: [],
       videoList: [],
       audioShow: false,
+      typeStr: { str: "", type: 1 },
     };
   },
   methods: {
@@ -205,8 +206,9 @@ export default {
       }
       let ctx = this.getHtmlContents(str);
       if (ctx) {
-        this.$emit("sendMsg",this.handleData(ctx));
+        this.$emit("sendMsg", this.handleData(ctx));
       }
+      this.vaildateForm();
       this.clearVal();
     },
     handleData(ctx) {
@@ -229,21 +231,21 @@ export default {
           role: "user",
           content: { txt: ctx, ratio: str, data: qList },
         };
-      }else if (this.film){
-        const fList=this.videoList
+      } else if (this.film) {
+        const fList = this.videoList;
         fList.push({
-          type:'question',
-          role:'user',
-          content:ctx,
-        })
+          type: "question",
+          role: "user",
+          content: ctx,
+        });
         const regex = /分裂数量(\d+)/;
-        const count = ctx.match(regex)[1] || "1"
-       
-        parameter={
-          count:count,
-          data:fList
-        }
-        console.log('parameter',parameter)
+        const count = ctx.match(regex)[1] || "1";
+
+        parameter = {
+          count: count,
+          data: fList,
+        };
+        console.log("parameter", parameter);
       } else {
         parameter = {
           type: "text",
@@ -294,27 +296,58 @@ export default {
     },
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
-      this.value += typeStr;
-      this.canSend = true;
+      if (typeStr.dataType === 2 && this.imgList.length > 0) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
+      }
+      this.typeStr = typeStr;
+      this.value = typeStr.str;
+    },
+    handleUpload(img) {
+      this.imgList.push(img);
+      if (this.typeStr.dataType === 2) {
+        this.canSend = true;
+      } else {
+        const b = this.vaildateForm();
+        if (this.typeStr && b) {
+          this.canSend = true;
+        }
+      }
     },
     // 上传文件
-    handleUpload(img) {
-      this.videoList.push(img);
-      console.log(this.videoList);
+    handleUpload1(file) {
+      this.videoList.push(file);
+      const b = this.vaildateForm();
+      if (this.typeStr && b) {
+        this.canSend = true;
+      }
     },
     // 第二个input实时判断是否换个输入框
     handleInputX(e) {
       if (e.target != this.$refs.ine1) {
-        e.target.setAttribute("txt", e.target.value);
+        let s = e.target.value;
+        if (e.target.getAttribute("number")) {
+          s = s.replace(/[^\d]/g, "");
+        }
+        e.target.setAttribute("txt", s);
       }
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
       const ctx = this.getHtmlContents(val);
-      if (ctx) {
+      const b = this.vaildateForm();
+      if (
+        this.typeStr &&
+        this.typeStr.type === "image" &&
+        this.imgList.length > 0 &&
+        b
+      ) {
+        this.canSend = true;
+      } else if (ctx && b && !this.typeStr) {
         this.canSend = true;
       } else {
         this.canSend = false;
-        this.$refs.ine1.innerText = "";
+        // this.$refs.ine1.innerText = "";
         this.isSecond = false;
       }
       const h = this.$refs.ine1.offsetHeight;
@@ -330,10 +363,22 @@ export default {
     // 删除图片
     handleDelPic(n) {
       this.imgList.splice(n, 1);
+      const b = this.vaildateForm();
+      if (this.typeStr && b && this.imgList.length > 0) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
+      }
     },
     // 删除视频
-    handleDelVio(n){
+    handleDelVio(n) {
       this.videoList.splice(n, 1);
+      const b = this.vaildateForm();
+      if (this.typeStr && b && this.videoList.length > 0) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
+      }
     },
     // 计算光标的位置
     selectionPosition() {

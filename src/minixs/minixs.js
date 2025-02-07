@@ -16,7 +16,7 @@ Vue.mixin({
     ])
   },
   methods: {
-    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath','setChatList']),
+    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath', 'setChatList']),
     createAiScript (arr = []) {
       let result = '';
       arr.forEach(item => {
@@ -73,7 +73,7 @@ Vue.mixin({
             innerText = el.innerText;
             contents += innerText;
           }
-        }else if(domEle === 'select'){
+        } else if (domEle === 'select') {
           if (el.innerText) {
             innerText = el.querySelector('option:checked');
             contents += innerText;
@@ -89,6 +89,19 @@ Vue.mixin({
         str = htmlString.replace(/<[^>]*>/g, '');
       }
       return str;
+    },
+    // 验证表单
+    vaildateForm () {
+      const form = document.getElementById('myForm');
+      if (!form) return true;
+      const elementsWithCustomAttr = form.querySelectorAll('[required]');
+      for (let i = 0; i < elementsWithCustomAttr.length; i++) {
+        const dom = elementsWithCustomAttr[i];
+        if (!dom.value) {
+          return false;
+        }
+      }
+      return true;
     }
   }
 })

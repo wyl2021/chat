@@ -1,5 +1,5 @@
 <template>
-  <div class="d-conrainer" ref="answerRef">
+  <div class="d-conrainer" ref="answerRef" @scroll="handleScroll">
     <div style="display: flex; justify-content: flex-end">
       <el-button
         size="mini"
@@ -93,10 +93,15 @@
 </template>
 <script>
 // import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
-import moment from "moment";
+
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
-import { SaveChatCollect, CreateChatImg, GetChatImg } from "@/api/chat";
+import { SaveChatCollect } from "@/api/chat";
+import doDataSend from "./aiInterface/doDataSend";
+import textInter from "./aiInterface/textInter";
+import imgInter from "./aiInterface/imgInter";
+import viedoInter from "./aiInterface/viedoInter";
+import historyInter from "./aiInterface/historyInter";
 // import audioView from "./audioView.vue";
 /**
  * 数据类型
@@ -165,356 +170,23 @@ export default {
       result: "",
       isDel: true,
       messages: [],
+      pageIndex: 0,
+      pageSize: 10,
     };
   },
   mounted() {},
   methods: {
-    handleMessage(val) {
-      console.log('val',val)
-      const content = val.content;
-      this.result = "";
-      if (val.type === "image") {
-        this.messages.push({
-          type: "question",
-          dataType: "image",
-          content: {
-            imgList: content?.data.filter((e) => e.type === "base64"),
-            text: content.txt,
-          },
-          time: moment().format("YYYY-MM-DD HH:mm:ss"),
-        });
-        this.aiImgAnswer(content);
-      }else if(val.type === "video"){
-        content.forEach(item=>{
-          console.log('item',item)
-          this.messages.push({
-            type:'question',
-            dataType:item.type==='question'?'text':item.type,
-            content:{
-              imgList:item.data.filter((item) => item.type === "originalImage")
-                .map((item) => item.url)|| [],
-              videoList:item.data.filter((item) => item.type === "originalVideo")
-                .map((item) => item.url)|| [],
-              text:item?.content,
-            }
-          })
-        })
-        console.log(this.messages)
-        this.aiVideoAnswer(val)
-        // this.messages.push({
-        //   type: "question",
-        //   dataType: "image",
-        //   content: {
-        //     imgList: content?.data.filter((e) => e.type === "base64"),
-        //     text: content.txt,
-        //   },
-        //   time: moment().format("YYYY-MM-DD HH:mm:ss"),
-        // });
-      } else if (val.type === "history") {
-        if (Array.isArray(val) && val.length > 0) {
-          let messages = [];
-          let currentQuestion = {
-            question: "", //文本问题
-            img: [], ///图片
-            video: [], //视频
-          }; // 用于存储当前的提问
-
-          val.forEach((item) => {
-            // 只处理已生成的数据
-            item.data.forEach((message) => {
-              if (message.role === "user") {
-                if (message.type === "text") {
-                  currentQuestion.question = message.content; // 获取用户提问
-                } else if (message.type === "image") {
-                  currentQuestion.img = message.data.map(
-                    (dataItem) => dataItem.content
-                  );
-                } else if (message.type === "video") {
-                  currentQuestion.video = message.data.map(
-                    (dataItem) => dataItem.url
-                  );
-                }
-              } else if (message.role === "assistant") {
-                if (currentQuestion) {
-                  // 当提问和回答都存在时，创建消息对象并添加到 messages 列表中
-                  messages.push({
-                    question: currentQuestion.question,
-                    content:
-                      message.type === "answer"
-                        ? message.content
-                        : message.type === "imageUrl"
-                        ? this.imageDate(message.data)
-                        : this.videoDate(message.data),
-                    imgList: currentQuestion.img, // 如果有图片，可以在这里处理
-                    videoList: currentQuestion.video, // 如果有视频，可以在这里处理
-                  });
-                  currentQuestion = ""; // 重置当前问题
-                }
-              }
-            });
-          });
-          this.messages = messages;
-        }
-      } else {
-        this.messages.push({
-          type: "question",
-          dataType: "text",
-          content: {
-            text: val?.content,
-          },
-          time: moment().format("YYYY-MM-DD HH:mm:ss"),
-        });
-        this.aiAnswer({ templetId: val?.templetId, txt: val?.content });
-        
-      }
-    },
-    /* eslint-disable */
-    async aiAnswer({ templetId = 0, txt = "" }) {
-      // 创建对话  只针对文本会话
-      const url = "http://www.swsai.com:5003/api/v1";
-      this.loading = true; // 标记正在加载
-      this.isDel = false;
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: this.getToken,
-            action: "CreateChatTextStream",
-            templetId: templetId,
-            sessionId: Session.get("sessionId") || "",
-            data: [
-              {
-                type: "question",
-                role: "user",
-                content: txt,
-              },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        this.setChatList();
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let chunk = "";
-
-        /* eslint-disable */
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunk += decoder.decode(value, { stream: true });
-          // 检查流结束标志
-          if (chunk.endsWith("[DONE]")) {
-            this.isDel = true;
-            chunk = chunk.replace("[DONE]", ""); // 移除结束标志
-            this.loading = false; // 关闭加载状态
-          }
-          // 尝试逐块解析 JSON
-          let boundary = chunk.indexOf("}{");
-          while (boundary !== -1) {
-            const jsonChunk = chunk.slice(0, boundary + 1);
-            this.processJsonChunk(jsonChunk);
-
-            // 更新 chunk，移除已解析部分
-            chunk = chunk.slice(boundary + 1);
-            boundary = chunk.indexOf("}{");
-          }
-          // 尝试解析剩余的完整 JSON
-          try {
-            const jsonChunk = JSON.parse(chunk);
-            this.processJsonChunk(jsonChunk);
-            chunk = ""; // 清空 chunk
-          } catch (err) {
-            // 如果解析失败，保留 chunk 继续累加数据
-          }
-        }
-        this.messages.push({
-          type: "answer",
-          dataType: "text",
-          content: this.result,
-          time: moment().format("YYYY-MM-DD HH:mm:ss"),
-        });
-        this.scrollToBottom();
-        // this.loading = false; // 完成后关闭加载状态
-        // $("#result").append(result + "\n");
-      } catch (error) {
-        console.error("Error:", error);
-        this.$message.error("请求失败，请稍后重试！");
-        this.loading = false;
-        this.isDel = true; // 标记删除状态
-      }
-    },
-    // 图片会话
-    async aiImgAnswer(val) {
-      this.loading = true; // 标记正在加载
-      this.isDel = false;
-      let isPolling = 0;
-      try {
-        const poll = async () => {
-          if (isPolling == 4) 
-          {
-            Session.set("sessionId", "");
-            this.loading = false;
-            return;
-          }
-          try {
-            const response = await GetChatImg({
-              id: Number(Session.get("sessionId")),
-            });
-
-            if (response.code !== 2) {
-              console.log("回复成功", response);
-              this.messages.push({
-                type: "answer",
-                dataType: "image",
-                content: this.imageDate(response.data),
-                time: moment().format("YYYY-MM-DD HH:mm:ss"),
-              });
-              console.log(1111, this.messages);
-              this.loading = false;
-            } else {
-              isPolling++;
-              setTimeout(poll, 1000); // 继续轮询
-            }
-          } catch (error) {
-            console.error("轮询失败", error);
-            isPolling = 4;
-          }
-        };
-        CreateChatImg({
-          templetId: val?.templetId || 1,
-          sessionId: Session.get("sessionId") || "",
-          ratio: val?.ratio,
-          data: val?.data,
-        }).then(async (res) => {
-          if (res.code === 1) {
-            await Session.set("sessionId", res.data.sessionId);
-            poll();
-          } else {
-            this.$message.error(res.msg);
-          }
-        });
-      } catch (error) {
-        console.error("Error:", error);
-        this.$message.error("请求失败，请稍后重试！");
-        this.loading = false;
-        this.isDel = true; // 标记删除状态
-      }
-    },
-    async aiVideoAnswer(val){
-      this.loading = true; // 标记正在加载
-      this.isDel = false;
-      let isPolling = 0;
-      try {
-        const poll = async () => {
-          if (isPolling == 4) 
-          {
-            Session.set("sessionId", "");
-            this.loading = false;
-            return;
-          }
-          try {
-            const response = await GetChatVideo({
-              id: Number(Session.get("sessionId")),
-            });
-
-            if (response.code !== 2) {
-              console.log("回复成功", response);
-              this.messages.push({
-                type: "answer",
-                dataType: "video",
-                content: this.videoDate(response.data),
-                time: moment().format("YYYY-MM-DD HH:mm:ss"),
-              });
-              console.log(1111, this.messages);
-              this.loading = false;
-            } else {
-              isPolling++;
-              setTimeout(poll, 1000); // 继续轮询
-            }
-          } catch (error) {
-            console.error("轮询失败", error);
-            isPolling = 4;
-          }
-        };
-        CreateChatVideo({
-          templetId: val?.templetId || 1,
-          sessionId: Session.get("sessionId") || "",
-          count: val?.count || '1',
-          data: val?.data,
-        }).then(async (res) => {
-          if (res.code === 1) {
-            await Session.set("sessionId", res.data.sessionId);
-            poll();
-          } else {
-            this.$message.error(res.msg);
-          }
-        });
-      } catch (error) {
-        console.error("Error:", error);
-        this.$message.error("请求失败，请稍后重试！");
-        this.loading = false;
-        this.isDel = true; // 标记删除状态
-      }
-    },
-    // 处理图片数据
-    imageDate(response){
-      let answerList = [];
-              response.forEach((item) => {
-                const images = item.reduce(
-                  (acc, item) => {
-                    if (item.type === "externalLinkImage") {
-                      acc.externalLinkImage = item.url;
-                    } else if (item.type === "originalImage") {
-                      acc.originalImage = item.url;
-                    } else if (item.type === "thumbnail") {
-                      acc.thumbnail = item.url;
-                    }
-                    return acc;
-                  },
-                  { externalLinkImage: "", originalImage: "", thumbnail: "" }
-                );
-                answerList.push({
-                  type: item.type,
-                  data: images,
-                });
-              });
-            return answerList;
-    },
-    //处理视频数据
-    videoDate(response){
-      let answerList = [];
-      response.forEach(item=>{
-        answerList.push({
-          type:item.type==='videoUrl'?'video':item.type==='imageUrl'?'image':'question',
-          data:item.type==='videoUrl'?item.data?.url:item.type==='imageUrl'?this.imageDate(item.data):item.content
-        })
-      })
-      return answerList
-    },
-    // 处理解析后的 JSON 数据
-    processJsonChunk(chunk) {
-      try {
-        if (typeof chunk === "string") {
-          chunk = JSON.parse(chunk); // 确保是 JSON 对象
-        }
-        if (chunk.code === 1) {
-          const content = chunk?.data?.data?.content || "";
-          // 更新当前消息的 AI 回复内容
-          this.result += content; // 拼接内容
-          Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
-        } else if (chunk.code === 0) {
-          this.$message.error("请求失败：" + chunk.msg);
-        } else if (chunk.code === -1) {
-          this.$message.error("Token 已失效，请重新登录！");
-        }
-      } catch (err) {
-        console.error("处理 JSON 块出错:", err);
+    ...doDataSend,
+    ...textInter,
+    ...imgInter,
+    ...viedoInter,
+    ...historyInter,
+    // 滑块的回调
+    handleScroll() {
+      const scrollContainer = this.$refs.answerRef;
+      if (scrollContainer.scrollTop === 0) {
+        // 滑块滑到顶部，获取历史记录
+        this.fetchHistory();
       }
     },
     // 滚动到页面底部

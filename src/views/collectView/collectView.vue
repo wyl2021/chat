@@ -51,7 +51,7 @@
 </template>
 <script>
 import AIinput from "@/components/AIinput/AIinput";
-import { GetChatList, GetChatDetailsTextList } from "@/api/chat";
+import { GetChatList } from "@/api/chat";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import { Session } from "@/utils/storage";
 export default {
@@ -79,30 +79,17 @@ export default {
   },
   methods: {
     jump(val) {
-      // 发送消息
-      GetChatDetailsTextList({
-        pageIndex: 1,
-        pageSize: 10,
-        sessionId: val?.id,
-      }).then((res) => {
-        if (res.code === 1) {
-          this.answerText = {
-            type: "history",
-            content: res.data,
-          };
-          Session.set("sessionId", val?.id);
-          this.isJump = true;
-          // this.$refs.aiInput.isTab = false;
-          // this.$refs.aiInput.canSend = false;
-          this.ctxVal = "";
-          this.$nextTick(() => {
-            const h = this.$refs.aiInput.$el.offsetHeight;
-            this.resizeHeight = h + 30;
-            this.answer = true;
-          });
-        } else {
-          this.$message.error(res.msg);
-        }
+      this.answerText = {
+        type: "history",
+        role: "user",
+        content: null,
+      };
+      Session.set("sessionId", val?.id);
+      this.isJump = true;
+      this.$nextTick(() => {
+        const h = this.$refs.aiInput.$el.offsetHeight;
+        this.resizeHeight = h + 30;
+        this.answer = true;
       });
     },
     handleCollect() {

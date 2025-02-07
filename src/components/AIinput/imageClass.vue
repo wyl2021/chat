@@ -66,13 +66,15 @@ export default {
   methods: {
     // 选择比例的效果
     handleCommand(val) {
-      let str = "<span>比例：</span>";
+      let str = "<form id='myForm'><span>比例：</span>";
+      let dataType = 1;
       if (val === "自定义") {
         const reg = new RegExp(/[^\d]/g);
-        str += `<span>长</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" /><span>宽</span><input type="text" class="inputTs" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" />`;
+        str += `<span>长</span><input type="text" number="true" class="inputTs" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" required /><span>宽</span><input type="text" number="true" class="inputTs" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" required />`;
+        dataType = 1;
       } else {
         const arr = ["1:1", "4:3", "3:4", "16:9", "9:16"];
-        str += `<select class="selectTs" txt="${val}">`;
+        str += `<select class="selectTs" txt="${val}" required >`;
         arr.forEach((ele) => {
           if (ele === val) {
             str += `<option value="${ele}" selected>${ele}</option>`;
@@ -80,9 +82,10 @@ export default {
             str += `<option value="${ele}">${ele}</option>`;
           }
         });
-        str += `</select>`;
+        str += `</select></form>`;
+        dataType = 2;
       }
-      this.$emit("change", str);
+      this.$emit("change", { str, dataType, type: "image" });
     },
     // 上传图片之前的操作
     handleBeforeUpload(file) {
