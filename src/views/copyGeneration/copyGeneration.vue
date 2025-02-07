@@ -104,7 +104,7 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
-      console.log(' this.answerText', this.answerText)
+      console.log(" this.answerText", this.answerText);
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";
@@ -155,7 +155,6 @@ export default {
           const data = res.data || [];
           const dom = this.createAiScript(data);
           this.$refs.aiInput.isTab = true;
-          this.$refs.aiInput.canSend = true;
           this.ctxVal = dom;
         }
       });

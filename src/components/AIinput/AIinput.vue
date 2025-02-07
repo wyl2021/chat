@@ -191,7 +191,7 @@ export default {
       imgList: [],
       videoList: [],
       audioShow: false,
-      typeStr: { str: "", type: 1 },
+      typeStr: null,
     };
   },
   methods: {

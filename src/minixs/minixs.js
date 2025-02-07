@@ -18,26 +18,36 @@ Vue.mixin({
   methods: {
     ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath', 'setChatList']),
     createAiScript (arr = []) {
-      let result = '';
+      let result = '<form id="myForm">';
       arr.forEach(item => {
         if (item.type === 'text') {
           // const txt = item.content.replace('/\r\n/g', '<br>');
-          result += `<span>${item.content}</span>`;
+          if (item.content === '/n') {
+            result += '<br/>'
+          } else {
+            result += `<span>${item.content}</span>`;
+          }
         } else if (item.type === 'input') {
           const len = this.textWidth(item.placeholder) + 10;
-          result += `<input class="inputTs" style="width: ${len || 130}px" type="text" placeholder="[${item.placeholder}]" />`;
+          result += `<input class="inputTs" required style="width: ${len || 130}px" type="text" placeholder="[${item.placeholder}]" />`;
+        } else if (item.type === 'int') {
+          const len = item.placeholder ? this.textWidth(item.placeholder) + 10 : 50;
+          const reg = new RegExp(/[^\d]/g);
+          result += `<input class="inputTs" required style="width: ${len || 130}px" number="true"  placeholder="[${item.placeholder || '请输入'}]" onkeyup="value=value.replace(${reg},'')" />`;
         } else if (item.type === 'select') {
           const arr = item.data || [];
-          result += `<select class="selectTs" txt="${arr[0].value}">`
+          result += `<select class="selectTs" required txt="${arr[0].value}">`
           arr.forEach(item => {
             result += `<option value="${item.value}">${item.name}</option>`;
           });
           result += `</select>`;
         }
       });
+      result += `</form>`;
       const txt = `<pre style="width: 100%;white-space: pre-wrap;line-height: 1.7">${result}</pre>`
       return txt;
     },
+    // 文本宽度
     textWidth (text, font) {
       // 创建一个canvas元素用于测量文本
       const canvas = document.createElement('canvas');
@@ -52,6 +62,7 @@ Vue.mixin({
       // 返回文本宽度
       return metrics.width;
     },
+    // 获取内容
     getHtmlContents (htmlString) {
       // 创建一个新的DOM解析器
       const parser = new DOMParser();
