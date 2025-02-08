@@ -75,8 +75,22 @@ export default {
     };
   },
   created() {
-    this.handleCollect();
+    console.log(this.$route.query.collect)
+    if(!this.$route.query.collect){
+      this.handleCollect();
+    }else{
+      this.jump({id:this.$route.query.sessionId||0}); // 每次路由变化时刷新数据
+    }
   },
+  watch: {
+  '$route'(to, from) {
+    console.log('to:', to);
+    console.log('from:', from);
+    if(to.query.collect==="0"){
+    this.jump({id:to.query.sessionId||0}); // 每次路由变化时刷新数据
+    }
+  }
+},
   methods: {
     jump(val) {
       this.answerText = {

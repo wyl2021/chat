@@ -86,6 +86,7 @@
         :index="`6-${index + 1}`"
         v-for="(item, index) in recentlyChatList"
         :key="index"
+        @click.native="handleSelect1(item)"
       >
         <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
       </el-menu-item>
@@ -158,12 +159,25 @@ export default {
   methods: {
    
     handleSelect(index) {
-      console.log(Session.get('sessionId'))
+      // console.log(Session.get('sessionId'))
+      if(index.includes('6-'))return 
       this.selectedIndex = index;
       this.$router.push(index);
       this.setActivePath(index);
       Session.remove('sessionId')
 
+    },
+    handleSelect1(item){
+      console.log(item)
+      this.$router.push({
+        path:'/collectView',
+        query:{
+          collect:0,
+          sessionId:item.id,
+          type:item.type
+        }
+      })
+      this.setActivePath('');
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);

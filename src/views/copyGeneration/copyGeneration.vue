@@ -103,7 +103,7 @@ export default {
   methods: {
     // 发送消息
     handleSendMsg(val) {
-      this.answerText = { templetId: 0, txt: val.txt, imgList: val.imgList };
+      this.answerText = { templetId: 0, content: val.content, imgList: val.imgList };
       console.log(" this.answerText", this.answerText);
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
@@ -144,6 +144,7 @@ export default {
           ele.img = require("@/assets/images/icon_ctb.png"); // 图片路径
         });
         this.ctxList = arr;
+     
       }
     },
     // 获取模版
@@ -155,6 +156,7 @@ export default {
           const data = res.data || [];
           const dom = this.createAiScript(data);
           this.$refs.aiInput.isTab = true;
+          this.$refs.aiInput.canSend = false;
           this.ctxVal = dom;
         }
       });

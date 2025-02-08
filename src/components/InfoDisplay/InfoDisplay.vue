@@ -21,8 +21,20 @@
             v-for="(item, inx) in message.content.imgList"
             :key="inx"
           >
-            <img :src="item.content" />
+            <!-- <img :src="item.content" /> -->
+            <img
+              v-if="item.type === 'imageUrl' && item.data.externalLinkImage"
+              :src="
+                item.data.thumbnail ||
+                item.data.originalImage ||
+                item.data.externalLinkImage
+              "
+            />
+            
           </div>
+          <div class="d-c-header" >
+          <pre >{{ message?.content.text }}</pre>
+        </div>
         </div>
         <div
           style="display: flex; justify-content: flex-end; flex-wrap: wrap"
@@ -33,8 +45,12 @@
             v-for="(item2, inx2) in message.content.videoList"
             :key="inx2"
           >
-            <img :src="item2" />
+            <img v-if="item2.type==='imageUrl'" :src="item2.url" />
+            <video v-if="item.type==='videoUrl'" :src="item2.url" controls></video>
           </div>
+          <div class="d-c-header" >
+          <pre >{{ message?.content.text }}</pre>
+        </div>
         </div>
         <!-- <audioView
           v-if="message.audioObj"
@@ -87,7 +103,7 @@
           </el-tooltip>
         </div>
       </div>
-      <LoadingView v-if="loading"></LoadingView>
+      <LoadingView v-if="loading && index===messages.length-1"></LoadingView>
     </div>
   </div>
 </template>
@@ -172,6 +188,7 @@ export default {
       messages: [],
       pageIndex: 0,
       pageSize: 10,
+      historySessionId:''
     };
   },
   mounted() {},

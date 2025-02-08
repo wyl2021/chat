@@ -113,6 +113,9 @@ import barArr from "./barArr";
 import filmClass from "./filmClass.vue";
 import imageClass from "./imageClass.vue";
 import AudioRecorder from "./AudioRecorderClass.vue";
+import {filmVaildate} from "./inpuiCanSend/filmVaildateForm"
+import {picVaildate} from "./inpuiCanSend/picVaildateForm"
+
 export default {
   components: {
     filmClass,
@@ -156,6 +159,7 @@ export default {
   computed: {
     otherType() {
       return {
+      
         pic: this.pic,
         film: this.film,
       };
@@ -181,6 +185,8 @@ export default {
   },
   data() {
     return {
+      filmVaildate,
+        picVaildate,
       barArr,
       value: "",
       isTab: false,
@@ -208,7 +214,7 @@ export default {
       if (ctx) {
         this.$emit("sendMsg", this.handleData(ctx));
       }
-      this.vaildateForm();
+      this.pic?this.picVaildate():this.film?this.filmVaildate():this.vaildateForm();
       this.clearVal();
     },
     handleData(ctx) {
@@ -309,7 +315,7 @@ export default {
       if (this.typeStr.dataType === 2) {
         this.canSend = true;
       } else {
-        const b = this.vaildateForm();
+        const b = this.picVaildate();
         if (this.typeStr && b) {
           this.canSend = true;
         }
@@ -318,7 +324,8 @@ export default {
     // 上传文件
     handleUpload1(file) {
       this.videoList.push(file);
-      const b = this.vaildateForm();
+      const b = this.filmVaildate();
+      console.log(this.typeStr,b)
       if (this.typeStr && b) {
         this.canSend = true;
       }
@@ -335,7 +342,7 @@ export default {
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
       const ctx = this.getHtmlContents(val);
-      const b = this.vaildateForm();
+      const b = this.pic?this.picVaildate():this.film?this.filmVaildate():this.vaildateForm();
       if (
         this.typeStr &&
         this.typeStr.type === "image" &&
@@ -363,7 +370,7 @@ export default {
     // 删除图片
     handleDelPic(n) {
       this.imgList.splice(n, 1);
-      const b = this.vaildateForm();
+      const b = this.picVaildate();
       if (this.typeStr && b && this.imgList.length > 0) {
         this.canSend = true;
       } else {
@@ -373,7 +380,7 @@ export default {
     // 删除视频
     handleDelVio(n) {
       this.videoList.splice(n, 1);
-      const b = this.vaildateForm();
+      const b = this.filmVaildate();
       if (this.typeStr && b && this.videoList.length > 0) {
         this.canSend = true;
       } else {

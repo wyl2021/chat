@@ -62,6 +62,7 @@ export default {
   imageDate (response) {
     let answerList = [];
     response.forEach((item) => {
+      console.log('处理图片数据',item)
       const images = item.reduce(
         (acc, item) => {
           if (item.type === "externalLinkImage") {
