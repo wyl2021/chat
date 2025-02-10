@@ -9,31 +9,31 @@ export default {
     try {
       const poll = async () => {
         if (isPolling == 4) {
-          Session.set("sessionId", "");
+          Session.set("id", "");
           this.loading = false;
           return;
         }
         try {
           const response = await GetChatVideo({
-            id: Number(Session.get("sessionId")),
+            id: Number(Session.get("id")),
           });
 
           if (response.code !== 2) {
-            console.log("回复成功", response);
+           
             this.messages.push({
               type: "answer",
               dataType: "video",
               content: this.videoDate(response.data),
               time: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
-            console.log(1111, this.messages);
+           
             this.loading = false;
           } else {
             isPolling++;
             setTimeout(poll, 1000); // 继续轮询
           }
         } catch (error) {
-          console.error("轮询失败", error);
+          
           isPolling = 4;
         }
       };
@@ -41,17 +41,23 @@ export default {
         templetId: val?.templetId || 1,
         sessionId: Session.get("sessionId") || "",
         count: val?.count || "1",
-        data: val?.data,
+        data: val?.content,
       }).then(async (res) => {
-        if (res.code === 1) {
-          await Session.set("sessionId", res.data.sessionId);
-          poll();
+        if (res.code === 0 ) {
+          if (res.msg) {
+            this.$message.error(res.msg);
+          }else{
+            await Session.set("sessionId", res.data.sessionId);
+            await Session.set("id", res.data.id);
+            poll();
+          }
+         
         } else {
           this.$message.error(res.msg);
         }
       });
     } catch (error) {
-      console.error("Error:", error);
+     
       this.$message.error("请求失败，请稍后重试！");
       this.loading = false;
       this.isDel = true; // 标记删除状态
@@ -59,7 +65,9 @@ export default {
   },
   //处理视频数据
   videoDate (response) {
+   
     let answerList = [];
+    if(!response) return 
     response.forEach((item) => {
       answerList.push({
         type:
@@ -70,9 +78,9 @@ export default {
               : "question",
         data:
           item.type === "videoUrl"
-            ? item.data?.url
+            ? item.data[0]?.url
             : item.type === "imageUrl"
-              ? this.imageDate(item.data)
+              ? item.data[0]?.url
               : item.content,
       });
     });

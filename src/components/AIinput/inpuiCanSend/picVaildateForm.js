@@ -9,6 +9,5 @@
          if (!dom.value) {
            return false;
          }
-       }
-       
+        }
 }

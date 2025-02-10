@@ -23,34 +23,28 @@
           >
             <!-- <img :src="item.content" /> -->
             <img
-              v-if="item.type === 'imageUrl' && item.data.externalLinkImage"
+          
               :src="
-                item.data.thumbnail ||
-                item.data.originalImage ||
-                item.data.externalLinkImage
+                item.content ||  item  || ''
               "
             />
             
           </div>
-          <div class="d-c-header" >
-          <pre >{{ message?.content.text }}</pre>
-        </div>
+      
         </div>
         <div
-          style="display: flex; justify-content: flex-end; flex-wrap: wrap"
+         
           v-if="message.dataType === 'video'"
         >
           <div
-            class="d-c-pic"
-            v-for="(item2, inx2) in message.content.videoList"
-            :key="inx2"
+            v-for="(item3, inx3) in message.content.videoList"
+            :key="inx3"
+            :class="item3.type==='image'?'d-c-pic':'d-c-film'"
           >
-            <img v-if="item2.type==='imageUrl'" :src="item2.url" />
-            <video v-if="item.type==='videoUrl'" :src="item2.url" controls></video>
+            <img  v-if="item3.type==='image'" :src="item3.data || item3" />
+            <video    v-if="item3.type==='video'" :src="item3.data || item3" controls></video>
           </div>
-          <div class="d-c-header" >
-          <pre >{{ message?.content.text }}</pre>
-        </div>
+       
         </div>
         <!-- <audioView
           v-if="message.audioObj"
@@ -203,7 +197,7 @@ export default {
       const scrollContainer = this.$refs.answerRef;
       if (scrollContainer.scrollTop === 0) {
         // 滑块滑到顶部，获取历史记录
-        this.fetchHistory();
+        this.getHiStory();
       }
     },
     // 滚动到页面底部
@@ -299,6 +293,17 @@ export default {
   margin-bottom: 5px;
   img {
     height: 110px;
+    width: 100%;
+    object-fit: contain;
+  }
+}
+.d-c-film {
+  margin-left: 7px;
+  margin-bottom: 5px;
+  video {
+    height: 110px;
+    width: 100%;
+    object-fit: contain;
   }
 }
 pre {

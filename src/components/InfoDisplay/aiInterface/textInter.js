@@ -16,7 +16,7 @@ export default {
           token: this.getToken,
           action: "CreateChatTextStream",
           templetId: templetId,
-          sessionId: Session.get("sessionId").toString() || "",
+          sessionId: Session.get("sessionId")?.toString() || "",
           data: [
             {
               type: "question",

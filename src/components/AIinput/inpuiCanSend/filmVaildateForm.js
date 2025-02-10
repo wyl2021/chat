@@ -7,6 +7,5 @@ export function filmVaildate () {
           if (!dom.value) {
             return false;
           }
-        }
-        
+        }        
 }

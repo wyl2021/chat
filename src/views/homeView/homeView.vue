@@ -48,6 +48,7 @@ import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import AIinput from "@/components/AIinput/AIinput";
 import store from "@/store/store";
 import { GetChatTempletList } from "@/api/chat";
+
 export default {
   components: {
     InfoDisplay,
@@ -66,7 +67,9 @@ export default {
   created() {
     this.getChatTemplet();
   },
+ 
   methods: {
+   
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";

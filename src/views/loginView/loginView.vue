@@ -59,6 +59,7 @@ import phonePassword from "./phonePassword.vue";
 import phoneCode from "./phoneCode.vue";
 import registerView from "./registerView.vue";
 import retrievePassword from "./retrievePassword.vue";
+import { swsLogin, oaLogin } from "@/api/login";
 export default {
   components: {
     accountPassword,
@@ -73,7 +74,57 @@ export default {
       submitLoading: false,
     };
   },
+  mounted() {
+    const token = this.getTokenFromUrl("token");
+    const loginType = this.getTokenFromUrl("type");
+    console.log(token, loginType);
+    if (token && loginType) {
+      this.aoAndswsLogin(token, loginType);
+    }
+  },
   methods: {
+    getTokenFromUrl(param) {
+      const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
+      const value = urlParams.get(param);
+      console.log(urlParams);
+      // 处理 URL 编码后的单引号（如果存在）
+      return value ? value.replace(/['"]/g, "") : null;
+    },
+    aoAndswsLogin(token, loginType) {
+      if (loginType === "sws") {
+        swsLogin({ token: token }).then((swsRes) => {
+          if (swsRes.msg === 0) {
+            if (swsRes.msg) {
+              this.setToken(swsRes.data.token);
+              this.$router.push({
+                path: "/",
+              });
+              this.$message.success("登录成功");
+            } else {
+              this.$message.error(swsRes.msg);
+            }
+          } else {
+            this.$message.error(swsRes.msg);
+          }
+        });
+      } else if (loginType === "oa") {
+        oaLogin({ token: token }).then((oaRes) => {
+          if (oaRes.code === 0) {
+            if (oaRes.msg) {
+              this.setToken(oaRes.data.token);
+              this.$router.push({
+                path: "/",
+              });
+              this.$message.success("登录成功");
+            } else {
+              this.$message.error(oaRes.msg);
+            }
+          } else {
+            this.$message.error(oaRes.msg);
+          }
+        });
+      }
+    },
     // 切换不同登录模式
     handleLoginType(n) {
       this.activeIndex = n;
