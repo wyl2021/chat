@@ -20,21 +20,21 @@ export default {
           });
 
           if (response.code !== 2) {
-          
+
             this.messages.push({
               type: "answer",
               dataType: "image",
               content: this.imageDate(response.data),
               time: moment().format("YYYY-MM-DD HH:mm:ss"),
             });
-           
+
             this.loading = false;
           } else {
             isPolling++;
             setTimeout(poll, 1000); // 继续轮询
           }
         } catch (error) {
-        
+
           isPolling = 4;
         }
       };
@@ -53,7 +53,6 @@ export default {
         }
       });
     } catch (error) {
-     
       this.$message.error("请求失败，请稍后重试！");
       this.loading = false;
       this.isDel = true; // 标记删除状态
@@ -62,9 +61,9 @@ export default {
   // 处理图片数据
   imageDate (response) {
     let answerList = [];
-    if(!response) return 
+    if (!response) return
     response.forEach((item) => {
-    
+
       const images = item.data.reduce(
         (acc, item) => {
           if (item.type === "externalLinkImage") {
