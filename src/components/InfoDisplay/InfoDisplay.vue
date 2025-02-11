@@ -1,6 +1,6 @@
 <template>
   <div class="d-conrainer" ref="answerRef" @scroll="handleScroll">
-    <div style="display: flex; justify-content: flex-end">
+    <div v-if="isBack" style="display: flex; justify-content: flex-end">
       <el-button
         size="mini"
         type="text"
@@ -22,29 +22,22 @@
             :key="inx"
           >
             <!-- <img :src="item.content" /> -->
-            <img
-          
-              :src="
-                item.content ||  item  || ''
-              "
-            />
-            
+            <img :src="item.content || item || ''" />
           </div>
-      
         </div>
-        <div
-         
-          v-if="message.dataType === 'video'"
-        >
+        <div v-if="message.dataType === 'video'">
           <div
             v-for="(item3, inx3) in message.content.videoList"
             :key="inx3"
-            :class="item3.type==='image'?'d-c-pic':'d-c-film'"
+            :class="item3.type === 'image' ? 'd-c-pic' : 'd-c-film'"
           >
-            <img  v-if="item3.type==='image'" :src="item3.data || item3" />
-            <video    v-if="item3.type==='video'" :src="item3.data || item3" controls></video>
+            <img v-if="item3.type === 'image'" :src="item3.data || item3" />
+            <video
+              v-if="item3.type === 'video'"
+              :src="item3.data || item3"
+              controls
+            ></video>
           </div>
-       
         </div>
         <!-- <audioView
           v-if="message.audioObj"
@@ -63,17 +56,30 @@
           v-if="Array.isArray(message?.content) && message?.content.length > 0"
         >
           <div v-for="(item2, index2) in message?.content" :key="index2">
-            <img
-              v-if="item2.type === 'imageUrl' && item2.data.externalLinkImage"
-              :src="
-                item2.data.thumbnail ||
-                item2.data.originalImage ||
-                item2.data.externalLinkImage
+          
+            <div
+              @click="
+                handlePreview(
+                  item2.data.thumbnail ||
+                    item2.data.originalImage ||
+                    item2.data.externalLinkImage
+                )
               "
-            />
+              class="w-img"
+              v-if="item2.type === 'imageUrl' && item2.data.externalLinkImage"
+            >
+              <img
+                :src="
+                  item2.data.thumbnail ||
+                  item2.data.originalImage ||
+                  item2.data.externalLinkImage
+                "
+              />
+            </div>
             <video
-              v-if="item2.type === 'videoUrl' && item2.data.url"
-              :src="item2.data.url"
+              v-if="item2.type === 'videoUrl' && item2.data"
+              :src="item2.data"
+              style="width: 200px; height:100px "
               controls
             ></video>
             <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
@@ -97,8 +103,16 @@
           </el-tooltip>
         </div>
       </div>
-      <LoadingView v-if="loading && index===messages.length-1"></LoadingView>
+      <LoadingView
+        v-if="loading && index === messages.length - 1"
+      ></LoadingView>
     </div>
+    <el-dialog :visible.sync="dialogVisible" width="50%" center :show-close="false">
+      <img style="width: 100%; object-fit: contain;" :src="previewImg" />
+      <span slot="footer" class="dialog-footer">
+      <el-button size="small" @click="dialogVisible = false">取消</el-button>
+    </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -137,6 +151,15 @@ export default {
       type: [Object, null],
       required: true,
     },
+    isBack:{
+      type:Boolean,
+      default:true
+    },
+  },
+  beforeDestroy() {
+    clearInterval(this.imgPoll);
+    clearInterval(this.videoPoll);
+    console.log('定时器已销毁')
   },
   watch: {
     // 高自适应计算
@@ -182,7 +205,11 @@ export default {
       messages: [],
       pageIndex: 0,
       pageSize: 10,
-      historySessionId:''
+      historySessionId: "",
+      dialogVisible: false,
+      previewImg: "",
+      imgPoll:null,
+      videoPoll:null
     };
   },
   mounted() {},
@@ -192,6 +219,11 @@ export default {
     ...imgInter,
     ...viedoInter,
     ...historyInter,
+    handlePreview(img) {
+      console.log(img);
+      this.previewImg = img;
+      this.dialogVisible = true;
+    },
     // 滑块的回调
     handleScroll() {
       const scrollContainer = this.$refs.answerRef;
@@ -211,6 +243,7 @@ export default {
       this.fShow = false;
       Session.remove("sessionId");
       this.$emit("close");
+      this.$destroy()
     },
     // 删除
     handleDel() {
@@ -310,5 +343,12 @@ pre {
   width: 100%;
   white-space: pre-wrap;
   line-height: 1.3;
+}
+.w-img{
+  width: 200px;
+  img{
+    width: 100%;
+    object-fit: contain;
+  }
 }
 </style>

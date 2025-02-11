@@ -44,9 +44,9 @@ export default {
                   dataType: dataType,
                   content: {
                     text: e.content,
-                    videoList: this.videoDate(dt),
-                    imgList: e?.data?.filter(item => item && item.type === "originalImage")
-                      .map(d => d.url) || []
+                    videoList:dataType === 'video'?this.videoDate(dt):[],
+                    imgList:dataType === 'image'? e?.data?.filter(item => item && item.type === "originalImage")
+                      .map(d => d.url) || []:[]
                   },
                   time: moment(e.addtime).format("YYYY-MM-DD HH:mm:ss")
                 };
@@ -54,7 +54,7 @@ export default {
               
                 // 连续的 user 消息，追加内容
                 currentMessage.content.text =e.content || "";
-                currentMessage.content.imgList.push(
+                dataType === 'image' && currentMessage.content.imgList.push(
                   ...e?.data?.filter(item => item && item.type === "originalImage")
                     .map(d => d.url) || []
                 );
@@ -81,8 +81,8 @@ export default {
                   content: dataType === 'image'
                     ? this.imageDate(dt)
                     : dataType === 'video'
-                      ? e?.data?.filter(item => item && item.type === "originalVideo")
-                      .map(d => d.url) || []
+                      ?Array.isArray(e?.data)? e?.data?.filter(item => item && item.type === "originalVideo")
+                      .map(d => d.url) || []:[{type:'videoUrl',data:e?.data?.url || ''}]
                       : e.content,
                   time: moment(e.addtime).format("YYYY-MM-DD HH:mm:ss")
                 };

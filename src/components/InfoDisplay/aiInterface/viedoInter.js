@@ -7,8 +7,8 @@ export default {
     this.isDel = false;
     let isPolling = 0;
     try {
-      const poll = async () => {
-        if (isPolling == 4) {
+      this.videoPoll = async () => {
+        if (isPolling == 60) {
           Session.set("id", "");
           this.loading = false;
           return;
@@ -30,7 +30,7 @@ export default {
             this.loading = false;
           } else {
             isPolling++;
-            setTimeout(poll, 1000); // 继续轮询
+            setTimeout(this.videoPoll, 60000); // 继续轮询
           }
         } catch (error) {
           
@@ -49,7 +49,7 @@ export default {
           }else{
             await Session.set("sessionId", res.data.sessionId);
             await Session.set("id", res.data.id);
-            poll();
+            this.videoPoll();
           }
          
         } else {
@@ -78,12 +78,13 @@ export default {
               : "question",
         data:
           item.type === "videoUrl"
-            ? item.data[0]?.url
+            ?Array.isArray(item.data)? item.data[0]?.url:item.data.url
             : item.type === "imageUrl"
               ? item.data[0]?.url
               : item.content,
       });
     });
+
     return answerList;
   },
 }

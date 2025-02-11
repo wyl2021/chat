@@ -216,6 +216,7 @@ export default {
     },
     handleData(ctx) {
       let parameter = {};
+      console.log(this.pic,this.film)
       if (this.pic) {
         const qList = this.imgList.map((item) => ({
           type: "base64",
@@ -226,7 +227,7 @@ export default {
         qList.push({
           type: "question",
           role: "user",
-          content: "生成相似图片",
+          content: `生成相似图片${ctx}`,
         });
         const str = ctx.replace("比例：", "");
         parameter = {
@@ -298,7 +299,7 @@ export default {
     },
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
-      if (typeStr.dataType === 2 && this.imgList.length > 0) {
+      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;

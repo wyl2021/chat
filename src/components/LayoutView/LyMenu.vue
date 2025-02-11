@@ -124,7 +124,7 @@
 import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
 import { Session } from "@/utils/storage";
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -144,44 +144,47 @@ export default {
     };
   },
   created() {
-    
     this.recentlyChatList = this.getChatList;
   },
   computed: {
-    ...mapGetters(['getChatList']),
+    ...mapGetters(["getChatList"]),
   },
-    watch: {
-    
+  watch: {
     getChatList(newList) {
       this.recentlyChatList = newList;
     },
   },
   methods: {
-   
     handleSelect(index) {
       // console.log(Session.get('sessionId'))
-      if(index.includes('6-'))return 
+      if (index.includes("6-")) return;
       this.selectedIndex = index;
-      this.$router.push(index);
+      index === "/collectView"
+        ? this.$router.push({
+            path: index,
+            query: {
+              collect: 1,
+            },
+          })
+        : this.$router.push(index);
       this.setActivePath(index);
-      Session.remove('sessionId')
-
+      Session.remove("sessionId");
     },
-    handleSelect1(item){
-      console.log(item)
-      this.$router.push({
-        path:'/collectView',
-        query:{
-          collect:0,
-          sessionId:item.id,
-          type:item.type
-        }
-      })
-      this.setActivePath('');
+    handleSelect1(item) {
+      console.log(item);
+      this.$router.replace({
+        path: "/collectView",
+        query: {
+          collect: 0,
+          sessionId: item.id,
+          type: item.type,
+        },
+      });
+      this.setActivePath("");
     },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
-      this.setChatList()
+      this.setChatList();
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);

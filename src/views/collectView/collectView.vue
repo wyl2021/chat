@@ -36,10 +36,13 @@
       :resizeHeight="resizeHeight"
       :ques="answerText"
       @close="answer = false"
+      :isBack="$route.query.collect!=='0'"
     ></InfoDisplay>
 
     <div class="h-footer" v-if="isJump">
       <AIinput
+      :pic="type==='img'"
+      :film="type==='video'"
         ref="aiInput"
         v-model="ctxVal"
         placeholder="输入您要撰写的主题"
@@ -72,11 +75,12 @@ export default {
       answerText: null,
       answer: false,
       ctxVal: "",
+      type:'text'
     };
   },
   created() {
     console.log(this.$route.query.collect)
-    if(!this.$route.query.collect){
+    if(this.$route.query.collect==='1'){
       this.handleCollect();
     }else{
       this.jump({id:this.$route.query.sessionId||0}); // 每次路由变化时刷新数据
@@ -87,11 +91,28 @@ export default {
     console.log('to:', to);
     console.log('from:', from);
     if(to.query.collect==="0"){
-    this.jump({id:to.query.sessionId||0}); // 每次路由变化时刷新数据
+    this.jump({id:to.query.sessionId||0,type:to.query.type||'text'}); // 每次路由变化时刷新数据
+    }else{
+      this.resetDate()
+      this.handleCollect();
     }
   }
 },
   methods: {
+    resetDate(){
+      this.collectList= [],
+      this.prams={
+        pageIndex: 1,
+        pageSize: 10,
+        collect: 1,
+      },
+      this.resizeHeight=100,
+      this.isJump= false,
+      this.answerText=null,
+      this.answer= false,
+      this.ctxVal= "",
+      this.type='text'
+    },
     jump(val) {
       this.answerText = {
         type: "history",
@@ -99,6 +120,7 @@ export default {
         content: null,
       };
       Session.set("sessionId", val?.id);
+      this.type=val?.type
       this.isJump = true;
       this.$nextTick(() => {
         const h = this.$refs.aiInput.$el.offsetHeight;

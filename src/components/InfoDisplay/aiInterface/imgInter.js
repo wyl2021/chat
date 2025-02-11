@@ -8,8 +8,8 @@ export default {
     this.isDel = false;
     let isPolling = 0;
     try {
-      const poll = async () => {
-        if (isPolling == 4) {
+      this.imgPoll = async () => {
+        if (isPolling == 60) {
           Session.set("id", "");
           this.loading = false;
           return;
@@ -31,7 +31,7 @@ export default {
             this.loading = false;
           } else {
             isPolling++;
-            setTimeout(poll, 1000); // 继续轮询
+            setTimeout(this.imgPoll, 60000); // 继续轮询
           }
         } catch (error) {
 
@@ -47,7 +47,7 @@ export default {
         if (res.code === 1) {
           await Session.set("sessionId", res.data.sessionId);
           await Session.set("id", res.data.id);
-          poll();
+          this.imgPoll();
         } else {
           this.$message.error(res.msg);
         }
