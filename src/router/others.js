@@ -28,5 +28,10 @@ export default [
     path: '/collectView',
     name: 'collectView',
     component: () => import('@/views/collectView/collectView.vue')
+  },
+  {
+    path: '/recentlyGenerated',
+    name: 'recentlyGenerated',
+    component: () => import('@/views/recentlyGenerated/recentlyGenerated.vue')
   }
 ]

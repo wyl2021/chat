@@ -11,7 +11,7 @@
     </div>
     <div class="d-c-inner" v-for="(message, index) in messages" :key="index">
       <!--提问区域-->
-      <div class="d-c-r" v-if="message.type === 'question'">
+      <div class="d-c-r" v-show="message.type === 'question'">
         <div
           style="display: flex; justify-content: flex-end; flex-wrap: wrap"
           v-if="message.dataType === 'image'"
@@ -48,7 +48,7 @@
         </div>
       </div>
       <!--回答区域-->
-      <div class="d-c-l" v-if="message.type === 'answer'">
+      <div class="d-c-l" v-show="message.type === 'answer'">
         <pre v-if="typeof message?.content === 'string'">{{
           message?.content
         }}</pre>
@@ -56,7 +56,6 @@
           v-if="Array.isArray(message?.content) && message?.content.length > 0"
         >
           <div v-for="(item2, index2) in message?.content" :key="index2">
-          
             <div
               @click="
                 handlePreview(
@@ -79,13 +78,16 @@
             <video
               v-if="item2.type === 'videoUrl' && item2.data"
               :src="item2.data"
-              style="width: 200px; height:100px "
+              style="width: 200px; height: 100px"
               controls
             ></video>
             <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
           </div>
         </div>
-        <div class="d-c-footer" v-if="fShow">
+        <LoadingView
+          v-show="loading && index === messages.length - 1"
+        ></LoadingView>
+        <div class="d-c-footer" v-show="message?.content">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
             <span class="dfs" @click="handleCopy(message.answer)">
               <img src="@/assets/images/copy.png" />
@@ -104,14 +106,19 @@
         </div>
       </div>
       <LoadingView
-        v-if="loading && index === messages.length - 1"
+        v-show="loading && txtIndex === 0 && index === messages.length - 1"
       ></LoadingView>
     </div>
-    <el-dialog :visible.sync="dialogVisible" width="50%" center :show-close="false">
-      <img style="width: 100%; object-fit: contain;" :src="previewImg" />
+    <el-dialog
+      :visible.sync="dialogVisible"
+      width="50%"
+      center
+      :show-close="false"
+    >
+      <img style="width: 100%; object-fit: contain" :src="previewImg" />
       <span slot="footer" class="dialog-footer">
-      <el-button size="small" @click="dialogVisible = false">取消</el-button>
-    </span>
+        <el-button size="small" @click="dialogVisible = false">取消</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -151,15 +158,15 @@ export default {
       type: [Object, null],
       required: true,
     },
-    isBack:{
-      type:Boolean,
-      default:true
+    isBack: {
+      type: Boolean,
+      default: true,
     },
   },
   beforeDestroy() {
     clearInterval(this.imgPoll);
     clearInterval(this.videoPoll);
-    console.log('定时器已销毁')
+    console.log("定时器已销毁");
   },
   watch: {
     // 高自适应计算
@@ -181,6 +188,9 @@ export default {
           // this.$refs.dcb.style.maxHeight = `calc(100% - ${h1 + 20}px)`;
           if (val) {
             this.handleMessage(val);
+            this.$nextTick(() => {
+              this.scrollToBottom();
+            });
           }
         });
       },
@@ -200,16 +210,18 @@ export default {
       sessionId: "",
       fShow: false,
       loading: false,
+      txtIndex: 0,
       result: "",
       isDel: true,
       messages: [],
       pageIndex: 0,
       pageSize: 10,
+      pageFinished: false,
       historySessionId: "",
       dialogVisible: false,
       previewImg: "",
-      imgPoll:null,
-      videoPoll:null
+      imgPoll: null,
+      videoPoll: null,
     };
   },
   mounted() {},
@@ -229,7 +241,7 @@ export default {
       const scrollContainer = this.$refs.answerRef;
       if (scrollContainer.scrollTop === 0) {
         // 滑块滑到顶部，获取历史记录
-        this.getHiStory();
+        this.getHistory();
       }
     },
     // 滚动到页面底部
@@ -243,7 +255,7 @@ export default {
       this.fShow = false;
       Session.remove("sessionId");
       this.$emit("close");
-      this.$destroy()
+      this.$destroy();
     },
     // 删除
     handleDel() {
@@ -268,6 +280,21 @@ export default {
       } else {
         this.$message.error(res.msg);
       }
+    },
+    // 清除的方法
+    clear() {
+      this.result = "";
+      this.fShow = false;
+      this.loading = false;
+      this.isDel = true;
+      this.messages = [];
+      this.txtIndex = 0;
+      this.pageIndex = 0;
+      this.historySessionId = "";
+      this.pageFinished = false;
+      this.imgPoll = null;
+      this.videoPoll = null;
+      this.previewImg = "";
     },
   },
 };
@@ -344,9 +371,9 @@ pre {
   white-space: pre-wrap;
   line-height: 1.3;
 }
-.w-img{
+.w-img {
   width: 200px;
-  img{
+  img {
     width: 100%;
     object-fit: contain;
   }

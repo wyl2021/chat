@@ -65,13 +65,12 @@ export default {
           // 如果解析失败，保留 chunk 继续累加数据
         }
       }
-      this.messages.push({
-        type: "answer",
-        dataType: "text",
-        content: this.result,
-        time: moment().format("YYYY-MM-DD HH:mm:ss"),
-      });
-      this.scrollToBottom();
+      // this.messages[this.txtIndex].content += this.result;
+      this.printCharacterByCharacterBrowser(this.result, 100, () => {
+        this.txtIndex = 0;
+        this.result = '';
+      })
+
       // this.loading = false; // 完成后关闭加载状态
       // $("#result").append(result + "\n");
     } catch (error) {
@@ -92,6 +91,16 @@ export default {
         // 更新当前消息的 AI 回复内容
         this.result += content; // 拼接内容
         Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
+        if (this.txtIndex === 0) {
+          this.messages.push({
+            type: "answer",
+            dataType: "text",
+            content: '',
+            time: moment().format("YYYY-MM-DD HH:mm:ss"),
+          });
+          this.txtIndex = this.messages.length - 1;
+        }
+
       } else if (chunk.code === 0) {
         this.$message.error("请求失败：" + chunk.msg);
       } else if (chunk.code === -1) {
@@ -101,4 +110,19 @@ export default {
       console.error("处理 JSON 块出错:", err);
     }
   },
+  // 流式打印
+  printCharacterByCharacterBrowser (text, delay, callback) {
+    let index = 0;
+    const that = this;
+    function printNextChar () {
+      if (index < text.length) {
+        that.messages[that.txtIndex].content += text[index++]; // 添加到body的textContent中，逐个字符打印
+        that.scrollToBottom();
+        setTimeout(printNextChar, delay); // 使用setTimeout来模拟延迟
+      } else {
+        callback && callback();
+      }
+    }
+    printNextChar(); // 开始打印过程
+  }
 }

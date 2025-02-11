@@ -113,6 +113,6 @@ Vue.mixin({
         }
       }
       return true;
-    }
+    },
   }
 })

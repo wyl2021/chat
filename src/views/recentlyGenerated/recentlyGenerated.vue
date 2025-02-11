@@ -1,25 +1,18 @@
 <template>
   <div class="h-container">
-    <div class="is-header">
-      <div class="is-h-d1">
-        <img
-          class="is-h-d1-m1"
-          src="https://www.swsai.com/style/dist/img/icon/Frame15_2.png"
-        /><span class="is-h-d1-s1">智能搜索</span>
-      </div>
-      <div style="text-align: center; font-size: 18px">汽车领域全能专家</div>
-    </div>
     <InfoDisplay
-      v-if="answer"
       :resizeHeight="resizeHeight"
       :ques="answerText"
-      @close="handleClose"
+      ref="iplay"
+      :isBack="false"
     ></InfoDisplay>
-    <div class="h-footer" :style="{ position: changeInputStyle }">
+    <div class="h-footer">
       <AIinput
+        :pic="type === 'img'"
+        :film="type === 'video'"
         ref="aiInput"
         v-model="ctxVal"
-        placeholder="请输入您的问题，限3000字"
+        placeholder="输入您要撰写的主题"
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
       ></AIinput>
@@ -30,25 +23,45 @@
 <script>
 import AIinput from "@/components/AIinput/AIinput";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
+import { Session } from "@/utils/storage";
 export default {
   components: {
     AIinput,
     InfoDisplay,
   },
+  watch: {
+    $route: {
+      handler() {
+        const { sessionId, type } = this.$route.query;
+        this.type = type;
+        Session.set("sessionId", sessionId);
+        this.$nextTick(() => {
+          this.$refs.iplay.clear();
+          this.$refs.iplay.getHistory();
+        });
+      },
+      immediate: true,
+    },
+  },
   data() {
     return {
-      ctxVal: "",
-      answer: false,
-      answerText: null,
       resizeHeight: 100,
-      changeInputStyle: "relative",
+      answerText: {
+        type: "history",
+        role: "user",
+        content: null,
+      },
+      answer: false,
+      ctxVal: "",
+      type: "text",
     };
   },
+  mounted() {},
   methods: {
     // 发送消息
     handleSendMsg(val) {
-      this.changeInputStyle = "absolute";
       this.answerText = val;
+      this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
       this.ctxVal = "";
       this.$nextTick(() => {
@@ -56,11 +69,6 @@ export default {
         this.resizeHeight = h + 30;
         this.answer = true;
       });
-    },
-    // 关闭回答
-    handleClose() {
-      this.answer = false;
-      this.changeInputStyle = "relative";
     },
     // 实时改变AI回答的高度
     changeAnswer() {
@@ -74,20 +82,5 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.is-header {
-  margin-bottom: 50px;
-}
-.is-h-d1 {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  .is-h-d1-m1 {
-    width: 16px;
-  }
-  .is-h-d1-s1 {
-    display: inline-block;
-    margin-left: 5px;
-  }
-}
+/* Add your CSS styles here */
 </style>

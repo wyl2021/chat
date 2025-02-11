@@ -216,7 +216,7 @@ export default {
     },
     handleData(ctx) {
       let parameter = {};
-      console.log(this.pic,this.film)
+      console.log(this.pic, this.film);
       if (this.pic) {
         const qList = this.imgList.map((item) => ({
           type: "base64",
@@ -299,17 +299,17 @@ export default {
     },
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
+      this.typeStr = typeStr;
+      this.value = typeStr.str;
       if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;
       }
-      this.typeStr = typeStr;
-      this.value = typeStr.str;
     },
     handleUpload(img) {
       this.imgList.push(img);
-      if (this.typeStr.dataType === 2) {
+      if (this.typeStr && this.typeStr.dataType === 2) {
         this.canSend = true;
       } else {
         const b = this.vaildateForm();

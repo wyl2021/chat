@@ -173,7 +173,7 @@ export default {
     handleSelect1(item) {
       console.log(item);
       this.$router.replace({
-        path: "/collectView",
+        path: "/recentlyGenerated",
         query: {
           collect: 0,
           sessionId: item.id,

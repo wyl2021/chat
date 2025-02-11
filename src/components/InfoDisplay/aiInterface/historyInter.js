@@ -2,9 +2,9 @@ import { GetChatDetailsTextList } from "@/api/chat";
 import { Session } from "@/utils/storage";
 import moment from "moment";
 export default {
-  getHistory() {
-
-    if (!Session.get("sessionId")) return;
+  getHistory () {
+    console.log(Session.get("sessionId"))
+    if (!Session.get("sessionId") || this.pageFinished) return;
     const currentSessionId = Session.get("sessionId");
 
     if (this.historySessionId === currentSessionId) {
@@ -22,6 +22,10 @@ export default {
     }).then((res) => {
       if (res.code === 1) {
         const data = res.data || [];
+        if (data.length === 0) {
+          this.pageFinished = true;
+          return;
+        }
         const dataType = res.data1.type === 'img' ? 'image' : res.data1.type === 'img' ? 'video' : res.data1.type;
         const arr = data.reverse();
 
@@ -36,7 +40,7 @@ export default {
                 if (currentMessage) {
                   this.messages.push(currentMessage);
                 }
-               
+
                 // 创建新的 user 消息
                 currentMessage = {
                   type: 'question',
@@ -44,29 +48,29 @@ export default {
                   dataType: dataType,
                   content: {
                     text: e.content,
-                    videoList:dataType === 'video'?this.videoDate(dt):[],
-                    imgList:dataType === 'image'? e?.data?.filter(item => item && item.type === "originalImage")
-                      .map(d => d.url) || []:[]
+                    videoList: dataType === 'video' ? this.videoDate(dt) : [],
+                    imgList: dataType === 'image' ? e?.data?.filter(item => item && item.type === "originalImage")
+                      .map(d => d.url) || [] : []
                   },
                   time: moment(e.addtime).format("YYYY-MM-DD HH:mm:ss")
                 };
               } else {
-              
+
                 // 连续的 user 消息，追加内容
-                currentMessage.content.text =e.content || "";
+                currentMessage.content.text = e.content || "";
                 dataType === 'image' && currentMessage.content.imgList.push(
                   ...e?.data?.filter(item => item && item.type === "originalImage")
                     .map(d => d.url) || []
                 );
-               
+
                 //  currentMessage.content.videoList.push(...this.videoDate(dt)
                 // );
               }
-    
+
             }
 
             if (e.role === 'assistant') {
-              
+
               if (!currentMessage || previousRole !== 'assistant') {
                 // 如果 currentMessage 存在并且角色切换了，推入消息列表
                 if (currentMessage) {
@@ -81,15 +85,15 @@ export default {
                   content: dataType === 'image'
                     ? this.imageDate(dt)
                     : dataType === 'video'
-                      ?Array.isArray(e?.data)? e?.data?.filter(item => item && item.type === "originalVideo")
-                      .map(d => d.url) || []:[{type:'videoUrl',data:e?.data?.url || ''}]
+                      ? Array.isArray(e?.data) ? e?.data?.filter(item => item && item.type === "originalVideo")
+                        .map(d => d.url) || [] : [{ type: 'videoUrl', data: e?.data?.url || '' }]
                       : e.content,
                   time: moment(e.addtime).format("YYYY-MM-DD HH:mm:ss")
                 };
               } else {
                 // 连续的 assistant 消息，追加内容
                 if (dataType === 'image') {
-                
+
                   currentMessage.content.push(...this.imageDate(dt));
                 } else if (dataType === 'video') {
 
@@ -97,7 +101,7 @@ export default {
                     ...e?.data?.filter(item => item && item.type === "originalVideo")
                       .map(d => d.url) || []
                   );
-                 
+
                 } else {
                   currentMessage.content = ` ${e.content}`;
                 }
@@ -129,7 +133,7 @@ export default {
           this.messages.push(currentMessage);
         }
 
-      
+
 
         this.scrollToBottom();
         // this.$refs.aiInput.isTab = false;
