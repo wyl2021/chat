@@ -34,10 +34,25 @@ pre {
   padding: 2px 5px;
   color: #fff;
   border-radius: 8px;
-  margin: 0 5px;
+  margin: 0 5px 5px 5px;
   background-clip: border-box;
 }
 .inputTs::placeholder {
+  color: #275680;
+  /* 设置颜色 */
+}
+.selectTs {
+  display: inline-block;
+  background-color: #242d3b;
+  outline: none;
+  border: none;
+  padding: 2px 5px;
+  color: #fff;
+  border-radius: 8px;
+  margin: 0 5px;
+  background-clip: border-box;
+}
+.selectTs::placeholder {
   color: #275680;
   /* 设置颜色 */
 }
@@ -81,6 +96,7 @@ pre {
 .h-c-tag {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
   margin-bottom: 15px;
 }
 .h-c-tag .tag {
@@ -89,6 +105,7 @@ pre {
   height: 30px;
   line-height: 30px;
   margin-right: 10px;
+  margin-top: 10px;
   border: 1px solid #333335;
   border-radius: 30px;
   cursor: pointer;
@@ -147,13 +164,17 @@ pre {
   padding-left: 28px;
 }
 .h-c-collect {
-  background: #1B1B1D;
+  background: #1b1b1d;
   border: 1px solid #454545;
   border-radius: 10px;
   padding: 10px 13px;
 }
-.h-c-collect .remark {
+.h-c-collect .r-box {
   width: 100%;
+  display: flex;
+}
+.h-c-collect .r-box .r-b-title {
+  width: 95%;
   color: #757575;
   white-space: nowrap;
   /* 不换行 */
@@ -163,11 +184,15 @@ pre {
   /* 使用省略号 */
   font-size: 13px;
 }
+.h-c-collect .r-box .r-b-icon img {
+  width: 15px;
+  height: 15px;
+}
 .h-c-collect .templetName {
-  background: #2C2B32;
+  background: #2c2b32;
   border-radius: 3px;
   padding: 3px;
-  color: #EEEEEE;
+  color: #eeeeee;
   font-size: 10px;
   width: fit-content;
   margin: 5px 0;
@@ -176,7 +201,7 @@ pre {
   height: 104px;
 }
 .h-c-collect .h-c-collect-d .content {
-  color: linear-gradient(180deg, #EEEEEE 0%, rgba(238, 238, 238, 0) 100%);
+  color: linear-gradient(180deg, #eeeeee 0%, rgba(238, 238, 238, 0) 100%);
   font-size: 8px;
   text-align: justify;
   overflow: hidden;
@@ -191,4 +216,16 @@ pre {
 .h-c-collect .h-c-collect-d video {
   width: 100px;
   height: 100px;
+}
+.upload-demo .el-button--primary {
+  background: transparent;
+  border-color: #353537;
+  border-radius: 36px;
+  color: #707070;
+}
+.dropdown-demo .el-button--primary {
+  background: transparent;
+  border-color: #353537;
+  border-radius: 36px;
+  color: #707070;
 }

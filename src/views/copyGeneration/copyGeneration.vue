@@ -9,7 +9,7 @@
       "
     >
       <div class="h-t-3">
-        <img src="@/assets/images/icon_13.png" />{{ title }}
+        <img :src="icon" />{{ title }}
       </div>
       <div class="h-t-2">{{ note }}</div>
       <div class="h-c-tag">
@@ -80,6 +80,7 @@ export default {
     return {
       type: "公关广告",
       title: "公关广告",
+      icon:'@/assets/images/icon_13.png',
       cgTag: [],
       ctxList: [],
       ctxVal: "",
@@ -93,10 +94,11 @@ export default {
   },
   mounted() {},
   async created() {
-    const { type, note, title } = this.$route.query;
+    const { type, note, title,icon } = this.$route.query;
     this.type = type || this.type;
     this.note = note || this.note;
     this.title = title || this.title;
+    this.icon=icon|| this.icon;
     await this.getList();
     this.handleCgTag(0);
   },

@@ -59,7 +59,6 @@
             <div
               @click="
                 handlePreview(
-                  item2.data.thumbnail ||
                     item2.data.originalImage ||
                     item2.data.externalLinkImage
                 )

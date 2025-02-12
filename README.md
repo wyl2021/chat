@@ -1,4 +1,4 @@
-# chat-car
+# ChatCar
 
 ## Project setup
 ```

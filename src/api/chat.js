@@ -57,6 +57,22 @@ export const SaveChatCollect = (data) => {
   })
 }
 
+// 回话删除
+export const DelChat=(data)=>{
+  return request({
+    method: 'post',
+    action: 'DelChat',
+    data
+  })
+}
+// 对话删除
+export const DelChatDetails=(data)=>{
+  return request({
+    method: 'post',
+    action: 'DelChatDetails',
+    data
+  })
+}
 // 文本会话
 
 // 创建会话

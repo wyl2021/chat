@@ -83,7 +83,7 @@
           <filmClass
             v-if="film"
             @upload="handleUpload1"
-            @change="handleChangeTypeClass"
+            @change="handleChangeTypeClass1"
           ></filmClass>
           <!---------------------------------------------------------->
           <span class="op-btn" v-if="leftIcon">
@@ -227,9 +227,11 @@ export default {
         qList.push({
           type: "question",
           role: "user",
-          content: `生成相似图片${ctx}`,
+          content: ctx,
         });
-        const str = ctx.replace("比例：", "");
+        const str = ctx.match(/比例：(\d+:\d+)/)
+          ? ctx.match(/比例：(\d+:\d+)/)[1]
+          : "1:1";
         parameter = {
           type: "image",
           role: "user",
@@ -298,7 +300,18 @@ export default {
       this.changeAnswer();
     },
     // 上传类型的数据
-    handleChangeTypeClass(typeStr) {
+    async handleChangeTypeClass(typeStr) {
+      this.typeStr = typeStr;
+      this.value = typeStr.str;
+     
+      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
+        this.canSend = true;
+      } else {
+        this.canSend = false;
+      }
+    },
+   
+    handleChangeTypeClass1(typeStr) {
       this.typeStr = typeStr;
       this.value = typeStr.str;
       if (this.typeStr.dataType === 2 && this.imgList.length > 0) {

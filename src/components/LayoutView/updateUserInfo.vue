@@ -66,15 +66,16 @@
   <script>
   import verificate from "@/utils/verificate";
   import { updUser,getUserInfo } from "@/api/login";
+  import store from "@/store/store";
   export default {
     data() {
       return {
         verificate,
         form: {
           txtPwd: "",
-          txtEmail:"",
-          txtPhone: "",
-          txtCompany:""
+          txtEmail:store.getters.getUserInfo.email || "",
+          txtPhone: store.getters.getUserInfo.phone || "",
+          txtCompany:store.getters.getUserInfo.company || ""
         },
         dialogVisible: false,
       };
@@ -98,7 +99,7 @@
             }else{
                 const userInfo= await getUserInfo()
                 await this.setUserInfo(userInfo.data)
-                this.resetForm()
+                // this.resetForm()
                 this.$message.success('修改成功')
                 this.dialogVisible = false;
             }

@@ -88,7 +88,12 @@
         :key="index"
         @click.native="handleSelect1(item)"
       >
+      <div style="justify-content: space-between;display: flex;">
         <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
+        <span  @click.stop="handleCancel(item.id)">
+              <img style="width:15px;height:15px" src="@/assets/images/del.png" />
+            </span>
+          </div>
       </el-menu-item>
       <!-- <el-menu-item index="6-2"
         ><TooltipTxt
@@ -125,7 +130,7 @@ import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
 import { Session } from "@/utils/storage";
 import { mapGetters } from "vuex";
-
+import {DelChat} from "@/api/chat"
 export default {
   props: {
     isCollapse: {
@@ -189,6 +194,17 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
+    handleCancel(id){
+      console.log(id)
+      DelChat({sessionId:id}).then(res=>{
+        if(res.code===1){
+          this.setChatList()
+          this.$message.success('删除成功')
+        }else{
+          this.$message.error(res.msg)
+        }
+      })
+    }
   },
 };
 </script>

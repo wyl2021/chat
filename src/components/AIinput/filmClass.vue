@@ -17,8 +17,8 @@
         <el-dropdown-item icon="el-icon-s-management" command="混剪类型"
           >混剪类型</el-dropdown-item
         >
-        <el-dropdown-item icon="el-icon-paperclip" command="混剪类型"
-          >混剪类型</el-dropdown-item
+        <el-dropdown-item icon="el-icon-paperclip" command="裂变类型"
+          >裂变类型</el-dropdown-item
         >
         <el-dropdown-item icon="el-icon-picture-outline" command="图片生成视频"
           >图片生成视频</el-dropdown-item
@@ -32,6 +32,7 @@
       :before-upload="handleBeforeUpload"
       :show-file-list="false"
       :file-list="fileList"
+      :http-request="customUpload"
     >
       <el-button size="mini" type="primary" icon="el-icon-picture"
         >素材上传</el-button
@@ -66,8 +67,11 @@ export default {
     // this.handleDropdownList()
   },
   methods: {
+    customUpload(){
+
+    },
     handleCommand(val) {
-      const arr = ["混剪类型", "混剪类型", "图片生成视频"];
+      const arr = ["混剪类型", "裂变类型", "图片生成视频"];
       let dataType = 1;
       let str = "<form id='myForm'><span>已</span>";
       str += `<select class="selectTs" txt="${val}" required >`;

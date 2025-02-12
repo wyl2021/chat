@@ -112,6 +112,7 @@ export default {
           title: item.title || "-",
           note: item.note || "-",
           type: item.type,
+          icon:item.icon || '-'
         },
       });
     },
