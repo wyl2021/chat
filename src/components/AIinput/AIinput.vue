@@ -195,6 +195,7 @@ export default {
       typeStr: null,
     };
   },
+
   methods: {
     // 发送信息
     async sendMsg() {
@@ -302,15 +303,22 @@ export default {
     // 上传类型的数据
     async handleChangeTypeClass(typeStr) {
       this.typeStr = typeStr;
-      this.value = typeStr.str;
-     
+      let val = this.$refs.ine1.innerHTML.replace(
+        /<form.*?>[\s\S]*?<\/form>/g,
+        ""
+      );
+      val = val.replace(/&nbsp;/g, "");
+      // this.value += typeStr.str;
+      this.value = val + typeStr.str;
+      this.$refs.ine1.innerHTML = val + typeStr.str;
+
       if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;
       }
     },
-   
+
     handleChangeTypeClass1(typeStr) {
       this.typeStr = typeStr;
       this.value = typeStr.str;

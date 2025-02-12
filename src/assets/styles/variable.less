@@ -23,7 +23,9 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* 鼠标悬浮时滚动条的颜色 */
 }
-
+div[contenteditable] {
+  white-space: pre-wrap;
+}
 img {
   user-select: none;
   pointer-events: none;
@@ -176,24 +178,24 @@ pre {
   border: 1px solid #454545;
   border-radius: 10px;
   padding: 10px 13px;
- .r-box{
-  width: 100%;
-  display: flex;
-  .r-b-title {
-    width: 95%;
-    color: #757575;
-    white-space: nowrap; /* 不换行 */
-    overflow: hidden; /* 隐藏溢出内容 */
-    text-overflow: ellipsis; /* 使用省略号 */
-    font-size: 13px;
-  }
-  .r-b-icon{
-    img{
-      width: 15px;
-      height: 15px;
+  .r-box {
+    width: 100%;
+    display: flex;
+    .r-b-title {
+      width: 95%;
+      color: #757575;
+      white-space: nowrap; /* 不换行 */
+      overflow: hidden; /* 隐藏溢出内容 */
+      text-overflow: ellipsis; /* 使用省略号 */
+      font-size: 13px;
+    }
+    .r-b-icon {
+      img {
+        width: 15px;
+        height: 15px;
+      }
     }
   }
- }
   .templetName {
     background: #2c2b32;
     border-radius: 3px;

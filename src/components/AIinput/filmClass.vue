@@ -67,13 +67,12 @@ export default {
     // this.handleDropdownList()
   },
   methods: {
-    customUpload(){
-
-    },
+    customUpload() {},
     handleCommand(val) {
       const arr = ["混剪类型", "裂变类型", "图片生成视频"];
       let dataType = 1;
-      let str = "<form id='myForm'><span>已</span>";
+      let str =
+        "<form id='myForm' style='display:inline-block'><span>已</span>";
       str += `<select class="selectTs" txt="${val}" required >`;
       arr.forEach((ele) => {
         if (ele === val) {

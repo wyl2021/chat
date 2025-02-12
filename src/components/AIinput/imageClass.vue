@@ -66,7 +66,7 @@ export default {
   methods: {
     // 选择比例的效果
     handleCommand(val) {
-      let str = "<form id='myForm'><span>比例：</span>";
+      let str = `&nbsp;<form id='myForm' style='display:inline-block'><span>比例：</span>`;
       let dataType = 1;
       if (val === "自定义") {
         const reg = new RegExp(/[^\d]/g);
@@ -82,7 +82,7 @@ export default {
             str += `<option value="${ele}">${ele}</option>`;
           }
         });
-        str += `</select></form>`;
+        str += `</select></form>&nbsp;`;
         dataType = 2;
       }
       this.$emit("change", { str, dataType, type: "image" });
