@@ -209,6 +209,7 @@ export default {
       let ctx = this.getHtmlContents(str);
       let b = this.vaildateForm();
       if (ctx && b) {
+        console.log('sendMsg',ctx,this.handleData(ctx))
         this.$emit("sendMsg", this.handleData(ctx));
         this.clearVal();
         this.canSend = false;

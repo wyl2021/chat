@@ -46,6 +46,23 @@
         <div class="d-c-header">
           <pre>{{ message?.content.text }}</pre>
         </div>
+        <div class="d-c-footer" v-show="message?.content">
+          <el-tooltip class="item" effect="dark" content="复制" placement="top">
+            <span class="dfs" @click="handleCopy(message.answer)">
+              <img src="@/assets/images/copy.png" />
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="收藏" placement="top">
+            <span class="dfs" @click="handleCollect">
+              <img src="@/assets/images/collect.png" />
+            </span>
+          </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="删除" placement="top">
+            <span class="dfs" @click="handleDel(message.id, index)">
+              <img src="@/assets/images/del.png" />
+            </span>
+          </el-tooltip>
+        </div>
       </div>
       <!--回答区域-->
       <div class="d-c-l" v-show="message.type === 'answer'">
@@ -59,8 +76,7 @@
             <div
               @click="
                 handlePreview(
-                    item2.data.originalImage ||
-                    item2.data.externalLinkImage
+                  item2.data.originalImage || item2.data.externalLinkImage
                 )
               "
               class="w-img"
@@ -98,7 +114,7 @@
             </span>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <span class="dfs" @click="handleDel(message)">
+            <span class="dfs" @click="handleDel(message.id, index)">
               <img src="@/assets/images/del.png" />
             </span>
           </el-tooltip>
@@ -126,12 +142,13 @@
 
 import LoadingView from "@/components/LoadingView/LoadingView.vue";
 import { Session } from "@/utils/storage";
-import { SaveChatCollect } from "@/api/chat";
+import { SaveChatCollect, DelChatDetails } from "@/api/chat";
 import doDataSend from "./aiInterface/doDataSend";
 import textInter from "./aiInterface/textInter";
 import imgInter from "./aiInterface/imgInter";
 import viedoInter from "./aiInterface/viedoInter";
 import historyInter from "./aiInterface/historyInter";
+
 // import audioView from "./audioView.vue";
 /**
  * 数据类型
@@ -257,11 +274,25 @@ export default {
       this.$destroy();
     },
     // 删除
-    handleDel() {
-      if (!this.isDel) return;
-      this.result = "";
-      this.fShow = false;
-      this.$emit("close");
+    handleDel(id, index) {
+      console.log(id, index, this.messages);
+      if (id) {
+        DelChatDetails({ id: id }).then((res) => {
+          if (res.code === 1) {
+            this.messages.splice(index, 1);
+            this.$message.success("删除成功");
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      } else {
+        this.messages.splice(index, 1);
+      }
+
+      // if (!this.isDel) return;
+      // this.result = "";
+      // this.fShow = false;
+      // this.$emit("close");
     },
     // 复制
     async handleCopy(txt) {

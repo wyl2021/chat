@@ -106,7 +106,10 @@ export default {
     },
     jump(item) {
       // this.$router.push(item.path);
-      this.$router.push({
+      if(item.title==='知识库'){
+        this.$router.push('/knowledgeBase')
+      }else{
+        this.$router.push({
         path: "/copyGeneration",
         query: {
           title: item.title || "-",
@@ -115,6 +118,8 @@ export default {
           icon:item.icon || '-'
         },
       });
+      }
+     
     },
   },
 };

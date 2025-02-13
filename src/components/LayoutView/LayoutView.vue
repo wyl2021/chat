@@ -27,6 +27,15 @@
       <div style="padding: 0px 13px">
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
+      <!-- <el-switch
+      class="ly-switch"
+  v-model="value"
+  active-color="#222127"
+  inactive-color="#EEEEEE"
+  @change="handleTheme"
+  >
+
+</el-switch> -->
     </div>
     <div class="ly-body">
       <div class="ly-b-header">
@@ -54,9 +63,18 @@ export default {
   data() {
     return {
       collose: false,
+      value:true,
     };
   },
   methods: {
+    // handleTheme(e){
+    //   console.log(e)
+    //   if(e){
+
+    //   }else{
+        
+    //   }
+    // },
     handleCollose() {
       this.collose = !this.collose;
       if (this.collose) {
@@ -116,6 +134,11 @@ export default {
   //     width: 100%;
   //   }
   // }
+}
+.ly-switch{
+  position: fixed;
+    left: 100px;
+    bottom: 0;
 }
 .ly-body {
   width: 100%;

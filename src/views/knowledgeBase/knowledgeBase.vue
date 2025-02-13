@@ -1,0 +1,181 @@
+<template>
+  <el-container style="height: 100%">
+    <el-header>
+      <el-form ref="form" :model="form" label-width="80px" style="width: 30%">
+        <el-form-item label="标题">
+          <el-input v-model="form.title"></el-input>
+        </el-form-item>
+      </el-form>
+      <span class="b-s-button" @click="handleSearch"> 搜 索 </span>
+      <span class="b-s-button" @click="handleUpd"> 新 增 </span>
+    </el-header>
+    <el-main>
+      <el-table :data="baseList" style="background: transparent">
+        <el-table-column prop="Title" label="标签" />
+        <el-table-column prop="AddTime" label="添加时间">
+          <template slot-scope="scope">
+            <span>{{ scope.row.AddTime.substring(0, 10) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="Count" label="详情数量" />
+        <el-table-column prop="SetStr" label="提示词前缀" />
+        <el-table-column prop="Uid" label="添加用户" />
+        <el-table-column prop="Note" label="简介" />
+        <el-table-column prop="IsPublic" label="是否公开" />
+        <el-table-column prop="UserName" label="添加用户" />
+        <el-table-column fixed="right" label="操作" width="120">
+          <template slot-scope="scope">
+            <el-popconfirm
+              title="这是一段内容确定删除吗？"
+              @confirm="handleDel(scope.row)"
+            >
+              <el-button  type="text"
+              size="small" slot="reference">删除</el-button>
+            </el-popconfirm>
+
+            <el-button @click="handleUpd(scope.row)" type="text" size="small">
+              修改
+            </el-button>
+            <el-button
+              @click="handleDetails(scope.row)"
+              type="text"
+              size="small"
+            >
+              详情
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <baseUpd ref="bUpd" :data="baseInfo" @addAndUpd="handleAdd"></baseUpd>
+    </el-main>
+    <el-footer>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="current.page"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="current.pageInx"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="current.pageTotal"
+      >
+      </el-pagination>
+    </el-footer>
+  </el-container>
+</template>
+<script >
+import { GetKnowledgeBaseList,DelKnowledgeBase } from "@/api/knowledgeBase";
+import baseUpd from "./baseUpd.vue"
+export default {
+    components:{
+        baseUpd
+    },
+  data() {
+    return {
+      form: {
+        title: "",
+      },
+      params: {
+        pageIndex: 1,
+        pageSize: 10,
+      },
+      baseList: [
+       
+      ],
+      current: {
+        page: 1,
+        pageInx: 1,
+        pageTotal: 100,
+      },
+      baseInfo:null
+    };
+  },
+  created() {
+    this.handleList()
+  },
+  watch: {
+    // 监听分页参数变化
+    "current.page"(newPage) {
+      this.params.pageIndex = newPage;
+      this.handleList(); // 自动查询
+    },
+    "current.pageInx"(newPageSize) {
+      this.params.pageSize = newPageSize;
+      this.handleList(); // 自动查询
+    },
+  },
+  methods: {
+    handleSearch() {
+      // 点击搜索按钮时触发数据查询
+      this.params.pageIndex = 1; // 重置页码
+      //   this.handleList();
+    },
+    handleList() {
+      GetKnowledgeBaseList({ ...this.params, ...this.form }).then((res) => {
+        if (res.code === 1) {
+          this.baseList = res.data;
+          this.current.pageTotal = res.total;
+        } else {
+          this.$message.error(res.msg);
+        }
+      });
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+      this.current.pageInx = val; // 更新每页条数
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+      this.current.page = val; // 更新当前页
+    },
+    // 删除
+    handleDel(row) {
+        console.log(row);
+            DelKnowledgeBase({ id: row.id }).then((res) => {
+              if (res.code === 1) {
+                this.$message({
+                  type: "success",
+                  message: "删除成功",
+                });
+              } else {
+                this.$message({
+                  type: "error",
+                  message: res.msg,
+                });
+              }
+            });
+    },
+    handleAdd(res){
+        if(res){
+            this.handleList()
+        }
+        // SaveKnowledgeBase().then(res)
+    },
+    // 修改
+    handleUpd(res) {
+        this.baseInfo=res || {}
+        this.$refs.bUpd.dialogVisible=true
+    },
+    // 详情
+    handleDetails() {},
+  },
+};
+</script>
+<style scoped lang='less'>
+:deep.el-header {
+  display: flex;
+  align-content: center;
+}
+:deep.transparent-table .el-table__header {
+  background-color: transparent !important; /* 设置表头背景透明 */
+}
+
+.b-s-button {
+  background: #2f96ec;
+  padding: 10px 15px 0 15px;
+  height: 30px;
+  text-align: center;
+  border-radius: 5px;
+  margin-left: 50px;
+  cursor: default;
+}
+</style>

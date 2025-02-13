@@ -100,6 +100,7 @@ Vue.mixin({
         str = htmlString.replace(/<[^>]*>/g, '');
       }
       return str;
+
     },
     // 验证表单
     vaildateForm () {

@@ -45,7 +45,7 @@
       :isBack="$route.query.collect !== '0'"
     ></InfoDisplay>
 
-    <div class="h-footer" v-if="isJump">
+    <!-- <div class="h-footer" v-if="isJump">
       <AIinput
         :pic="type === 'img'"
         :film="type === 'video'"
@@ -55,17 +55,15 @@
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
       ></AIinput>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
-import AIinput from "@/components/AIinput/AIinput";
 import { GetChatList,SaveChatCollect } from "@/api/chat";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import { Session } from "@/utils/storage";
 export default {
   components: {
-    AIinput,
     InfoDisplay,
   },
   data() {
@@ -144,10 +142,10 @@ export default {
       };
       Session.set("sessionId", val?.id);
       this.type = val?.type;
-      this.isJump = true;
+      // this.isJump = true;
       this.$nextTick(() => {
-        const h = this.$refs.aiInput.$el.offsetHeight;
-        this.resizeHeight = h + 30;
+        // const h = this.$refs.aiInput.$el.offsetHeight;
+        // this.resizeHeight = h + 30;
         this.answer = true;
       });
     },

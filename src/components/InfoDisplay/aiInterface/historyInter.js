@@ -31,13 +31,16 @@ export default {
 
         let currentMessage = null;
         let previousRole = null;
-        arr.forEach(ele => {
+        arr.forEach((ele,index) => {
           const dt = ele.data || [];
           dt.forEach(e => {
             if (e.role === 'user') {
               if (!currentMessage || previousRole !== e.role) {
                 // 如果 currentMessage 存在并且角色切换了，推入消息列表
                 if (currentMessage) {
+                  
+                  currentMessage.id=arr[index-1].id
+                  console.log('currentMessage',currentMessage)
                   this.messages.push(currentMessage);
                 }
 
@@ -74,6 +77,8 @@ export default {
               if (!currentMessage || previousRole !== 'assistant') {
                 // 如果 currentMessage 存在并且角色切换了，推入消息列表
                 if (currentMessage) {
+                  currentMessage.id=arr[index-1].id
+                  console.log('currentMessage',currentMessage)
                   this.messages.push(currentMessage);
                 }
 
@@ -128,13 +133,16 @@ export default {
             //   })
             // }
           })
+          
         })
         if (currentMessage) {
+          currentMessage.id=arr[arr.length-1].id
+          console.log('currentMessage1111111',currentMessage)
           this.messages.push(currentMessage);
         }
 
 
-
+        console.log('this.messages',this.messages)
         this.scrollToBottom();
         // this.$refs.aiInput.isTab = false;
         // this.$refs.aiInput.canSend = false;

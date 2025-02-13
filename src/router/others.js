@@ -33,5 +33,9 @@ export default [
     path: '/recentlyGenerated',
     name: 'recentlyGenerated',
     component: () => import('@/views/recentlyGenerated/recentlyGenerated.vue')
+  },{
+    path: '/knowledgeBase',
+    name: 'knowledgeBase',
+    component: () => import('@/views/knowledgeBase/knowledgeBase.vue')
   }
 ]
