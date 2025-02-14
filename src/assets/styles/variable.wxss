@@ -19,6 +19,9 @@
   background: #555;
   /* 鼠标悬浮时滚动条的颜色 */
 }
+div[contenteditable] {
+  white-space: pre-wrap;
+}
 img {
   user-select: none;
   pointer-events: none;

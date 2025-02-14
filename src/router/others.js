@@ -37,5 +37,11 @@ export default [
     path: '/knowledgeBase',
     name: 'knowledgeBase',
     component: () => import('@/views/knowledgeBase/knowledgeBase.vue')
-  }
+  },
+  {
+    path: '/baseDetails',
+    name: 'baseDetails',
+    component: () => import('@/views/knowledgeBase/baseDetails.vue')
+  },
+  
 ]

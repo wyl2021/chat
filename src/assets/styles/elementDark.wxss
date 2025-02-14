@@ -1,0 +1,76 @@
+.el-input__inner {
+  border: 1px solid #181818 !important;
+  outline: none !important;
+  color: #fff !important;
+  background-color: #454545 !important;
+  /* 去掉默认背景色 */
+}
+.el-input__prefix {
+  left: 0px !important;
+  height: 100% !important;
+  background: #1b1b1d !important;
+}
+.el-input__icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.el-dialog__header {
+  padding: 10px 13px !important;
+  border-bottom: 1px solid #ccc !important;
+}
+.el-dialog__body {
+  padding: 20px 13px !important;
+}
+.el-dialog__footer {
+  padding: 10px 13px !important;
+  border-top: 1px solid #ccc !important;
+}
+.el-dialog {
+  background-color: #1e1e1e !important;
+}
+.el-dialog__title {
+  color: #fff !important;
+}
+.el-dialog__headerbtn {
+  top: 13px !important;
+  right: 13px !important;
+}
+.el-menu {
+  border-right-style: none !important;
+}
+.el-menu-item.is-active {
+  border: 1px solid #2f95eb !important;
+  border-radius: 10px !important;
+}
+.el-tooltip {
+  z-index: 2001;
+}
+.el-dropdown-menu {
+  background-color: #212126 !important;
+  border: 1px solid #353537 !important;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow {
+  border-bottom-color: #353537 !important;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow::after {
+  background-color: transparent !important;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow::after {
+  border-bottom-color: #353537 !important;
+}
+.el-dropdown-menu__item {
+  color: #fff !important;
+}
+.el-dropdown-menu__item:hover {
+  background-color: #f0f0f0 !important;
+  /* 修改背景颜色 */
+  color: #333 !important;
+  /* 修改文字颜色 */
+}
+.el-table th {
+  background: #222127 !important;
+}
+.el-table__row {
+  background: #222127 !important;
+}

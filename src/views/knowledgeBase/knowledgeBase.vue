@@ -1,5 +1,14 @@
 <template>
   <el-container style="height: 100%">
+    <div style="display: flex; justify-content: flex-end;margin-right:24px">
+      <el-button
+        size="mini"
+        type="text"
+        icon="el-icon-arrow-left"
+        @click="handleBack"
+        >返回</el-button
+      >
+    </div>
     <el-header>
       <el-form ref="form" :model="form" label-width="80px" style="width: 30%">
         <el-form-item label="标题">
@@ -7,7 +16,7 @@
         </el-form-item>
       </el-form>
       <span class="b-s-button" @click="handleSearch"> 搜 索 </span>
-      <span class="b-s-button" @click="handleUpd"> 新 增 </span>
+      <span class="b-s-button" @click="handleUpd({})"> 新 增 </span>
     </el-header>
     <el-main>
       <el-table :data="baseList" style="background: transparent">
@@ -21,7 +30,11 @@
         <el-table-column prop="SetStr" label="提示词前缀" />
         <el-table-column prop="Uid" label="添加用户" />
         <el-table-column prop="Note" label="简介" />
-        <el-table-column prop="IsPublic" label="是否公开" />
+        <el-table-column prop="IsPublic" label="是否公开">
+          <template slot-scope="scope">{{
+            scope.row.IsPublic ? "公开" : "隐藏"
+          }}</template>
+        </el-table-column>
         <el-table-column prop="UserName" label="添加用户" />
         <el-table-column fixed="right" label="操作" width="120">
           <template slot-scope="scope">
@@ -29,8 +42,9 @@
               title="这是一段内容确定删除吗？"
               @confirm="handleDel(scope.row)"
             >
-              <el-button  type="text"
-              size="small" slot="reference">删除</el-button>
+              <el-button type="text" size="small" slot="reference"
+                >删除</el-button
+              >
             </el-popconfirm>
 
             <el-button @click="handleUpd(scope.row)" type="text" size="small">
@@ -63,12 +77,12 @@
   </el-container>
 </template>
 <script >
-import { GetKnowledgeBaseList,DelKnowledgeBase } from "@/api/knowledgeBase";
-import baseUpd from "./baseUpd.vue"
+import { GetKnowledgeBaseList, DelKnowledgeBase } from "@/api/knowledgeBase";
+import baseUpd from "./baseUpd.vue";
 export default {
-    components:{
-        baseUpd
-    },
+  components: {
+    baseUpd,
+  },
   data() {
     return {
       form: {
@@ -78,19 +92,17 @@ export default {
         pageIndex: 1,
         pageSize: 10,
       },
-      baseList: [
-       
-      ],
+      baseList: [],
       current: {
         page: 1,
         pageInx: 1,
         pageTotal: 100,
       },
-      baseInfo:null
+      baseInfo: null,
     };
   },
   created() {
-    this.handleList()
+    this.handleList();
   },
   watch: {
     // 监听分页参数变化
@@ -104,6 +116,9 @@ export default {
     },
   },
   methods: {
+     handleBack(){
+        this.$router.go(-1)
+    },
     handleSearch() {
       // 点击搜索按钮时触发数据查询
       this.params.pageIndex = 1; // 重置页码
@@ -129,34 +144,43 @@ export default {
     },
     // 删除
     handleDel(row) {
-        console.log(row);
-            DelKnowledgeBase({ id: row.id }).then((res) => {
-              if (res.code === 1) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功",
-                });
-              } else {
-                this.$message({
-                  type: "error",
-                  message: res.msg,
-                });
-              }
-            });
-    },
-    handleAdd(res){
-        if(res){
-            this.handleList()
+      console.log(row);
+      DelKnowledgeBase({ id: row.Id }).then((res) => {
+        if (res.code === 1) {
+          this.handleList();
+          this.$message({
+            type: "success",
+            message: "删除成功",
+          });
+        } else {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
         }
-        // SaveKnowledgeBase().then(res)
+      });
+    },
+    handleAdd(res) {
+      if (res) {
+        this.handleList();
+      }
+      // SaveKnowledgeBase().then(res)
     },
     // 修改
     handleUpd(res) {
-        this.baseInfo=res || {}
-        this.$refs.bUpd.dialogVisible=true
+      this.baseInfo = res;
+      console.log(this.baseInfo);
+      this.$refs.bUpd.dialogVisible = true;
     },
     // 详情
-    handleDetails() {},
+    handleDetails(dil) {
+      this.$router.push({
+        path: "/baseDetails",
+        query: {
+          id: dil.Id,
+        },
+      });
+    },
   },
 };
 </script>
@@ -164,9 +188,6 @@ export default {
 :deep.el-header {
   display: flex;
   align-content: center;
-}
-:deep.transparent-table .el-table__header {
-  background-color: transparent !important; /* 设置表头背景透明 */
 }
 
 .b-s-button {

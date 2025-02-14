@@ -36,6 +36,10 @@
   >
 
 </el-switch> -->
+<el-button @click="toggleTheme" class="theme-toggle">
+      <span v-if="isDarkMode" class="moon-icon">🌙</span>
+      <span v-else class="sun-icon">🌞</span>
+    </el-button>
     </div>
     <div class="ly-body">
       <div class="ly-b-header">
@@ -64,9 +68,25 @@ export default {
     return {
       collose: false,
       value:true,
+      isDarkMode: false // 默认使用明亮模式
     };
   },
   methods: {
+    toggleTheme() {
+      this.isDarkMode = !this.isDarkMode;
+      this.applyTheme();
+    },
+    applyTheme() {
+      if (this.isDarkMode) {
+        // 应用黑暗模式样式
+        document.body.classList.add('dark-theme');
+        document.body.classList.remove('light-theme');
+      } else {
+        // 应用明亮模式样式
+        document.body.classList.add('light-theme');
+        document.body.classList.remove('dark-theme');
+      }
+    },
     // handleTheme(e){
     //   console.log(e)
     //   if(e){
@@ -159,5 +179,27 @@ export default {
 .ly-b-content {
   width: 100%;
   height: calc(100% - 50px);
+}
+/* 太阳和月亮按钮样式 */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.sun-icon,
+.moon-icon {
+  font-size: 2rem;
+  transition: 0.3s;
+}
+
+.theme-toggle:hover .sun-icon {
+  color: #f39c12;
+}
+
+.theme-toggle:hover .moon-icon {
+  color: #3498db;
 }
 </style>
