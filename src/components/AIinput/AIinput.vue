@@ -460,6 +460,10 @@ export default {
           event.preventDefault();
           const parentNode = startContainer.parentNode;
           parentNode.innerText = "";
+          const b = this.vaildateForm();
+          if (!b) {
+            this.canSend = false;
+          }
         }
       }
     },
