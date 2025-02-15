@@ -64,11 +64,14 @@
       ></div>
       <div
         ref="ine1"
+        id="editableDiv"
         class="h-f-input1"
         :contenteditable="!disabled"
         v-html="value"
         :placeholder="placeholder"
         @input="handleInputX"
+        @keydown="preventDeleteKey"
+        @beforeinput="currentProtected"
         v-if="isTab"
       ></div>
       <div class="h-fi">
@@ -195,7 +198,7 @@ export default {
       typeStr: null,
     };
   },
-
+  mounted() {},
   methods: {
     // 发送信息
     async sendMsg() {
@@ -209,7 +212,7 @@ export default {
       let ctx = this.getHtmlContents(str);
       let b = this.vaildateForm();
       if (ctx && b) {
-        console.log('sendMsg',ctx,this.handleData(ctx))
+        console.log("sendMsg", ctx, this.handleData(ctx));
         this.$emit("sendMsg", this.handleData(ctx));
         this.clearVal();
         this.canSend = false;
@@ -218,7 +221,6 @@ export default {
     },
     handleData(ctx) {
       let parameter = {};
-      console.log(this.pic, this.film);
       if (this.pic) {
         const qList = this.imgList.map((item) => ({
           type: "base64",
@@ -430,6 +432,62 @@ export default {
         span.parentNode.removeChild(span);
         // 打印光标相对于输入框顶部的位置
         return top;
+      }
+    },
+    // 获取当前光标是否在带有protected的元素
+    currentProtected(event) {
+      var selection = window.getSelection();
+      var range = selection.getRangeAt(0);
+      const startContainer = range.startContainer;
+      if (
+        event.inputType === "deleteContentBackward" &&
+        startContainer.nodeType === Node.ELEMENT_NODE
+      ) {
+        const str = startContainer.classList.toString();
+        const startOffset = range.startOffset;
+        // 阻止删除操作
+        if (str.includes("protected") && startOffset === 0) {
+          event.preventDefault();
+        }
+      } else if (range.startOffset == 1) {
+        const parentNodeClassName = startContainer.parentNode
+          ? startContainer.parentNode.className
+          : null;
+        if (
+          parentNodeClassName.includes("protected") &&
+          event.inputType === "deleteContentBackward"
+        ) {
+          event.preventDefault();
+          const parentNode = startContainer.parentNode;
+          parentNode.innerText = "";
+        }
+      }
+    },
+    // 过滤哪些不能删除的内容
+    preventDeleteKey(event) {
+      if (event.key === "Backspace") {
+        var selection = window.getSelection();
+        var range = selection.getRangeAt(0);
+        var startContainer = range.startContainer;
+        var startOffset = range.startOffset;
+        var previousNode = startContainer.childNodes[startOffset - 1]; // 获取光标前的节点
+        if (
+          previousNode &&
+          previousNode.nodeType === Node.ELEMENT_NODE &&
+          previousNode.classList.contains("protected")
+        ) {
+          // 如果光标前的节点是受保护的元素，则阻止默认行为
+          event.preventDefault();
+        } else if (
+          startOffset === 0 &&
+          startContainer.nodeType === Node.ELEMENT_NODE
+        ) {
+          // 如果光标位于第一个子节点之前，检查第一个子节点是否受保护
+          var firstChild = startContainer.childNodes[0];
+          if (firstChild && firstChild.classList.contains("protected")) {
+            event.preventDefault();
+          }
+        }
       }
     },
   },

@@ -5,7 +5,6 @@
 @fontSize: 13px;
 @borderPrimaryDark: #2f96ec;
 
-
 // 亮色主题变量
 @fontColorLight: #333333; // 亮色主题文字颜色
 @backgroundLight: #ffffff; // 亮色主题背景颜色
@@ -50,8 +49,26 @@ pre {
   border-radius: 8px;
   margin: 0 5px 5px 5px;
   background-clip: border-box;
+  min-height: 17px;
 }
-
+.inputTTs {
+  display: inline-block;
+  background-color: #242d3b;
+  outline: none;
+  border-style: none;
+  padding: 2px 5px;
+  color: #fff;
+  border-radius: 8px;
+  margin: 0 5px 5px 5px;
+  background-clip: border-box;
+  min-height: 17px;
+  width: auto;
+  max-width: 100%;
+}
+.inputTTs:empty:before {
+  content: attr(placeholder);
+  color: #275680;
+}
 .inputTs::placeholder {
   color: #275680; /* 设置颜色 */
 }

@@ -28,15 +28,15 @@ Vue.mixin({
             result += `<span>${item.content}</span>`;
           }
         } else if (item.type === 'input') {
-          const len = this.textWidth(item.placeholder) + 10;
-          result += `<input class="inputTs" required style="width: ${len || 130}px" type="text" placeholder="[${item.placeholder}]" />`;
+          const len = this.textWidth(item.placeholder) + 15;
+          result += `<span class="inputTTs protected" contenteditable="true" style="min-width: ${len || 130}px" required placeholder="[${item.placeholder}]"></span>`;
         } else if (item.type === 'int') {
           const len = item.placeholder ? this.textWidth(item.placeholder) + 10 : 50;
           const reg = new RegExp(/[^\d]/g);
-          result += `<input class="inputTs" required style="width: ${len || 130}px" number="true"  placeholder="[${item.placeholder || '请输入'}]" onkeyup="value=value.replace(${reg},'')" />`;
+          result += `<input class="inputTs protected" required style="width: ${len || 130}px" number="true"  placeholder="[${item.placeholder || '请输入'}]" onkeyup="value=value.replace(${reg},'')" />`;
         } else if (item.type === 'select') {
           const arr = item.data || [];
-          result += `<select class="selectTs" required txt="${arr[0].value}">`
+          result += `<select class="selectTs protected" required txt="${arr[0].value}">`
           arr.forEach(item => {
             result += `<option value="${item.value}">${item.name}</option>`;
           });
@@ -109,7 +109,8 @@ Vue.mixin({
       const elementsWithCustomAttr = form.querySelectorAll('[required]');
       for (let i = 0; i < elementsWithCustomAttr.length; i++) {
         const dom = elementsWithCustomAttr[i];
-        if (!dom.value) {
+        const val = dom.value || dom.innerText;
+        if (!val) {
           return false;
         }
       }

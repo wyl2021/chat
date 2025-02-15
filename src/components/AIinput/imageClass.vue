@@ -70,11 +70,11 @@ export default {
       let dataType = 1;
       if (val === "自定义") {
         const reg = new RegExp(/[^\d]/g);
-        str += `<span>长</span><input type="text" number="true" class="inputTs" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" required /><span>宽</span><input type="text" number="true" class="inputTs" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" required />`;
+        str += `<span>长</span><input type="text" number="true" class="inputTs protected" style="width: 80px" placeholder="请输入长多少" onkeyup="value=value.replace(${reg},'')" required /><span>宽</span><input type="text" number="true" class="inputTs protected" style="width: 80px" placeholder="请输入宽多少" onkeyup="value=value.replace(${reg},'')" required />`;
         dataType = 1;
       } else {
         const arr = ["1:1", "4:3", "3:4", "16:9", "9:16"];
-        str += `<select class="selectTs" txt="${val}" required >`;
+        str += `<select class="selectTs protected" txt="${val}" required >`;
         arr.forEach((ele) => {
           if (ele === val) {
             str += `<option value="${ele}" selected>${ele}</option>`;

@@ -73,7 +73,7 @@ export default {
       let dataType = 1;
       let str =
         "<form id='myForm' style='display:inline-block'><span>已</span>";
-      str += `<select class="selectTs" txt="${val}" required >`;
+      str += `<select class="selectTs protected" txt="${val}" required >`;
       arr.forEach((ele) => {
         if (ele === val) {
           str += `<option value="${ele}" selected>${ele}</option>`;
@@ -83,10 +83,10 @@ export default {
       });
       str += "</select>";
       str += "<span>创建视频。品牌车型</span>";
-      str += `<input type="text" required class="inputTs" style="width: 210px" placeholder="[填写车型，准确到输入品牌、车型]"  />`;
+      str += `<span required class="inputTTs protected" contenteditable="true" style="min-width: 210px" placeholder="[填写车型，准确到输入品牌、车型]" ></span>`;
       str += "<span>分裂数量</span>";
       const arr1 = [1, 2, 3, 4];
-      str += `<select class="selectTs" txt="1" required >`;
+      str += `<select class="selectTs protected" txt="1" required >`;
       arr1.forEach((ele) => {
         if (ele === 1) {
           str += `<option value="${ele}" selected>${ele}</option>`;
@@ -96,11 +96,11 @@ export default {
       });
       str += "</select><br>";
       str += "<span>视频文案</span>";
-      str += `<input type="text" required class="inputTs" style="width:505px" placeholder="[围绕车型特点、优势、品牌，应简洁明了，要给出小于10个字到主题，或者14个字内"  />`;
-      str += `<input type="text" required class="inputTs" style="width:360px" placeholder="到副主题，如果不填封面没有文字或者根据车型随机出文案]" /><br>`;
+      str += `<span required class="inputTTs protected" contenteditable="true" style="min-width:505px" placeholder="[围绕车型特点、优势、品牌，应简洁明了，要给出小于10个字到主题，或者14个字内" ></span>`;
+      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:360px" placeholder="到副主题，如果不填封面没有文字或者根据车型随机出文案]" ></span><br>`;
       str += "<span>视频长度</span>";
       const arr2 = ["15秒内", "30秒内", "45秒内", "60秒内"];
-      str += `<select class="selectTs" txt="15" required >`;
+      str += `<select class="selectTs protected" txt="15" required >`;
       arr2.forEach((ele) => {
         if (ele === 15) {
           str += `<option value="${ele}" selected>${ele}</option>`;
@@ -110,9 +110,9 @@ export default {
       });
       str += "</select>";
       str += "<span>视频BGM</span>";
-      str += `<input type="text" class="inputTs" required style="width:100px" placeholder="抖音热门BGM"  /><br>`;
+      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="抖音热门BGM" ></span><br>`;
       str += "<span>其他要求</span>";
-      str += `<input type="text" class="inputTs" required style="width:100px" placeholder="[其他补充要求]"  /></form>`;
+      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="[其他补充要求]" ></span></form>`;
       this.$emit("change", { str, dataType, type: "video" });
     },
     // 上传图片之前的操作
