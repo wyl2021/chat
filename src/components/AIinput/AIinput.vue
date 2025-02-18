@@ -210,6 +210,7 @@ export default {
         str = this.$refs.ine.innerHTML;
       }
       let ctx = this.getHtmlContents(str);
+      console.log(str,'测试测试测试测',ctx)
       let b = this.vaildateForm();
       if (ctx && b) {
         console.log("sendMsg", ctx, this.handleData(ctx));
@@ -288,7 +289,9 @@ export default {
     },
     // 实时判断是否换个输入框
     handleInput() {
+     
       const val = this.$refs.ine.innerHTML;
+      console.log(this.isTab,val)
       const ctx = this.getHtmlContents(val);
       if (ctx) {
         this.canSend = true;
@@ -315,7 +318,7 @@ export default {
       this.value = val + typeStr.str;
       this.$refs.ine1.innerHTML = val + typeStr.str;
 
-      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
+      if (this.typeStr.dataType === 2 ) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -361,12 +364,11 @@ export default {
       }
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
-      const ctx = this.getHtmlContents(val);
+      const ctx =this.getHtmlContents(val);
       const b = this.vaildateForm();
       if (
         this.typeStr &&
         this.typeStr.type === "image" &&
-        this.imgList.length > 0 &&
         b
       ) {
         this.canSend = true;
@@ -503,7 +505,7 @@ export default {
   position: relative;
   width: 100%;
   height: auto;
-  background: #222127;
+  background: var(--background);
 }
 .h-f-top {
   display: flex;
@@ -532,10 +534,11 @@ export default {
   }
 }
 .h-f-inner {
+  background: var(--background);
   position: relative;
   width: calc(100% - 20px);
   height: auto;
-  border: 1px solid #333335;
+  border: 1px solid var(--background);;
   border-radius: 15px;
   padding: 10px 13px;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);

@@ -4,12 +4,13 @@
 @fontColorHighlightDark: #fff;
 @fontSize: 13px;
 @borderPrimaryDark: #2f96ec;
-
+@silderBackgroundDark:#000;
 // 亮色主题变量
 @fontColorLight: #333333; // 亮色主题文字颜色
 @backgroundLight: #ffffff; // 亮色主题背景颜色
 @fontColorHighlightLight: #000000; // 亮色主题高亮文字颜色
 @borderPrimaryLight: #1e90ff; // 亮色主题边框颜色
+@silderBackgroundLight:#F3F4F6;
 
 /* 为所有WebKit浏览器添加自定义滚动条样式 */
 ::-webkit-scrollbar {
@@ -39,6 +40,122 @@ img {
 pre {
   margin: 0px;
 }
+
+/* 默认亮色主题 */
+:root {
+  --fontColor: @fontColorLight;
+  --background: @backgroundLight;
+  --fontColorHighlight: @fontColorHighlightLight;
+  --borderPrimary: @borderPrimaryLight;
+}
+
+/* 暗色主题 */
+body.dark-theme {
+  --fontColor: @fontColorDark;
+  --background: @backgroundDark;
+  --fontColorHighlight: @fontColorHighlightDark;
+  --borderPrimary: @borderPrimaryDark;
+  --sliderGround:@silderBackgroundDark;
+}
+
+/* 亮色主题 */
+body.light-theme {
+  --fontColor: @fontColorLight;
+  --background: @backgroundLight;
+  --fontColorHighlight: @fontColorHighlightLight;
+  --borderPrimary: @borderPrimaryLight;
+  --sliderGround:@silderBackgroundLight;
+}
+
+.ly-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  min-width: 1200px;
+  min-height: 768px;
+  overflow: auto;
+  background: var(--background);
+}
+.ly-silder {
+  width: 260px;
+  background: var(--sliderGround);
+  height: 100%;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.ly-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 13px;
+  .logo-img {
+    display: inline-block;
+    width: 177px;
+    height: 50px;
+    overflow: hidden;
+    text-align: center;
+    line-height: 50px;
+    margin: auto;
+  }
+  // .logo {
+  //   display: inline-block;
+  //   width: 26px;
+  //   height: 26px;
+  //   border-radius: 26px;
+  //   background: #212126;
+  //   overflow: hidden;
+  //   text-align: center;
+  //   line-height: 26px;
+  //   margin-right: 10px;
+  //   img {
+  //     width: 100%;
+  //   }
+  // }
+}
+.ly-switch {
+  position: fixed;
+  left: 100px;
+  bottom: 0;
+}
+.ly-body {
+  width: 100%;
+  height: 100%;
+}
+.ly-b-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  padding: 0px 13px;
+  .ly-b-h-r {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+}
+.ly-b-content {
+  width: 100%;
+  height: calc(100% - 50px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .inputTs {
   display: inline-block;
   background-color: #242d3b;

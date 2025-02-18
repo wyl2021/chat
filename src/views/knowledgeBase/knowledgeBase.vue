@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100%">
-    <div style="display: flex; justify-content: flex-end;margin-right:24px">
+    <div style="display: flex; justify-content: flex-end; margin-right: 24px">
       <el-button
         size="mini"
         type="text"
@@ -50,6 +50,17 @@
             <el-button @click="handleUpd(scope.row)" type="text" size="small">
               修改
             </el-button>
+            <el-upload
+              class="upload-demo"
+              action=""
+              :on-change="(file,fileList) => handlePreview(scope.row,file,fileList)"
+              :file-list="[]"
+              :http-request="customUpload"
+              :show-file-list="false"
+            >
+              <el-button type="text" size="small"> 上传文件 </el-button>
+            </el-upload>
+
             <el-button
               @click="handleDetails(scope.row)"
               type="text"
@@ -77,7 +88,11 @@
   </el-container>
 </template>
 <script >
-import { GetKnowledgeBaseList, DelKnowledgeBase } from "@/api/knowledgeBase";
+import {
+  GetKnowledgeBaseList,
+  DelKnowledgeBase,
+  UpdKnowledgeBaseFileD,
+} from "@/api/knowledgeBase";
 import baseUpd from "./baseUpd.vue";
 export default {
   components: {
@@ -116,8 +131,8 @@ export default {
     },
   },
   methods: {
-     handleBack(){
-        this.$router.go(-1)
+    handleBack() {
+      this.$router.go(-1);
     },
     handleSearch() {
       // 点击搜索按钮时触发数据查询
@@ -170,7 +185,9 @@ export default {
     handleUpd(res) {
       this.baseInfo = res;
       console.log(this.baseInfo);
-      this.$refs.bUpd.dialogVisible = true;
+      this.$nextTick(() => {
+        this.$refs.bUpd.dialogVisible = true;
+      });
     },
     // 详情
     handleDetails(dil) {
@@ -181,6 +198,36 @@ export default {
         },
       });
     },
+    // 上传图片之前的操作
+    async handlePreview(row, file) {
+      console.log(row, file);
+
+      if (!file) return false;
+
+      const isLt5M = file.raw.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        this.$message.error("上传内容不能大于5M");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file.raw);
+      formData.append("id", row.Id);
+
+      try {
+        const fileRes = await UpdKnowledgeBaseFileD(formData);
+        console.log(fileRes);
+
+        if (fileRes.code === 1) {
+          this.$message.success("上传成功");
+        } else {
+          this.$message.error("上传失败：" + fileRes.msg);
+        }
+      } catch (error) {
+        this.$message.error("上传出错: " + error.message);
+      }
+    },
+    customUpload() {},
   },
 };
 </script>

@@ -80,7 +80,7 @@ export default {
     return {
       type: "公关广告",
       title: "公关广告",
-      icon:'@/assets/images/icon_13.png',
+      icon:'https://www.swsai.com/style/dist/img/icon/home1_1.png',
       cgTag: [],
       ctxList: [],
       ctxVal: "",

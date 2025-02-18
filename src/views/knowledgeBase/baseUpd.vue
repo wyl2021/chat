@@ -7,9 +7,9 @@
     width="37"
   >
     <el-form :model="form" ref="ruleForm" size="small">
-      <el-form-item label="知识库id">
+      <!-- <el-form-item label="知识库id">
         <el-input v-model.trim="form.id"></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item
         prop="title"
         label="标题"
@@ -27,14 +27,13 @@
       <el-form-item label="是否公开">
         <el-switch v-model="form.isPublic"></el-switch>
       </el-form-item>
-      <el-form-item label="文件">
+      <!-- <el-form-item label="文件">
         <el-upload
           class="upload-demo"
           drag
           action=""
           multiple
-          :before-upload="handleBeforeUpload"
-          :show-file-list="false"
+          :on-change="handlePreview"
           :file-list="fileList"
           :http-request="customUpload"
         >
@@ -44,7 +43,7 @@
             只能上传txt/docx文件，且不超过5M
           </div>
         </el-upload>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
@@ -55,7 +54,7 @@
 
 <script>
 import verificate from "@/utils/verificate";
-import { SaveKnowledgeBase,UpdKnowledgeBaseFileD } from "@/api/knowledgeBase";
+import { SaveKnowledgeBase } from "@/api/knowledgeBase";
 export default {
   props: {
     data: {
@@ -77,16 +76,23 @@ export default {
   
     };
   },
+  computed: {
+    // 计算属性，确保 `data` 变化时，`form` 自动同步
+    computedForm() {
+      return this.data ? {
+        id: this.data.Id || null,
+        title: this.data.Title || "",
+        note: this.data.Note || "",
+        isPublic: this.data.IsPublic===1 || false,
+      } : { ...this.form };  // 保证在没有数据时，表单不会为空
+    }
+  },
   watch: {
-    data: {
-      handler(newData) {
-        if (newData) {
-          this.form.id = newData.Id || null;
-          this.form.title = newData.Title || "";
-          this.form.note = newData.Note || "";
-          this.form.isPublic = newData.IsPublic || 0;
-        }
+    computedForm: {
+      handler(newForm) {
+        this.form = { ...newForm }; // 在 computed 属性变化时同步到 form
       },
+      deep: true,  // 深度监听
     },
   },
   methods: {
@@ -106,31 +112,34 @@ export default {
         }
       });
     },
-    // 上传图片之前的操作
-    async handleBeforeUpload(file) {
-      console.log(file);
-      if (!file) return false;
-      const that = this;
-      const isLt5M = file.size / 1024 / 1024 < 5;
-      if(!isLt5M){
-        that.$message.error('上传内容不能大于5M')
-        return 
-      }
-      const formData = new FormData();
-        formData.append("file", file);
-        formData.append("id", this.form.id);
-        const fileRes=await UpdKnowledgeBaseFileD(formData)
-        console.log(fileRes)
-        if(fileRes.code===1){
-            that.$message.success("上传成功");
-        }else{
-            that.$message.error("上传失败：" + fileRes.msg);
-        }
-    },
+    // // 上传图片之前的操作
+    // async handlePreview(file) {
+    //   console.log(file);
+    //   if (!file) return false;
+    //   const that = this;
+    //   const isLt5M = file.raw.size / 1024 / 1024 < 5;
+    //   if(!isLt5M){
+    //     that.$message.error('上传内容不能大于5M')
+    //     return 
+    //   }
+    //   const formData = new FormData();
+    //     formData.append("file", file.raw);
+    //     formData.append("id", this.form.id);
+    //     const fileRes=await UpdKnowledgeBaseFileD(formData)
+    //     console.log(fileRes)
+    //     if(fileRes.code===1){
+    //         that.$message.success("上传成功");
+    //     }else{
+    //         that.$message.error("上传失败：" + fileRes.msg);
+    //     }
+    // },
     customUpload() {},
   },
 };
 </script>
 
-<style>
+<style lass="less" scoped>
+:deep .el-upload-dragger{
+  background:transparent !important;
+}
 </style>

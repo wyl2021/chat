@@ -11,7 +11,10 @@
           "
           v-if="!collose"
         >
-        <img class="logo-img" src="https://www.swsai.com/style/dist/img/icon/logo.png" />
+          <img
+            class="logo-img"
+            src="https://www.swsai.com/style/dist/img/icon/logo.png"
+          />
           <!-- <div class="logo">
             <img src="@/assets/images/logo.jpg" />
           </div>
@@ -27,6 +30,10 @@
       <div style="padding: 0px 13px">
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
+      <el-button @click="toggleTheme" class="theme-toggle">
+            <span v-if="isDarkMode" class="moon-icon">🌙</span>
+            <span v-else class="sun-icon">🌞</span>
+          </el-button>
       <!-- <el-switch
       class="ly-switch"
   v-model="value"
@@ -36,15 +43,12 @@
   >
 
 </el-switch> -->
-<el-button @click="toggleTheme" class="theme-toggle">
-      <span v-if="isDarkMode" class="moon-icon">🌙</span>
-      <span v-else class="sun-icon">🌞</span>
-    </el-button>
     </div>
     <div class="ly-body">
       <div class="ly-b-header">
         <div></div>
         <div class="ly-b-h-r">
+         
           <span class="el-icon-bell" style="font-size: 15px"></span>
           <userCp></userCp>
         </div>
@@ -67,24 +71,30 @@ export default {
   data() {
     return {
       collose: false,
-      value:true,
-      isDarkMode: false // 默认使用明亮模式
+      value: true,
+      isDarkMode: true, // 默认使用明亮模式
     };
+  },
+  mounted() {
+    this.applyTheme(); // 初始加载时应用当前主题
   },
   methods: {
     toggleTheme() {
       this.isDarkMode = !this.isDarkMode;
       this.applyTheme();
+      console.log(this.isDarkMode);
     },
     applyTheme() {
+      const rootElement = document.body;
+
       if (this.isDarkMode) {
-        // 应用黑暗模式样式
-        document.body.classList.add('dark-theme');
-        document.body.classList.remove('light-theme');
+        // 切换到暗色主题
+        rootElement.classList.add("dark-theme");
+        rootElement.classList.remove("light-theme");
       } else {
-        // 应用明亮模式样式
-        document.body.classList.add('light-theme');
-        document.body.classList.remove('dark-theme');
+        // 切换到亮色主题
+        rootElement.classList.add("light-theme");
+        rootElement.classList.remove("dark-theme");
       }
     },
     // handleTheme(e){
@@ -92,7 +102,7 @@ export default {
     //   if(e){
 
     //   }else{
-        
+
     //   }
     // },
     handleCollose() {
@@ -109,77 +119,8 @@ export default {
 
 <style lang="less" scoped>
 @import url("@/assets/styles/variable.less");
-.ly-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: flex-start;
-  min-width: 1200px;
-  min-height: 768px;
-  overflow: auto;
-  background: @backgroundDark;
-}
-.ly-silder {
-  width: 260px;
-  background: black;
-  height: 100%;
-  transition: all 0.3s;
-  flex-shrink: 0;
-}
-.ly-logo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 13px;
-  .logo-img {
-      display: inline-block;
-    width: 177px;
-    height: 50px;
-    overflow: hidden;
-    text-align: center;
-    line-height: 50px;
-    margin: auto;
-    }
-  // .logo {
-  //   display: inline-block;
-  //   width: 26px;
-  //   height: 26px;
-  //   border-radius: 26px;
-  //   background: #212126;
-  //   overflow: hidden;
-  //   text-align: center;
-  //   line-height: 26px;
-  //   margin-right: 10px;
-  //   img {
-  //     width: 100%;
-  //   }
-  // }
-}
-.ly-switch{
-  position: fixed;
-    left: 100px;
-    bottom: 0;
-}
-.ly-body {
-  width: 100%;
-  height: 100%;
-}
-.ly-b-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 50px;
-  padding: 0px 13px;
-  .ly-b-h-r {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
-}
-.ly-b-content {
-  width: 100%;
-  height: calc(100% - 50px);
-}
+
+
 /* 太阳和月亮按钮样式 */
 .theme-toggle {
   background: transparent;
@@ -187,11 +128,17 @@ export default {
   font-size: 30px;
   cursor: pointer;
   transition: 0.3s;
+  border-color: transparent !important;
+    background: transparent !important;
+    width: 20px;
+    height: 20px;
+    padding: 2px !important;
+    margin-right:5px !important;
 }
 
 .sun-icon,
 .moon-icon {
-  font-size: 2rem;
+  font-size: 15px;
   transition: 0.3s;
 }
 

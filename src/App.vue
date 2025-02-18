@@ -19,7 +19,7 @@ export default {
 #app {
   min-width: 100%;
   height: 100%;
-  color: @fontColorHighlightDark;
+  color: var(--fontColorHighlight);
   font-size: @fontSize;
 }
 </style>

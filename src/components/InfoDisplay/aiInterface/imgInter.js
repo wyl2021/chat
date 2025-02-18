@@ -3,7 +3,7 @@ import moment from "moment";
 import { Session } from "@/utils/storage";
 export default {
   // 图片会话
-  async aiImgAnswer (val) {
+  async aiImgAnswer(val) {
     this.loading = true; // 标记正在加载
     this.isDel = false;
     let isPolling = 0;
@@ -49,7 +49,13 @@ export default {
           await Session.set("id", res.data.id);
           this.imgPoll();
         } else {
-          this.$message.error(res.msg);
+          if (res.msg.includes('timeout')) {
+            // 如果是超时错误，则不显示错误消息
+            console.log('请求超时，不显示错误');
+          } else {
+            this.$message.error(res.msg);
+          }
+
         }
       });
     } catch (error) {
@@ -59,7 +65,7 @@ export default {
     }
   },
   // 处理图片数据
-  imageDate (response) {
+  imageDate(response) {
     let answerList = [];
     if (!response) return
     response.forEach((item) => {

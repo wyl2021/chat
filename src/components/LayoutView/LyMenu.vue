@@ -86,11 +86,11 @@
         :index="`6-${index + 1}`"
         v-for="(item, index) in recentlyChatList"
         :key="index"
-        @click.native="handleSelect1(item)"
+        @click.native="handleSelect1(item)" 
       >
       <div style="justify-content: space-between;display: flex;">
         <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
-        <span  @click.stop="handleCancel(item.id)">
+        <span  @click.stop="handleCancel(item.id,index)">
               <img style="width:15px;height:15px" src="@/assets/images/del.png" />
             </span>
           </div>
@@ -194,11 +194,19 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    handleCancel(id){
-      console.log(id)
+    handleCancel(id,index){
+      console.log(id,index)
       DelChat({sessionId:id}).then(res=>{
         if(res.code===1){
           this.setChatList()
+         
+          if(index===0){
+            this.setActivePath('/home');
+           this.$router.push('/home')
+          }else{
+            this.handleSelect1(this.recentlyChatList[index-1])
+          }
+          
           this.$message.success('删除成功')
         }else{
           this.$message.error(res.msg)
