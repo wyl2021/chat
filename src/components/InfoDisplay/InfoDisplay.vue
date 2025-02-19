@@ -96,12 +96,14 @@
               style="width: 200px; height: 100px"
               controls
             ></video>
-            <pre v-if="item2.type === 'answer'">{{ item2.content }}</pre>
+            <pre v-if="item2.type === 'answer'">{{
+              item2.content || item2.data
+            }}</pre>
           </div>
         </div>
-        <LoadingView
+        <!-- <LoadingView
           v-show="loading && index === messages.length - 1"
-        ></LoadingView>
+        ></LoadingView> -->
         <div class="d-c-footer" v-show="message?.content">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
             <span class="dfs" @click="handleCopy(message.answer)">
@@ -180,8 +182,8 @@ export default {
     },
   },
   beforeDestroy() {
-    clearInterval(this.imgPoll);
-    clearInterval(this.videoPoll);
+  clearInterval(this.videoPoll ? this.videoPoll : this.imgPoll);
+
     console.log("定时器已销毁");
   },
   watch: {

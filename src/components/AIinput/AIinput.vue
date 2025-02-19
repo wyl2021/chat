@@ -209,8 +209,11 @@ export default {
       } else {
         str = this.$refs.ine.innerHTML;
       }
-      let ctx = this.getHtmlContents(str);
-      console.log(str,'测试测试测试测',ctx)
+      let ctx =
+        this.typeStr.dataType === 2
+          ? this.getHtmlContentsImg(str)
+          : this.getHtmlContents(str);
+      // console.log('测试测试测试测',ctx)
       let b = this.vaildateForm();
       if (ctx && b) {
         console.log("sendMsg", ctx, this.handleData(ctx));
@@ -289,9 +292,8 @@ export default {
     },
     // 实时判断是否换个输入框
     handleInput() {
-     
       const val = this.$refs.ine.innerHTML;
-      console.log(this.isTab,val)
+      console.log(this.isTab, val);
       const ctx = this.getHtmlContents(val);
       if (ctx) {
         this.canSend = true;
@@ -318,7 +320,7 @@ export default {
       this.value = val + typeStr.str;
       this.$refs.ine1.innerHTML = val + typeStr.str;
 
-      if (this.typeStr.dataType === 2 ) {
+      if (this.typeStr.dataType === 2) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -364,21 +366,33 @@ export default {
       }
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
-      const ctx =this.getHtmlContents(val);
-      const b = this.vaildateForm();
-      if (
-        this.typeStr &&
-        this.typeStr.type === "image" &&
-        b
-      ) {
-        this.canSend = true;
-      } else if (
-        this.typeStr &&
-        this.typeStr.type === "video" &&
-        this.videoList.length > 0 &&
-        b
-      ) {
-        this.canSend = true;
+      const ctx = this.getHtmlContents(val);
+      const b = this.vaildateForm(this.pic ? 2 : null);
+      if (this.pic) {
+        this.typeStr = {
+          type: "image",
+          dataType: 2,
+        };
+
+        if (
+          this.typeStr &&
+          this.typeStr.type === "image" &&
+          b &&
+          ctx.replace(/比例：\d+:\d+/, "").trim()
+        ) {
+          this.canSend = true;
+        } else {
+          this.canSend = false;
+        }
+      } else if (this.film) {
+        if (
+          this.typeStr &&
+          this.typeStr.type === "video" &&
+          this.videoList.length > 0 &&
+          b
+        ) {
+          this.canSend = true;
+        }
       } else if (ctx && b && !this.typeStr) {
         this.canSend = true;
       } else {
@@ -386,6 +400,26 @@ export default {
         // this.$refs.ine1.innerText = "";
         this.isSecond = false;
       }
+      // if (
+      //   this.typeStr &&
+      //   this.typeStr.type==="image" &&
+      //   b
+      // ) {
+      //   this.canSend = true;
+      // } else if (
+      //   this.typeStr &&
+      //   this.typeStr.type === "video" &&
+      //   this.videoList.length > 0 &&
+      //   b
+      // ) {
+      //   this.canSend = true;
+      // } else if (ctx && b && !this.typeStr) {
+      //   this.canSend = true;
+      // } else {
+      //   this.canSend = false;
+      //   // this.$refs.ine1.innerText = "";
+      //   this.isSecond = false;
+      // }
       const h = this.$refs.ine1.offsetHeight;
       if (h <= this.xh && !this.isSecond && !this.pic && !this.film) {
         this.isTab = false;
@@ -538,7 +572,7 @@ export default {
   position: relative;
   width: calc(100% - 20px);
   height: auto;
-  border: 1px solid var(--background);;
+  border: 1px solid var(--background);
   border-radius: 15px;
   padding: 10px 13px;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);

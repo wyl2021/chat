@@ -118,7 +118,14 @@ export const GetChatImg = (data) => {
     data
   })
 }
-
+// 停止图片对话
+export const StopChatImg=(data)=>{
+  return request({
+    method: 'post',
+    action: 'StopChatImg',
+    data
+  })
+}
 // 视频会话
 
 // 创建分片ID
@@ -177,6 +184,14 @@ export const GetChatVideo = (data) => {
   return request({
     method: 'post',
     action: 'GetChatVideo',
+    data
+  })
+}
+// 停止视频对话
+export const StopChatVideo=(data)=>{
+  return request({
+    method: 'post',
+    action: 'StopChatVideo',
     data
   })
 }
