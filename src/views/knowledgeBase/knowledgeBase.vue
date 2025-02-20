@@ -12,7 +12,7 @@
     <el-header>
       <el-form ref="form" :model="form" label-width="80px" style="width: 30%">
         <el-form-item label="标题">
-          <el-input v-model="form.title"></el-input>
+          <el-input v-model="form.title" placeholder="请输入"></el-input>
         </el-form-item>
       </el-form>
       <span class="b-s-button" @click="handleSearch"> 搜 索 </span>
@@ -50,16 +50,9 @@
             <el-button @click="handleUpd(scope.row)" type="text" size="small">
               修改
             </el-button>
-            <el-upload
-              class="upload-demo"
-              action=""
-              :on-change="(file,fileList) => handlePreview(scope.row,file,fileList)"
-              :file-list="[]"
-              :http-request="customUpload"
-              :show-file-list="false"
-            >
-              <el-button type="text" size="small"> 上传文件 </el-button>
-            </el-upload>
+            <el-button type="text" size="small" @click="dialogVisible = true">
+              上传文件
+            </el-button>
 
             <el-button
               @click="handleDetails(scope.row)"
@@ -72,6 +65,37 @@
         </el-table-column>
       </el-table>
       <baseUpd ref="bUpd" :data="baseInfo" @addAndUpd="handleAdd"></baseUpd>
+      <el-dialog
+        :close-on-press-escape="false"
+        :close-on-click-modal="false"
+        :visible.sync="dialogVisible"
+        title="上传文件"
+        width="30%"
+      >
+        <el-upload
+          class="upload-demo"
+          style=''
+          action=""
+          drag
+          :on-change="
+            (file, fileList) => handlePreview(scope.row, file, fileList)
+          "
+          :file-list="fileList"
+          :http-request="customUpload"
+          :show-file-list="false"
+          multiple
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em>单次最多50个文件</div>
+          <div class="el-upload__tip" >
+            单文件限制5M，单篇文章限2500字，只支持txt/docx
+          </div>
+          <!-- slot="tip" -->
+        </el-upload>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+        </span>
+      </el-dialog>
     </el-main>
     <el-footer>
       <el-pagination
@@ -114,6 +138,8 @@ export default {
         pageTotal: 100,
       },
       baseInfo: null,
+      dialogVisible: false,
+      fileList:[]
     };
   },
   created() {
@@ -137,13 +163,14 @@ export default {
     handleSearch() {
       // 点击搜索按钮时触发数据查询
       this.params.pageIndex = 1; // 重置页码
-      //   this.handleList();
+      this.handleList();
     },
     handleList() {
       GetKnowledgeBaseList({ ...this.params, ...this.form }).then((res) => {
         if (res.code === 1) {
           this.baseList = res.data;
           this.current.pageTotal = res.total;
+          this.form.title = "";
         } else {
           this.$message.error(res.msg);
         }
@@ -246,4 +273,8 @@ export default {
   margin-left: 50px;
   cursor: default;
 }
+:deep .el-upload-dragger{
+  background:transparent !important;
+}
+
 </style>

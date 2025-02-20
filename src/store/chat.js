@@ -7,7 +7,6 @@ const chatState = {
         setChatList({ commit }) {
             // 在这里固定接口的参数
             const params = { pageIndex: 1, pageSize: 3, collect: 0 };
-            
             GetChatList(params).then((res) => {
                 console.log(res)
               if (res.code === 1) {
@@ -16,7 +15,8 @@ const chatState = {
                 this.$message.error(res.msg);
               }
             }).catch((error) => {
-             this.$message.error("获取聊天列表失败: "+error);
+                console.log(error)
+             this.$message.error("获取聊天列表失败 ");
             });
           },
     },

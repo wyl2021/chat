@@ -78,24 +78,36 @@
       style="border-top: 1px solid #323232; border-bottom: 1px solid #323232"
     >
       <template slot="title">
-        <!-- <i class="el-icon-files"></i> -->
         <img class="icon-menu" :src="MenuIcon['最近生成'].unselectedImg" />
         <span>最近生成</span>
       </template>
-      <el-menu-item
-        :index="`6-${index + 1}`"
-        v-for="(item, index) in recentlyChatList"
-        :key="index"
-        @click.native="handleSelect1(item)" 
-      >
-      <div style="justify-content: space-between;display: flex;">
-        <TooltipTxt :text="item.remark" :len="10" color="#757575"></TooltipTxt>
-        <span  @click.stop="handleCancel(item.id,index)">
-              <img style="width:15px;height:15px" src="@/assets/images/del.png" />
+      <el-submenu v-for="(item, index) in recentlyChatList" :key="index" :index="`6-${index+1}`">
+        <template slot="title"> 
+          <span>{{ item.name }}</span>
+        </template>
+        <el-menu-item
+          :index="`6-${index + 1}-${index2+1}`"
+          v-for="(item2, index2) in item.data"
+          :key="index2"
+          @click.native="handleSelect1(item2)"
+        >
+          <div style="justify-content: space-between; display: flex">
+            <TooltipTxt
+              :text="item2.remark"
+              :len="10"
+              color="#757575"
+            ></TooltipTxt>
+            <span @click.stop="handleCancel(item2.id, index2)">
+              <img
+                style="width: 15px; height: 15px"
+                src="@/assets/images/del.png"
+              />
             </span>
           </div>
-      </el-menu-item>
-      <!-- <el-menu-item index="6-2"
+        </el-menu-item>
+      </el-submenu>
+    </el-submenu>
+    <!-- <el-menu-item index="6-2"
         ><TooltipTxt
           text="汽车洞察系统有什么令人舒适的"
           :len="10"
@@ -109,7 +121,6 @@
           color="#757575"
         ></TooltipTxt>
       </el-menu-item> -->
-    </el-submenu>
     <el-menu-item index="/collectView">
       <!-- <i class="el-icon-star-off"></i> -->
       <img
@@ -130,7 +141,7 @@ import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
 import { Session } from "@/utils/storage";
 import { mapGetters } from "vuex";
-import {DelChat} from "@/api/chat"
+import { DelChat } from "@/api/chat";
 export default {
   props: {
     isCollapse: {
@@ -194,25 +205,25 @@ export default {
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    handleCancel(id,index){
-      console.log(id,index)
-      DelChat({sessionId:id}).then(res=>{
-        if(res.code===1){
-          this.setChatList()
-         
-          if(index===0){
-            this.setActivePath('/home');
-           this.$router.push('/home')
-          }else{
-            this.handleSelect1(this.recentlyChatList[index-1])
+    handleCancel(id, index) {
+      console.log(id, index);
+      DelChat({ sessionId: id }).then((res) => {
+        if (res.code === 1) {
+          this.setChatList();
+
+          if (index === 0) {
+            this.setActivePath("/home");
+            this.$router.push("/home");
+          } else {
+            this.handleSelect1(this.recentlyChatList[index - 1]);
           }
-          
-          this.$message.success('删除成功')
-        }else{
-          this.$message.error(res.msg)
+
+          this.$message.success("删除成功");
+        } else {
+          this.$message.error(res.msg);
         }
-      })
-    }
+      });
+    },
   },
 };
 </script>

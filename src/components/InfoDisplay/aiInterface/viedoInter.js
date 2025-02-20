@@ -9,9 +9,13 @@ export default {
     try {
       this.videoPoll = async () => {
         if (isPolling == 60) {
-          await StopChatVideo({ id: Session.get("sessionId") })
-          Session.set("id", "");
           this.loading = false;
+          try {
+            await StopChatVideo({ id: Session.get("sessionId") })
+            Session.set("id", "");
+          } catch (error) {
+            this.$message.error('Error stopping chat video:', error);
+          }
           return;
         }
         try {
@@ -35,7 +39,7 @@ export default {
           }
         } catch (error) {
           isPolling = 60;
-          await StopChatVideo({ id: Session.get("sessionId") })
+
         }
       };
       CreateChatVideo({

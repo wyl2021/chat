@@ -20,6 +20,14 @@
               <div
                 class="u-i-f-btn"
                 style="margin-bottom: 10px"
+                @click.stop="$router.push('/knowledgeBase')"
+              >
+                <i class="el-icon-edit-outline" style="margin-right: 5px"></i>
+                <span>知识库</span>
+              </div>
+              <div
+                class="u-i-f-btn"
+                style="margin-bottom: 10px"
                 @click.stop="$refs['upd'].dialogVisible = true"
               >
                 <i class="el-icon-edit-outline" style="margin-right: 5px"></i>

@@ -101,9 +101,9 @@
             }}</pre>
           </div>
         </div>
-        <!-- <LoadingView
+        <LoadingView
           v-show="loading && index === messages.length - 1"
-        ></LoadingView> -->
+        ></LoadingView>
         <div class="d-c-footer" v-show="message?.content">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
             <span class="dfs" @click="handleCopy(message.answer)">

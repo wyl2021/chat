@@ -210,13 +210,13 @@ export default {
         str = this.$refs.ine.innerHTML;
       }
       let ctx =
-        this.typeStr.dataType === 2
+        this.typeStr && this.typeStr.dataType === 2
           ? this.getHtmlContentsImg(str)
           : this.getHtmlContents(str);
-      // console.log('测试测试测试测',ctx)
+    
       let b = this.vaildateForm();
       if (ctx && b) {
-        console.log("sendMsg", ctx, this.handleData(ctx));
+
         this.$emit("sendMsg", this.handleData(ctx));
         this.clearVal();
         this.canSend = false;
@@ -237,8 +237,11 @@ export default {
           role: "user",
           content: ctx,
         });
-        const str = ctx.match(/比例：(\d+:\d+)/)
-          ? ctx.match(/比例：(\d+:\d+)/)[1]
+        const str = ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)
+          ? ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[1] ||
+            `${ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[2]}:${
+              ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[3]
+            }`
           : "1:1";
         parameter = {
           type: "image",
@@ -293,7 +296,6 @@ export default {
     // 实时判断是否换个输入框
     handleInput() {
       const val = this.$refs.ine.innerHTML;
-      console.log(this.isTab, val);
       const ctx = this.getHtmlContents(val);
       if (ctx) {
         this.canSend = true;
@@ -320,7 +322,12 @@ export default {
       this.value = val + typeStr.str;
       this.$refs.ine1.innerHTML = val + typeStr.str;
 
-      if (this.typeStr.dataType === 2) {
+      if (
+        this.typeStr.dataType === 2 &&
+        val
+          .replace(/比例：\s*\d+:\d+|\s*比例：\s*长\s*\d+\s*宽\s*\d+/, "")
+          .trim()
+      ) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -330,7 +337,7 @@ export default {
     handleChangeTypeClass1(typeStr) {
       this.typeStr = typeStr;
       this.value = typeStr.str;
-      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
+      if (this.typeStr.dataType === 2 && this.videoList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -366,20 +373,19 @@ export default {
       }
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
-      const ctx = this.getHtmlContents(val);
+      const ctx = this.pic
+        ? this.getHtmlContentsImg(val)
+        : this.getHtmlContents(val);
       const b = this.vaildateForm(this.pic ? 2 : null);
       if (this.pic) {
         this.typeStr = {
           type: "image",
           dataType: 2,
         };
-
-        if (
-          this.typeStr &&
-          this.typeStr.type === "image" &&
-          b &&
-          ctx.replace(/比例：\d+:\d+/, "").trim()
-        ) {
+        let replaced = ctx
+          .replace(/比例：\s*\d+:\d+|\s*比例：\s*长\s*\d+\s*宽\s*\d+/, "")
+          .trim();
+        if (this.typeStr && this.typeStr.type === "image" && b && replaced) {
           this.canSend = true;
         } else {
           this.canSend = false;
@@ -434,7 +440,7 @@ export default {
     handleDelPic(n) {
       this.imgList.splice(n, 1);
       const b = this.vaildateForm();
-      if (this.typeStr && b && this.imgList.length > 0) {
+      if (this.typeStr && b) {
         this.canSend = true;
       } else {
         this.canSend = false;

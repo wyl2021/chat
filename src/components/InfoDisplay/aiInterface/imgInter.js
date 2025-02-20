@@ -1,4 +1,4 @@
-import { CreateChatImg, GetChatImg,StopChatImg } from "@/api/chat";
+import { CreateChatImg, GetChatImg, StopChatImg } from "@/api/chat";
 import moment from "moment";
 import { Session } from "@/utils/storage";
 export default {
@@ -9,10 +9,15 @@ export default {
     let isPolling = 0;
     try {
       this.imgPoll = async () => {
+        
         if (isPolling == 60) {
-         await StopChatImg({id:Session.get("sessionId")})
-          Session.set("id", "");
           this.loading = false;
+          try {
+            await StopChatImg({ id: Session.get("sessionId") });
+            Session.set("id", "");
+          } catch (error) {
+             this.$message.error('Error stopping chat image:', error);
+          }
           return;
         }
         try {
@@ -32,13 +37,24 @@ export default {
             this.loading = false;
             console.log(this.messages, this.loading)
           } else {
-            isPolling++;
-            setTimeout(this.imgPoll, 60000); // 继续轮询
+            if (Array.isArray(response.code.data)) {
+              console.log("1")
+              if (response.code.data[0].type === 'err') {
+                console.log("2")
+                this.$message.error(response.code.data[0].msg)
+                isPolling = 60;
+               
+              }
+            } else {
+              isPolling++;
+              setTimeout(this.imgPoll, 60000); // 继续轮询
+            }
+
           }
         } catch (error) {
 
           isPolling = 60;
-          await StopChatImg({id:Session.get("sessionId")})
+          
         }
       };
       CreateChatImg({
@@ -73,32 +89,38 @@ export default {
     let answerList = [];
     if (!response) return
     if (Array.isArray(response)) {
+
       response.forEach((item) => {
-       console.log(item.data)
-       if(Array.isArray(item.data)){
-        const images = item.data.reduce(
-          (acc, item) => {
-            if (item.type === "externalLinkImage") {
-              acc.externalLinkImage = item.url;
-            } else if (item.type === "originalImage") {
-              acc.originalImage = item.url;
-            } else if (item.type === "thumbnail") {
-              acc.thumbnail = item.url;
-            }
-            return acc;
-          },
-          { externalLinkImage: "", originalImage: "", thumbnail: "" }
-        );
-        answerList.push({
-          type: item.type,
-          data: images,
-        });
-       }else{
-        console.log(item.data)
-       }
-         
-       
-        
+        if (item.type === 'imageUrl') {
+          console.log(item.data)
+          if (Array.isArray(item.data)) {
+            const images = item.data.reduce(
+              (acc, item) => {
+                if (item.type === "externalLinkImage") {
+                  acc.externalLinkImage = item.url;
+                } else if (item.type === "originalImage") {
+                  acc.originalImage = item.url;
+                } else if (item.type === "thumbnail") {
+                  acc.thumbnail = item.url;
+                }
+                return acc;
+              },
+              { externalLinkImage: "", originalImage: "", thumbnail: "" }
+            );
+            answerList.push({
+              type: item.type,
+              data: images,
+            });
+          } else {
+            console.log(item.data)
+          }
+        } else if (item.type === 'answer') {
+          answerList.push({
+            type: 'answer',
+            data: item.content,
+          });
+        }
+
       });
     } else {
       answerList.push({

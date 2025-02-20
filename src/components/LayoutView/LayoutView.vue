@@ -31,9 +31,9 @@
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
       <el-button @click="toggleTheme" class="theme-toggle">
-            <span v-if="isDarkMode" class="moon-icon">🌙</span>
-            <span v-else class="sun-icon">🌞</span>
-          </el-button>
+        <span v-if="isDarkMode" class="moon-icon">🌙</span>
+        <span v-else class="sun-icon">🌞</span>
+      </el-button>
       <!-- <el-switch
       class="ly-switch"
   v-model="value"
@@ -48,7 +48,6 @@
       <div class="ly-b-header">
         <div></div>
         <div class="ly-b-h-r">
-         
           <span class="el-icon-bell" style="font-size: 15px"></span>
           <userCp></userCp>
         </div>
@@ -120,7 +119,6 @@ export default {
 <style lang="less" scoped>
 @import url("@/assets/styles/variable.less");
 
-
 /* 太阳和月亮按钮样式 */
 .theme-toggle {
   background: transparent;
@@ -129,11 +127,11 @@ export default {
   cursor: pointer;
   transition: 0.3s;
   border-color: transparent !important;
-    background: transparent !important;
-    width: 20px;
-    height: 20px;
-    padding: 2px !important;
-    margin-right:5px !important;
+  background: transparent !important;
+  width: 20px;
+  height: 20px;
+  padding: 2px !important;
+  margin-right: 5px !important;
 }
 
 .sun-icon,
