@@ -50,7 +50,6 @@ export default {
   methods: {
     // 发送消息
     handleSendMsg(val) {
-      console.log('val',val)
       this.changeInputStyle = "absolute";
       this.answerText = val;
       this.$refs.aiInput.canSend = false;

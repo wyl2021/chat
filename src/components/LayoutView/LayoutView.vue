@@ -27,7 +27,14 @@
           ></span>
         </div>
       </div>
-      <div style="padding: 0px 13px">
+      <div
+        style="
+          padding: 0px 13px;
+          width: calc(100% - 26px);
+          height: 100%;
+          overflow-y: auto;
+        "
+      >
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
       <el-button @click="toggleTheme" class="theme-toggle">
