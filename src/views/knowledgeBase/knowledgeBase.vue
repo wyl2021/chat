@@ -50,7 +50,7 @@
             <el-button @click="handleUpd(scope.row)" type="text" size="small">
               修改
             </el-button>
-            <el-button type="text" size="small" @click="handleDialog(scope.row)">
+            <el-button type="text" size="small" @click="dialogVisible = true">
               上传文件
             </el-button>
 
@@ -78,10 +78,11 @@
           action=""
           drag
           :on-change="
-            (file, fileList) => handlePreview( file, fileList)
+            (file, fileList) => handlePreview(scope.row, file, fileList)
           "
           :file-list="fileList"
           :http-request="customUpload"
+          :show-file-list="false"
           multiple
         >
           <i class="el-icon-upload"></i>
@@ -138,8 +139,7 @@ export default {
       },
       baseInfo: null,
       dialogVisible: false,
-      fileList:[],
-      row:null
+      fileList:[]
     };
   },
   created() {
@@ -157,10 +157,6 @@ export default {
     },
   },
   methods: {
-    handleDialog(res){
-      this.row=res
-      this.dialogVisible = true
-    },
     handleBack() {
       this.$router.go(-1);
     },
@@ -230,8 +226,8 @@ export default {
       });
     },
     // 上传图片之前的操作
-    async handlePreview( file) {
-      console.log(this.row, file);
+    async handlePreview(row, file) {
+      console.log(row, file);
 
       if (!file) return false;
 
@@ -243,7 +239,7 @@ export default {
 
       const formData = new FormData();
       formData.append("file", file.raw);
-      formData.append("id", this.row.Id);
+      formData.append("id", row.Id);
 
       try {
         const fileRes = await UpdKnowledgeBaseFileD(formData);
@@ -282,4 +278,3 @@ export default {
 }
 
 </style>
-
