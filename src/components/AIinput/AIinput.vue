@@ -60,6 +60,7 @@
         v-html="value"
         :placeholder="placeholder"
         @input="handleInput"
+        @keydown.enter="handleEnter"
         v-if="!isTab"
       ></div>
       <div
@@ -72,6 +73,8 @@
         @input="handleInputX"
         @keydown="preventDeleteKey"
         @beforeinput="currentProtected"
+        @paste="handlePaste"
+        @keydown.enter="handleEnter"
         v-if="isTab"
       ></div>
       <div class="h-fi">
@@ -116,7 +119,7 @@ import barArr from "./barArr";
 import filmClass from "./filmClass.vue";
 import imageClass from "./imageClass.vue";
 import AudioRecorder from "./AudioRecorderClass.vue";
-
+import delEvent from "./inpuiCanSend/delEvent";
 export default {
   components: {
     filmClass,
@@ -196,6 +199,7 @@ export default {
       videoList: [],
       audioShow: false,
       typeStr: null,
+      modifiedContent: "",
     };
   },
   mounted() {},
@@ -209,14 +213,10 @@ export default {
       } else {
         str = this.$refs.ine.innerHTML;
       }
-      let ctx =
-        this.typeStr && this.typeStr.dataType === 2
-          ? this.getHtmlContentsImg(str)
-          : this.getHtmlContents(str);
-    
+      let ctx = this.getHtmlContents(str);
       let b = this.vaildateForm();
       if (ctx && b) {
-
+        console.log("sendMsg", ctx, this.handleData(ctx));
         this.$emit("sendMsg", this.handleData(ctx));
         this.clearVal();
         this.canSend = false;
@@ -237,11 +237,8 @@ export default {
           role: "user",
           content: ctx,
         });
-        const str = ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)
-          ? ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[1] ||
-            `${ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[2]}:${
-              ctx.match(/比例：\s*(\d+:\d+)|\s*长\s*(\d+)\s*宽\s*(\d+)/)[3]
-            }`
+        const str = ctx.match(/比例：(\d+:\d+)/)
+          ? ctx.match(/比例：(\d+:\d+)/)[1]
           : "1:1";
         parameter = {
           type: "image",
@@ -311,23 +308,10 @@ export default {
       this.changeAnswer();
     },
     // 上传类型的数据
-    async handleChangeTypeClass(typeStr) {
+    handleChangeTypeClass(typeStr) {
       this.typeStr = typeStr;
-      let val = this.$refs.ine1.innerHTML.replace(
-        /<form.*?>[\s\S]*?<\/form>/g,
-        ""
-      );
-      val = val.replace(/&nbsp;/g, "");
-      // this.value += typeStr.str;
-      this.value = val + typeStr.str;
-      this.$refs.ine1.innerHTML = val + typeStr.str;
-
-      if (
-        this.typeStr.dataType === 2 &&
-        val
-          .replace(/比例：\s*\d+:\d+|\s*比例：\s*长\s*\d+\s*宽\s*\d+/, "")
-          .trim()
-      ) {
+      this.value = typeStr.str;
+      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -373,32 +357,22 @@ export default {
       }
       // 上面的内容是对内部input赋值
       const val = this.$refs.ine1.innerHTML;
-      const ctx = this.pic
-        ? this.getHtmlContentsImg(val)
-        : this.getHtmlContents(val);
-      const b = this.vaildateForm(this.pic ? 2 : null);
-      if (this.pic) {
-        this.typeStr = {
-          type: "image",
-          dataType: 2,
-        };
-        let replaced = ctx
-          .replace(/比例：\s*\d+:\d+|\s*比例：\s*长\s*\d+\s*宽\s*\d+/, "")
-          .trim();
-        if (this.typeStr && this.typeStr.type === "image" && b && replaced) {
-          this.canSend = true;
-        } else {
-          this.canSend = false;
-        }
-      } else if (this.film) {
-        if (
-          this.typeStr &&
-          this.typeStr.type === "video" &&
-          this.videoList.length > 0 &&
-          b
-        ) {
-          this.canSend = true;
-        }
+      const ctx = this.getHtmlContents(val);
+      const b = this.vaildateForm();
+      if (
+        this.typeStr &&
+        this.typeStr.type === "image" &&
+        this.imgList.length > 0 &&
+        b
+      ) {
+        this.canSend = true;
+      } else if (
+        this.typeStr &&
+        this.typeStr.type === "video" &&
+        this.videoList.length > 0 &&
+        b
+      ) {
+        this.canSend = true;
       } else if (ctx && b && !this.typeStr) {
         this.canSend = true;
       } else {
@@ -406,26 +380,6 @@ export default {
         // this.$refs.ine1.innerText = "";
         this.isSecond = false;
       }
-      // if (
-      //   this.typeStr &&
-      //   this.typeStr.type==="image" &&
-      //   b
-      // ) {
-      //   this.canSend = true;
-      // } else if (
-      //   this.typeStr &&
-      //   this.typeStr.type === "video" &&
-      //   this.videoList.length > 0 &&
-      //   b
-      // ) {
-      //   this.canSend = true;
-      // } else if (ctx && b && !this.typeStr) {
-      //   this.canSend = true;
-      // } else {
-      //   this.canSend = false;
-      //   // this.$refs.ine1.innerText = "";
-      //   this.isSecond = false;
-      // }
       const h = this.$refs.ine1.offsetHeight;
       if (h <= this.xh && !this.isSecond && !this.pic && !this.film) {
         this.isTab = false;
@@ -440,7 +394,7 @@ export default {
     handleDelPic(n) {
       this.imgList.splice(n, 1);
       const b = this.vaildateForm();
-      if (this.typeStr && b) {
+      if (this.typeStr && b && this.imgList.length > 0) {
         this.canSend = true;
       } else {
         this.canSend = false;
@@ -480,34 +434,12 @@ export default {
     currentProtected(event) {
       var selection = window.getSelection();
       var range = selection.getRangeAt(0);
-      const startContainer = range.startContainer;
-      if (
-        event.inputType === "deleteContentBackward" &&
-        startContainer.nodeType === Node.ELEMENT_NODE
-      ) {
-        const str = startContainer.classList.toString();
-        const startOffset = range.startOffset;
-        // 阻止删除操作
-        if (str.includes("protected") && startOffset === 0) {
-          event.preventDefault();
-        }
-      } else if (range.startOffset == 1) {
-        const parentNodeClassName = startContainer.parentNode
-          ? startContainer.parentNode.className
-          : null;
-        if (
-          parentNodeClassName.includes("protected") &&
-          event.inputType === "deleteContentBackward"
-        ) {
-          event.preventDefault();
-          const parentNode = startContainer.parentNode;
-          parentNode.innerText = "";
-          const b = this.vaildateForm();
-          if (!b) {
-            this.canSend = false;
-          }
-        }
-      }
+      delEvent(event, range, this);
+    },
+    handlePaste(e) {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      const rawText = clipboardData.getData("text/plain");
+      this.modifiedContent = rawText;
     },
     // 过滤哪些不能删除的内容
     preventDeleteKey(event) {
@@ -536,6 +468,11 @@ export default {
         }
       }
     },
+    // 监听enter事件
+    handleEnter(e) {
+      e.preventDefault();
+      this.sendMsg();
+    },
   },
 };
 </script>
@@ -545,7 +482,7 @@ export default {
   position: relative;
   width: 100%;
   height: auto;
-  background: var(--background);
+  background: #222127;
 }
 .h-f-top {
   display: flex;
@@ -574,11 +511,10 @@ export default {
   }
 }
 .h-f-inner {
-  background: var(--background);
   position: relative;
   width: calc(100% - 20px);
   height: auto;
-  border: 1px solid var(--background);
+  border: 1px solid #333335;
   border-radius: 15px;
   padding: 10px 13px;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
