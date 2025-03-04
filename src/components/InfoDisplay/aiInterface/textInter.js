@@ -66,10 +66,10 @@ export default {
         }
       }
       // this.messages[this.txtIndex].content += this.result;
-      this.printCharacterByCharacterBrowser(this.result, 100, () => {
-        this.txtIndex = 0;
-        this.result = '';
-      })
+      // this.printCharacterByCharacterBrowser(this.result, 100, () => {
+      //   this.txtIndex = 0;
+      //   this.result = '';
+      // })
 
       // this.loading = false; // 完成后关闭加载状态
       // $("#result").append(result + "\n");
@@ -90,6 +90,7 @@ export default {
         const content = chunk?.data?.data?.content || "";
         // 更新当前消息的 AI 回复内容
         this.result += content; // 拼接内容
+
         Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
         if (this.txtIndex === 0) {
           this.messages.push({
@@ -100,7 +101,9 @@ export default {
           });
           this.txtIndex = this.messages.length - 1;
         }
-
+        // 每次的返回
+        this.messages[this.txtIndex].content = this.result;
+        this.scrollToBottom(); // ���动到底部
       } else if (chunk.code === 0) {
         this.$message.error("请求失败：" + chunk.msg);
       } else if (chunk.code === -1) {

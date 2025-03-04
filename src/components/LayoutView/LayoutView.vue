@@ -31,7 +31,7 @@
         style="
           padding: 0px 13px;
           width: calc(100% - 26px);
-          height: 100%;
+          height: calc(100% - 115px);
           overflow-y: auto;
         "
       >
