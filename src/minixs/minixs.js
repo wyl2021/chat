@@ -1,9 +1,30 @@
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 Vue.mixin({
-  data() {
+  data () {
     return {
 
+    }
+  },
+  directives: {
+    resize: {
+      // 指令的名称
+      bind (el, binding) {
+        let width = '', height = '';
+        function isReize () {
+          const style = document.defaultView.getComputedStyle(el);
+          if (width !== style.width || height !== style.height) {
+            binding.value({ width: style.width, height: style.height });
+            // 关键(这传入的是函数,所以执行此函数)
+          }
+          width = style.width;
+          height = style.height;
+        }
+        el.__vueSetInterval__ = setInterval(isReize, 300);
+      },
+      unbind (el) {
+        clearInterval(el.__vueSetInterval__);
+      }
     }
   },
   computed: {
@@ -17,7 +38,7 @@ Vue.mixin({
   },
   methods: {
     ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath', 'setChatList']),
-    createAiScript(arr = []) {
+    createAiScript (arr = []) {
       let result = '<form id="myForm">';
       arr.forEach(item => {
         if (item.type === 'text') {
@@ -48,7 +69,7 @@ Vue.mixin({
       return txt;
     },
     // 文本宽度
-    textWidth(text, font) {
+    textWidth (text, font) {
       // 创建一个canvas元素用于测量文本
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
@@ -63,104 +84,104 @@ Vue.mixin({
       return metrics.width;
     },
     // 获取内容
-    getHtmlContentsImg(htmlString) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
-        let tempText = '';  // 存储最终文本
+    getHtmlContentsImg (htmlString) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      let tempText = '';  // 存储最终文本
 
-        // 遍历 body 的子节点
-        doc.body.childNodes.forEach(item => {
-          if (item.nodeType === Node.TEXT_NODE) {
-            tempText += item.textContent.trim() + ' ';
-          } else if (item.tagName === 'FORM') {
-            // 遍历 form 内部子节点
-            Array.from(item.childNodes).forEach(node => {
-              if (node.nodeType === Node.TEXT_NODE) {
-                tempText += node.textContent.trim() + ' ';
-              } else if (node.tagName === 'SPAN') {
-                tempText += node.innerText.trim() + ' ';
-              } else if (node.tagName === 'INPUT') {
-                const txtValue = node.getAttribute('txt');
-                if (txtValue) tempText += txtValue.trim() + ' ';
-              } else if (node.tagName === 'SELECT') {
-                // 获取 select 的 txt 属性，如果没有则获取选中的 option 的 value
-                const selectedTxt = node.getAttribute('txt') || node.value;
-                if (selectedTxt) tempText += selectedTxt.trim() + ' ';
-              } else {
-                tempText += node.textContent.trim() + ' ';
-              }
-            });
-          } else {
-            tempText += item.textContent.trim() + ' ';
-          }
-        });
-        return tempText.trim();
-      },
-
-      getHtmlContents(htmlString) {
-        // console.log(htmlString)
-        // 创建一个新的DOM解析器
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlString, 'text/html');
-        let contents = '';
-
-        // 获取并累加文本节点（如 123, &nbsp; 等）
-        const textNodes = doc.body.childNodes;
-        textNodes.forEach(function (node) {
-          if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            if (text) {
-              contents += text;
+      // 遍历 body 的子节点
+      doc.body.childNodes.forEach(item => {
+        if (item.nodeType === Node.TEXT_NODE) {
+          tempText += item.textContent.trim() + ' ';
+        } else if (item.tagName === 'FORM') {
+          // 遍历 form 内部子节点
+          Array.from(item.childNodes).forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              tempText += node.textContent.trim() + ' ';
+            } else if (node.tagName === 'SPAN') {
+              tempText += node.innerText.trim() + ' ';
+            } else if (node.tagName === 'INPUT') {
+              const txtValue = node.getAttribute('txt');
+              if (txtValue) tempText += txtValue.trim() + ' ';
+            } else if (node.tagName === 'SELECT') {
+              // 获取 select 的 txt 属性，如果没有则获取选中的 option 的 value
+              const selectedTxt = node.getAttribute('txt') || node.value;
+              if (selectedTxt) tempText += selectedTxt.trim() + ' ';
+            } else {
+              tempText += node.textContent.trim() + ' ';
             }
-          }
-        });
-        // 使用querySelectorAll选择所有元素，然后遍历它们
-        const elements = doc.querySelectorAll('*');
-        elements.forEach(function (el) {
-          // 将元素的内容（包括其后代）添加到数组中
-          let innerText = ''
-          const domEle = el.tagName.toLowerCase();
-          if (['select', 'input'].includes(domEle)) {
-            if (el.getAttribute('txt')) {
-              innerText = el.getAttribute('txt');
-              contents += innerText;
-            }
-          } else if (domEle === 'span') {
-            if (el.innerText) {
-              innerText = el.innerText;
-              contents += innerText;
-            }
-          } else if (domEle === 'select') {
-            if (el.innerText) {
-              innerText = el.querySelector('option:checked');
-              contents += innerText;
-
-            }
-
-          }
-        });
-        let str = ""
-        if (contents) {
-          str = contents;
+          });
         } else {
-          str = htmlString.replace(/<[^>]*>/g, '');
+          tempText += item.textContent.trim() + ' ';
         }
-        return str;
+      });
+      return tempText.trim();
+    },
 
-      },
-      // 验证表单
-      vaildateForm(type=null) {
-        const form = document.getElementById('myForm');
-        if (!form) return type===2?false:true;
-        const elementsWithCustomAttr = form.querySelectorAll('[required]');
-        for (let i = 0; i < elementsWithCustomAttr.length; i++) {
-          const dom = elementsWithCustomAttr[i];
-          const val = dom.value || dom.innerText;
-          if (!val) {
-            return false;
+    getHtmlContents (htmlString) {
+      // console.log(htmlString)
+      // 创建一个新的DOM解析器
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      let contents = '';
+
+      // 获取并累加文本节点（如 123, &nbsp; 等）
+      const textNodes = doc.body.childNodes;
+      textNodes.forEach(function (node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent.trim();
+          if (text) {
+            contents += text;
           }
         }
-        return true;
-      },
-    }
-  })
+      });
+      // 使用querySelectorAll选择所有元素，然后遍历它们
+      const elements = doc.querySelectorAll('*');
+      elements.forEach(function (el) {
+        // 将元素的内容（包括其后代）添加到数组中
+        let innerText = ''
+        const domEle = el.tagName.toLowerCase();
+        if (['select', 'input'].includes(domEle)) {
+          if (el.getAttribute('txt')) {
+            innerText = el.getAttribute('txt');
+            contents += innerText;
+          }
+        } else if (domEle === 'span') {
+          if (el.innerText) {
+            innerText = el.innerText;
+            contents += innerText;
+          }
+        } else if (domEle === 'select') {
+          if (el.innerText) {
+            innerText = el.querySelector('option:checked');
+            contents += innerText;
+
+          }
+
+        }
+      });
+      let str = ""
+      if (contents) {
+        str = contents;
+      } else {
+        str = htmlString.replace(/<[^>]*>/g, '');
+      }
+      return str;
+
+    },
+    // 验证表单
+    vaildateForm (type = null) {
+      const form = document.getElementById('myForm');
+      if (!form) return type === 2 ? false : true;
+      const elementsWithCustomAttr = form.querySelectorAll('[required]');
+      for (let i = 0; i < elementsWithCustomAttr.length; i++) {
+        const dom = elementsWithCustomAttr[i];
+        const val = dom.value || dom.innerText;
+        if (!val) {
+          return false;
+        }
+      }
+      return true;
+    },
+  }
+})

@@ -182,7 +182,7 @@ export default {
     },
   },
   beforeDestroy() {
-  clearInterval(this.videoPoll ? this.videoPoll : this.imgPoll);
+    clearInterval(this.videoPoll ? this.videoPoll : this.imgPoll);
 
     console.log("定时器已销毁");
   },
@@ -401,7 +401,8 @@ export default {
 pre {
   width: 100%;
   white-space: pre-wrap;
-  line-height: 1.3;
+  line-height: 1.5;
+  letter-spacing: 1px;
 }
 .w-img {
   width: 200px;

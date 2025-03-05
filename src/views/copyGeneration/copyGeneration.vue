@@ -1,6 +1,7 @@
 <template>
   <div class="h-container">
     <div
+      ref="aTable"
       style="
         width: 100%;
         height: calc(100% - 80px);
@@ -8,9 +9,7 @@
         overflow-x: hidden;
       "
     >
-      <div class="h-t-3">
-        <img :src="icon" />{{ title }}
-      </div>
+      <div class="h-t-3"><img :src="icon" />{{ title }}</div>
       <div class="h-t-2">{{ note }}</div>
       <div class="h-c-tag">
         <div
@@ -53,6 +52,7 @@
         placeholder="输入您要撰写的主题"
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
+        @changeStyle="changeStyle"
       ></AIinput>
     </div>
   </div>
@@ -80,7 +80,7 @@ export default {
     return {
       type: "公关广告",
       title: "公关广告",
-      icon:'https://www.swsai.com/style/dist/img/icon/home1_1.png',
+      icon: "https://www.swsai.com/style/dist/img/icon/home1_1.png",
       cgTag: [],
       ctxList: [],
       ctxVal: "",
@@ -94,18 +94,22 @@ export default {
   },
   mounted() {},
   async created() {
-    const { type, note, title,icon } = this.$route.query;
+    const { type, note, title, icon } = this.$route.query;
     this.type = type || this.type;
     this.note = note || this.note;
     this.title = title || this.title;
-    this.icon=icon|| this.icon;
+    this.icon = icon || this.icon;
     await this.getList();
     this.handleCgTag(0);
   },
   methods: {
     // 发送消息
     handleSendMsg(val) {
-      this.answerText = { templetId: 0, content: val.content, imgList: val.imgList };
+      this.answerText = {
+        templetId: 0,
+        content: val.content,
+        imgList: val.imgList,
+      };
       console.log(" this.answerText", this.answerText);
       this.$refs.aiInput.isTab = false;
       this.$refs.aiInput.canSend = false;
@@ -146,7 +150,6 @@ export default {
           ele.img = require("@/assets/images/icon_ctb.png"); // 图片路径
         });
         this.ctxList = arr;
-     
       }
     },
     // 获取模版
@@ -169,6 +172,10 @@ export default {
         const h = this.$refs.aiInput.$el.offsetHeight;
         this.resizeHeight = h + 30;
       });
+    },
+    changeStyle(obj) {
+      const h = parseFloat(obj.height) + 25;
+      this.$refs.aTable.style.height = `calc(100% - ${h}px)`;
     },
   },
 };

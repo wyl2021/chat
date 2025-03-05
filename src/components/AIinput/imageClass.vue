@@ -66,7 +66,7 @@ export default {
   methods: {
     // 选择比例的效果
     handleCommand(val) {
-      let str = `<form id='myForm' style='display:inline-block'><span class="inputTTs protected" contenteditable="true" style="min-width: ${80}px" required placeholder="[请输入]">生成类似的图片</span><span>比例：</span>`;
+      let str = `<form id='myForm' style='display:inline-block'><span class="inputTTs protected" contenteditable="true" style="min-width: ${80}px" required placeholder="[请输入]"></span><span>比例：</span>`;
       let dataType = 1;
       if (val === "自定义") {
         const reg = new RegExp(/[^\d]/g);

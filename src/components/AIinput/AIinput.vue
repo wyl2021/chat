@@ -1,5 +1,5 @@
 <template>
-  <div class="h-f-outter" ref="aut">
+  <div class="h-f-outter" ref="aut" v-resize="handleResize">
     <div class="h-f-top" v-if="bar">
       <span
         class="st"
@@ -309,13 +309,17 @@ export default {
     },
     // 上传类型的数据
     handleChangeTypeClass(typeStr) {
-      this.typeStr = typeStr;
-      this.value = typeStr.str;
-      if (this.typeStr.dataType === 2 && this.imgList.length > 0) {
-        this.canSend = true;
+      if (!this.typeStr) {
+        this.value = typeStr.str;
       } else {
-        this.canSend = false;
+        let newStr = this.$refs.ine1.innerHTML.replace(
+          /<select\b[^>]*>[\s\S]*?<\/select>/,
+          typeStr.str.match(/<select\b[^>]*>[\s\S]*?<\/select>/)[0]
+        );
+        this.$refs.ine1.innerHTML = newStr;
+        this.value = newStr;
       }
+      this.typeStr = typeStr;
     },
 
     handleChangeTypeClass1(typeStr) {
@@ -359,12 +363,7 @@ export default {
       const val = this.$refs.ine1.innerHTML;
       const ctx = this.getHtmlContents(val);
       const b = this.vaildateForm();
-      if (
-        this.typeStr &&
-        this.typeStr.type === "image" &&
-        this.imgList.length > 0 &&
-        b
-      ) {
+      if (this.typeStr && this.typeStr.type === "image" && b) {
         this.canSend = true;
       } else if (
         this.typeStr &&
@@ -472,6 +471,10 @@ export default {
     handleEnter(e) {
       e.preventDefault();
       this.sendMsg();
+    },
+    // 监听长和宽
+    handleResize(obj) {
+      this.$emit("changeStyle", obj);
     },
   },
 };

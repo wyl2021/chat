@@ -4,13 +4,13 @@
 @fontColorHighlightDark: #fff;
 @fontSize: 13px;
 @borderPrimaryDark: #2f96ec;
-@silderBackgroundDark:#000;
+@silderBackgroundDark: #000;
 // 亮色主题变量
 @fontColorLight: #333333; // 亮色主题文字颜色
 @backgroundLight: #ffffff; // 亮色主题背景颜色
 @fontColorHighlightLight: #000000; // 亮色主题高亮文字颜色
 @borderPrimaryLight: #1e90ff; // 亮色主题边框颜色
-@silderBackgroundLight:#F3F4F6;
+@silderBackgroundLight: #f3f4f6;
 
 /* 为所有WebKit浏览器添加自定义滚动条样式 */
 ::-webkit-scrollbar {
@@ -55,7 +55,7 @@ body.dark-theme {
   --background: @backgroundDark;
   --fontColorHighlight: @fontColorHighlightDark;
   --borderPrimary: @borderPrimaryDark;
-  --sliderGround:@silderBackgroundDark;
+  --sliderGround: @silderBackgroundDark;
 }
 
 /* 亮色主题 */
@@ -64,7 +64,7 @@ body.light-theme {
   --background: @backgroundLight;
   --fontColorHighlight: @fontColorHighlightLight;
   --borderPrimary: @borderPrimaryLight;
-  --sliderGround:@silderBackgroundLight;
+  --sliderGround: @silderBackgroundLight;
 }
 
 .ly-container {
@@ -139,23 +139,6 @@ body.light-theme {
   height: calc(100% - 50px);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .inputTs {
   display: inline-block;
   background-color: #242d3b;
@@ -211,7 +194,6 @@ body.light-theme {
   position: relative;
   width: 70%;
   min-width: 460px;
-  max-width: 800px;
   height: calc(100% - 1px);
   margin: 0 auto;
   border-top: 1px solid transparent;
@@ -296,6 +278,9 @@ body.light-theme {
     display: block;
     font-size: 14px;
     margin-top: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
   .desc {
     width: 100%;

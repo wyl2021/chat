@@ -35,7 +35,6 @@ export default function delEvent (e, r, that) {
         // 复制粘贴的功能，前提请开启获取复制粘贴的内容
         e.preventDefault();
         // startContainer.innerText = that.modifiedContent;
-        that.handleInputX(e);
         r.deleteContents();
         r.insertNode(document.createTextNode(that.modifiedContent));
         const selection = window.getSelection();
@@ -43,6 +42,7 @@ export default function delEvent (e, r, that) {
         r.collapse(false);
         selection.removeAllRanges();
         selection.addRange(r);
+        that.handleInputX(e);
       }
     }
   }
