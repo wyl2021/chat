@@ -74,3 +74,6 @@
 .el-table__row {
   background: #222127 !important;
 }
+.el-upload-dragger {
+  width: 100% !important;
+}

@@ -36,11 +36,12 @@
           }}</template>
         </el-table-column>
         <el-table-column prop="UserName" label="添加用户" />
-        <el-table-column fixed="right" label="操作" width="120">
+        <el-table-column fixed="right" label="操作" width="230">
           <template slot-scope="scope">
             <el-popconfirm
               title="这是一段内容确定删除吗？"
               @confirm="handleDel(scope.row)"
+              style="margin-right:8px"
             >
               <el-button type="text" size="small" slot="reference"
                 >删除</el-button
@@ -50,7 +51,7 @@
             <el-button @click="handleUpd(scope.row)" type="text" size="small">
               修改
             </el-button>
-            <el-button type="text" size="small" @click="dialogVisible = true">
+            <el-button type="text" size="small" @click="handleUpload((scope.row))">
               上传文件
             </el-button>
 
@@ -78,11 +79,11 @@
           action=""
           drag
           :on-change="
-            (file, fileList) => handlePreview(scope.row, file, fileList)
+            (file, fileList) => handlePreview(fileRow, file, fileList)
           "
           :file-list="fileList"
           :http-request="customUpload"
-          :show-file-list="false"
+          :show-file-list="true"
           multiple
         >
           <i class="el-icon-upload"></i>
@@ -139,7 +140,8 @@ export default {
       },
       baseInfo: null,
       dialogVisible: false,
-      fileList:[]
+      fileList:[],
+      fileRow:null
     };
   },
   created() {
@@ -157,6 +159,10 @@ export default {
     },
   },
   methods: {
+    handleUpload(res){
+      this.fileRow=res
+      this.dialogVisible = true
+    },
     handleBack() {
       this.$router.go(-1);
     },
@@ -276,5 +282,7 @@ export default {
 :deep .el-upload-dragger{
   background:transparent !important;
 }
-
+:deep .el-upload{
+  width: 100%;
+}
 </style>

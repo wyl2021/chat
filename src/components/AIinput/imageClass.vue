@@ -42,9 +42,9 @@
         <el-dropdown-item icon="el-icon-crop" command="9:16"
           >9:16</el-dropdown-item
         >
-        <el-dropdown-item icon="el-icon-crop" command="自定义"
+        <!-- <el-dropdown-item icon="el-icon-crop" command="自定义"
           >自定义</el-dropdown-item
-        >
+        > -->
       </el-dropdown-menu>
     </el-dropdown>
   </div>

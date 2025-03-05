@@ -37,10 +37,10 @@
       >
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
-      <el-button @click="toggleTheme" class="theme-toggle">
+      <!-- <el-button @click="toggleTheme" class="theme-toggle">
         <span v-if="isDarkMode" class="moon-icon">🌙</span>
         <span v-else class="sun-icon">🌞</span>
-      </el-button>
+      </el-button> -->
       <!-- <el-switch
       class="ly-switch"
   v-model="value"
