@@ -94,7 +94,7 @@
           <div style="justify-content: space-between; display: flex">
             <TooltipTxt
               :text="item2.remark"
-              :len="10"
+              :len="20"
               color="#757575"
             ></TooltipTxt>
             <span @click.stop="handleCancel(item2.id, index2)">
@@ -188,14 +188,23 @@ export default {
     },
     handleSelect1(item) {
       console.log(item);
+      // 341011739171858
       this.$router.replace({
         path: "/recentlyGenerated",
         query: {
           collect: 0,
-          sessionId: item.id,
-          type: item.type,
+          sessionId: 829211741315623,
+          type: 'video',
         },
       });
+      // this.$router.replace({
+      //   path: "/recentlyGenerated",
+      //   query: {
+      //     collect: 0,
+      //     sessionId: item.id,
+      //     type: item.type,
+      //   },
+      // });
       this.setActivePath("");
     },
     handleOpen(key, keyPath) {

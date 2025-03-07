@@ -27,7 +27,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="Count" label="详情数量" />
-        <el-table-column prop="Uid" label="添加用户" />
         <el-table-column prop="Note" label="简介" />
         <el-table-column prop="IsPublic" label="是否公开">
           <template slot-scope="scope">{{

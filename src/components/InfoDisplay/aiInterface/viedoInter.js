@@ -1,6 +1,7 @@
 import moment from "moment";
 import { Session } from "@/utils/storage";
-import { GetChatVideo, CreateChatVideo, StopChatVideo } from "@/api/chat";
+import { GetChatVideo,CreateChatVideo,  StopChatVideo } from "@/api/chat";
+// 
 export default {
   async aiVideoAnswer(val) {
     this.loading = true; // 标记正在加载
@@ -42,6 +43,7 @@ export default {
 
         }
       };
+
       CreateChatVideo({
         templetId: val?.templetId || 1,
         sessionId: Session.get("sessionId") || "",

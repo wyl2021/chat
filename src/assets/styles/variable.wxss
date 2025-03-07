@@ -50,7 +50,7 @@ body.light-theme {
   --background: #ffffff;
   --fontColorHighlight: #000000;
   --borderPrimary: #1e90ff;
-  --sliderGround: #F3F4F6;
+  --sliderGround: #f3f4f6;
 }
 .ly-container {
   display: flex;
@@ -162,7 +162,6 @@ body.light-theme {
   position: relative;
   width: 70%;
   min-width: 460px;
-  max-width: 800px;
   height: calc(99%);
   margin: 0 auto;
   border-top: 1px solid transparent;
@@ -247,6 +246,9 @@ body.light-theme {
   display: block;
   font-size: 14px;
   margin-top: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .h-ce-1-d2 .desc {
   width: 100%;
@@ -301,15 +303,23 @@ body.light-theme {
 }
 .h-c-collect .h-c-collect-d {
   height: 104px;
+  overflow: hidden;
+  /* 渐变效果，超过10行时显示 */
 }
 .h-c-collect .h-c-collect-d .content {
-  color: linear-gradient(180deg, #eeeeee 0%, rgba(238, 238, 238, 0) 100%);
   font-size: 8px;
-  text-align: justify;
+  line-height: 12px;
+  /* 假设行高为12px */
   overflow: hidden;
-  /* 隐藏溢出内容 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 10;
   text-overflow: ellipsis;
-  /* 使用省略号 */
+}
+.h-c-collect .h-c-collect-d .gradient-text {
+  background: linear-gradient(180deg, #eeeeee 0%, rgba(238, 238, 238, 0) 100%);
+  -webkit-background-clip: text;
+  color: transparent;
 }
 .h-c-collect .h-c-collect-d img {
   width: 100px;

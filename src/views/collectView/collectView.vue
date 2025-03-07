@@ -21,8 +21,15 @@
 
           <div class="templetName">{{ item.templetName || "-" }}</div>
           <div class="h-c-collect-d" v-if="item.data">
-            <div v-if="item.data[0].type === 'question'" class="content">
-              {{ item.data[0].content || "-" }}
+            <div
+              v-if="item.data[0].type === 'question'"
+              class="content"
+              :ref="'contentElement'+index"
+              :class="{'gradient-text': isOverflow('contentElement'+index)}">
+            >
+              {{
+                item.data[0].content  || "-"
+              }}
             </div>
             <div v-if="item.data[0].type === 'imageUrl'">
               <img v-if="item.data[0].data" :src="item.data[0].data[0].url" />
@@ -59,7 +66,7 @@
   </div>
 </template>
 <script>
-import { GetChatList,SaveChatCollect } from "@/api/chat";
+import { GetChatList, SaveChatCollect } from "@/api/chat";
 import InfoDisplay from "@/components/InfoDisplay/InfoDisplay";
 import { Session } from "@/utils/storage";
 export default {
@@ -82,6 +89,7 @@ export default {
       type: "text",
     };
   },
+ 
   created() {
     console.log(this.$route.query.collect);
     if (this.$route.query.collect === "1") {
@@ -106,6 +114,15 @@ export default {
     },
   },
   methods: {
+    // 判断内容是否超出10行
+    isOverflow(refName) {
+      const contentElement = this.$refs[refName];
+      console.log(contentElement,refName)
+      if (contentElement && contentElement.scrollHeight > contentElement.clientHeight) {
+        return true; // 如果内容溢出
+      }
+      return false; // 如果没有溢出
+    },
     handleCancel(id) {
       if (id) {
         SaveChatCollect({ sessionId: id, collect: 0 }).then((res) => {

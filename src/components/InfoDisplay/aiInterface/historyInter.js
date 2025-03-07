@@ -101,12 +101,13 @@ export default {
 
                   currentMessage.content.push(...this.imageDate(dt));
                 } else if (dataType === 'video') {
-
-                  currentMessage.content.push(
-                    ...e?.data?.filter(item => item && item.type === "originalVideo")
-                      .map(d => d.url) || []
-                  );
-
+                  console.log(currentMessage.content,e?.data)
+                  currentMessage.content.push(e?.data?.url)
+                  // currentMessage.content.push(
+                  //  ...e?.data?.filter(item => item && item.type === "originalVideo")
+                  //     .map(d => d.url) 
+                  // );
+   
                 } else {
                   currentMessage.content = ` ${e.content}`;
                 }

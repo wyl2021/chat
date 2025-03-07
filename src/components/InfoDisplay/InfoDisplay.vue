@@ -48,7 +48,7 @@
         </div>
         <div class="d-c-footer" v-show="message?.content">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <span class="dfs" @click="handleCopy(message.answer)">
+            <span class="dfs" @click="handleCopy(message)">
               <img src="@/assets/images/copy.png" />
             </span>
           </el-tooltip>
@@ -93,7 +93,7 @@
             <video
               v-if="item2.type === 'videoUrl' && item2.data"
               :src="item2.data"
-              style="width: 200px; height: 100px"
+              style="width: 200px;max-height:300px"
               controls
             ></video>
             <pre v-if="item2.type === 'answer'">{{
@@ -106,7 +106,7 @@
         ></LoadingView>
         <div class="d-c-footer" v-show="message?.content">
           <el-tooltip class="item" effect="dark" content="复制" placement="top">
-            <span class="dfs" @click="handleCopy(message.answer)">
+            <span class="dfs" @click="handleCopy(message)">
               <img src="@/assets/images/copy.png" />
             </span>
           </el-tooltip>
@@ -297,9 +297,110 @@ export default {
       // this.$emit("close");
     },
     // 复制
-    async handleCopy(txt) {
-      await navigator.clipboard.writeText(txt);
-      this.$message.success("复制成功");
+    async handleCopy(message) {
+      console.log(message);
+      if (message.type === "question") {
+        if (message.dataType === "text") {
+          await navigator.clipboard.writeText(message?.content.text);
+          this.$message.success("复制成功");
+        } else if (message.dataType === "image") {
+          try {
+            // 遍历 imgList，获取所有图片并转换为 PNG
+            const blobs = await Promise.all(
+              message.content.imgList.map(async (item) => {
+                const imgUrl = item.content || item; // 兼容对象和字符串
+                const blob = await fetch(imgUrl).then((res) => res.blob());
+
+                // 创建 <img> 元素
+                const img = await new Promise((resolve) => {
+                  const image = new Image();
+                  image.crossOrigin = "anonymous"; // 解决跨域问题
+                  image.src = URL.createObjectURL(blob);
+                  image.onload = () => resolve(image);
+                });
+
+                // 使用 Canvas 绘制 PNG
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                // 转换为 PNG Blob
+                return new Promise((resolve) => {
+                  canvas.toBlob(resolve, "image/png");
+                });
+              })
+            );
+
+            // 复制到剪贴板
+            const clipboardItems = blobs.map(
+              (blob) => new ClipboardItem({ "image/png": blob })
+            );
+            await navigator.clipboard.write(clipboardItems);
+
+            this.$message.success("图片已复制到剪贴板！");
+          } catch (error) {
+            console.error("复制图片失败", error);
+            this.$message.error("复制失败，请检查图片地址！");
+          }
+        } else if (message.dataType === "video") {
+          this.$message.error("暂不支持复制视频");
+        }
+      } else if (message.type === "answer") {
+        if (message.dataType === "text") {
+          await navigator.clipboard.writeText(message.content);
+          this.$message.success("复制成功");
+        } else if (message.dataType === "image") {
+          try {
+            // 遍历 imgList，获取所有图片并转换为 PNG
+            const blobs = await Promise.all(
+              message.content.map(async (item) => {
+                const imgUrl =
+                  item.data.thumbnail ||
+                  item.data.originalImage ||
+                  item.data.externalLinkImage; // 兼容对象和字符串
+                const blob = await fetch(imgUrl).then((res) => res.blob());
+
+                // 创建 <img> 元素
+                const img = await new Promise((resolve) => {
+                  const image = new Image();
+                  image.crossOrigin = "anonymous"; // 解决跨域问题
+                  image.src = URL.createObjectURL(blob);
+                  image.onload = () => resolve(image);
+                });
+
+                // 使用 Canvas 绘制 PNG
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+
+                // 转换为 PNG Blob
+                return new Promise((resolve) => {
+                  canvas.toBlob(resolve, "image/png");
+                });
+              })
+            );
+
+            // 复制到剪贴板
+            const clipboardItems = blobs.map(
+              (blob) => new ClipboardItem({ "image/png": blob })
+            );
+            await navigator.clipboard.write(clipboardItems);
+
+            this.$message.success("图片已复制到剪贴板！");
+          } catch (error) {
+            console.error("复制图片失败", error);
+            this.$message.error("复制失败，请检查图片地址！");
+          }
+        } else if (message.dataType === "video") {
+          this.$message.error("暂不支持复制视频");
+        }
+      }
+      // await navigator.clipboard.writeText(txt);
+      // this.$message.success("复制成功");
     },
     // 收藏
     async handleCollect() {
@@ -393,7 +494,8 @@ export default {
   margin-left: 7px;
   margin-bottom: 5px;
   video {
-    height: 110px;
+    // height: 110px;
+    max-height: 300px;
     width: 100%;
     object-fit: contain;
   }

@@ -50,11 +50,11 @@ Vue.mixin({
           }
         } else if (item.type === 'input') {
           const len = this.textWidth(item.placeholder) + 15;
-          result += `<span class="inputTTs protected" contenteditable="true" style="min-width: ${len || 130}px" required placeholder="[${item.placeholder}]"></span>`;
+          result += `<span class="inputTTs protected" contenteditable="true" style="min-width: ${len || 130}px" required placeholder="[${item.placeholder || item.name || '请输入'}]"></span>`;
         } else if (item.type === 'int') {
           const len = item.placeholder ? this.textWidth(item.placeholder) + 10 : 50;
           const reg = new RegExp(/[^\d]/g);
-          result += `<input class="inputTs protected" required style="width: ${len || 130}px" number="true"  placeholder="[${item.placeholder || '请输入'}]" onkeyup="value=value.replace(${reg},'')" />`;
+          result += `<input class="inputTs protected" required style="width: ${len || 130}px" number="true"  placeholder="[${item.placeholder || item.name || '请输入'}]" onkeyup="value=value.replace(${reg},'')" />`;
         } else if (item.type === 'select') {
           const arr = item.data || [];
           result += `<select class="selectTs protected" required txt="${arr[0].value}">`

@@ -216,7 +216,6 @@ export default {
       let ctx = this.getHtmlContents(str);
       let b = this.vaildateForm();
       if (ctx && b) {
-        console.log("sendMsg", ctx, this.handleData(ctx));
         this.$emit("sendMsg", this.handleData(ctx));
         this.clearVal();
         this.canSend = false;
@@ -323,6 +322,7 @@ export default {
     },
 
     handleChangeTypeClass1(typeStr) {
+      console.log('typeStr',typeStr)
       this.typeStr = typeStr;
       this.value = typeStr.str;
       if (this.typeStr.dataType === 2 && this.videoList.length > 0) {

@@ -22,7 +22,8 @@
                 style="margin-bottom: 10px"
                 @click.stop="$router.push('/knowledgeBase')"
               >
-                <i class="el-icon-edit-outline" style="margin-right: 5px"></i>
+                <!-- <i class="el-icon-edit-outline" style="margin-right: 5px"></i> -->
+                <el-image src="https://www.swsai.com/style/dist/img/icon/Group367.png" style="width:15px;height:15px;margin-right:5px"> </el-image>
                 <span>知识库</span>
               </div>
               <div

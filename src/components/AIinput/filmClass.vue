@@ -14,7 +14,14 @@
         >二创类型</el-button
       >
       <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item icon="el-icon-s-management" command="混剪类型"
+        <el-dropdown-item
+          v-for="(item, index) in dropdownList"
+          :key="index"
+          :command="item.id"
+          ><img :src="item.icon" />
+          <span>{{ item.title }}</span></el-dropdown-item
+        >
+        <!-- <el-dropdown-item icon="el-icon-s-management" command="混剪类型"
           >混剪类型</el-dropdown-item
         >
         <el-dropdown-item icon="el-icon-paperclip" command="裂变类型"
@@ -22,7 +29,7 @@
         >
         <el-dropdown-item icon="el-icon-picture-outline" command="图片生成视频"
           >图片生成视频</el-dropdown-item
-        >
+        > -->
       </el-dropdown-menu>
     </el-dropdown>
     <el-upload
@@ -48,6 +55,7 @@ import {
   GetUploadId,
   CompleteMultipartUpload,
   UploadPart,
+  GetChatTempletById,
 } from "@/api/chat";
 export default {
   props: {
@@ -64,57 +72,73 @@ export default {
     };
   },
   created() {
-    // this.handleDropdownList()
+    this.handleDropdownList();
   },
   methods: {
     customUpload() {},
-    handleCommand(val) {
-      const arr = ["混剪类型", "裂变类型", "图片生成视频"];
-      let dataType = 1;
-      let str =
-        "<form id='myForm' style='display:inline-block'><span>已</span>";
-      str += `<select class="selectTs protected" txt="${val}" required >`;
-      arr.forEach((ele) => {
-        if (ele === val) {
-          str += `<option value="${ele}" selected>${ele}</option>`;
+    handleCommand(id) {
+      console.log(id);
+      let str =""
+      GetChatTempletById({ id: Number(id) }).then((res) => {
+        if (res.code === 1) {
+          console.log(res);
+          let dataType = 1;
+
+          str = this.createAiScript(res.data);
+          console.log('str',str);
+          this.$emit("change", { str, dataType, type: "video" });
         } else {
-          str += `<option value="${ele}">${ele}</option>`;
+          this.$message.error(res.msg);
         }
       });
-      str += "</select>";
-      str += "<span>创建视频。品牌车型</span>";
-      str += `<span required class="inputTTs protected" contenteditable="true" style="min-width: 210px" placeholder="[填写车型，准确到输入品牌、车型]" ></span>`;
-      str += "<span>分裂数量</span>";
-      const arr1 = [1, 2, 3, 4];
-      str += `<select class="selectTs protected" txt="1" required >`;
-      arr1.forEach((ele) => {
-        if (ele === 1) {
-          str += `<option value="${ele}" selected>${ele}</option>`;
-        } else {
-          str += `<option value="${ele}">${ele}</option>`;
-        }
-      });
-      str += "</select><br>";
-      str += "<span>视频文案</span>";
-      str += `<span required class="inputTTs protected" contenteditable="true" style="min-width:505px" placeholder="[围绕车型特点、优势、品牌，应简洁明了，要给出小于10个字到主题，或者14个字内" ></span>`;
-      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:360px" placeholder="到副主题，如果不填封面没有文字或者根据车型随机出文案]" ></span><br>`;
-      str += "<span>视频长度</span>";
-      const arr2 = ["15秒内", "30秒内", "45秒内", "60秒内"];
-      str += `<select class="selectTs protected" txt="15" required >`;
-      arr2.forEach((ele) => {
-        if (ele === 15) {
-          str += `<option value="${ele}" selected>${ele}</option>`;
-        } else {
-          str += `<option value="${ele}">${ele}</option>`;
-        }
-      });
-      str += "</select>";
-      str += "<span>视频BGM</span>";
-      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="抖音热门BGM" ></span><br>`;
-      str += "<span>其他要求</span>";
-      str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="[其他补充要求]" ></span></form>`;
-      this.$emit("change", { str, dataType, type: "video" });
     },
+    // handleCommand(val) {
+    //   const arr = ["混剪类型", "裂变类型", "图片生成视频"];
+    //   let dataType = 1;
+    //   let str =
+    //     "<form id='myForm' style='display:inline-block'><span>已</span>";
+    //   str += `<select class="selectTs protected" txt="${val}" required >`;
+    //   arr.forEach((ele) => {
+    //     if (ele === val) {
+    //       str += `<option value="${ele}" selected>${ele}</option>`;
+    //     } else {
+    //       str += `<option value="${ele}">${ele}</option>`;
+    //     }
+    //   });
+    //   str += "</select>";
+    //   str += "<span>创建视频。品牌车型</span>";
+    //   str += `<span required class="inputTTs protected" contenteditable="true" style="min-width: 210px" placeholder="[填写车型，准确到输入品牌、车型]" ></span>`;
+    //   str += "<span>分裂数量</span>";
+    //   const arr1 = [1, 2, 3, 4];
+    //   str += `<select class="selectTs protected" txt="1" required >`;
+    //   arr1.forEach((ele) => {
+    //     if (ele === 1) {
+    //       str += `<option value="${ele}" selected>${ele}</option>`;
+    //     } else {
+    //       str += `<option value="${ele}">${ele}</option>`;
+    //     }
+    //   });
+    //   str += "</select><br>";
+    //   str += "<span>视频文案</span>";
+    //   str += `<span required class="inputTTs protected" contenteditable="true" style="min-width:505px" placeholder="[围绕车型特点、优势、品牌，应简洁明了，要给出小于10个字到主题，或者14个字内" ></span>`;
+    //   str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:360px" placeholder="到副主题，如果不填封面没有文字或者根据车型随机出文案]" ></span><br>`;
+    //   str += "<span>视频长度</span>";
+    //   const arr2 = ["15秒内", "30秒内", "45秒内", "60秒内"];
+    //   str += `<select class="selectTs protected" txt="15" required >`;
+    //   arr2.forEach((ele) => {
+    //     if (ele === 15) {
+    //       str += `<option value="${ele}" selected>${ele}</option>`;
+    //     } else {
+    //       str += `<option value="${ele}">${ele}</option>`;
+    //     }
+    //   });
+    //   str += "</select>";
+    //   str += "<span>视频BGM</span>";
+    //   str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="抖音热门BGM" ></span><br>`;
+    //   str += "<span>其他要求</span>";
+    //   str += `<span class="inputTTs protected" contenteditable="true" required style="min-width:100px" placeholder="[其他补充要求]" ></span></form>`;
+    //   this.$emit("change", { str, dataType, type: "video" });
+    // },
     // 上传图片之前的操作
     async handleBeforeUpload(file) {
       console.log(file, this.fileList);
@@ -249,7 +273,7 @@ export default {
     handleDropdownList() {
       GetChatTempletByType({ type: "二创类型" }).then((res) => {
         if (res.code === 1) {
-          this.dropdownList = res.data || [];
+          this.dropdownList = res.data[0].data || [];
         } else {
           this.$message.error(res.msg);
         }
