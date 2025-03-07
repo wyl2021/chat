@@ -93,7 +93,7 @@
             <video
               v-if="item2.type === 'videoUrl' && item2.data"
               :src="item2.data"
-              style="width: 200px;max-height:300px"
+              style="width: 200px; max-height: 300px"
               controls
             ></video>
             <pre v-if="item2.type === 'answer'">{{
@@ -355,33 +355,35 @@ export default {
           try {
             // 遍历 imgList，获取所有图片并转换为 PNG
             const blobs = await Promise.all(
-              message.content.map(async (item) => {
-                const imgUrl =
-                  item.data.thumbnail ||
-                  item.data.originalImage ||
-                  item.data.externalLinkImage; // 兼容对象和字符串
-                const blob = await fetch(imgUrl).then((res) => res.blob());
+              message.content
+                .filter((item) => item.type === "imageUrl" && item.data) // 过滤无效项
+                .map(async (item) => {
+                  const imgUrl =
+                    item.data.thumbnail ||
+                    item.data.originalImage ||
+                    item.data.externalLinkImage; // 兼容对象和字符串
+                  const blob = await fetch(imgUrl).then((res) => res.blob());
 
-                // 创建 <img> 元素
-                const img = await new Promise((resolve) => {
-                  const image = new Image();
-                  image.crossOrigin = "anonymous"; // 解决跨域问题
-                  image.src = URL.createObjectURL(blob);
-                  image.onload = () => resolve(image);
-                });
+                  // 创建 <img> 元素
+                  const img = await new Promise((resolve) => {
+                    const image = new Image();
+                    image.crossOrigin = "anonymous"; // 解决跨域问题
+                    image.src = URL.createObjectURL(blob);
+                    image.onload = () => resolve(image);
+                  });
 
-                // 使用 Canvas 绘制 PNG
-                const canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
+                  // 使用 Canvas 绘制 PNG
+                  const canvas = document.createElement("canvas");
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  const ctx = canvas.getContext("2d");
+                  ctx.drawImage(img, 0, 0);
 
-                // 转换为 PNG Blob
-                return new Promise((resolve) => {
-                  canvas.toBlob(resolve, "image/png");
-                });
-              })
+                  // 转换为 PNG Blob
+                  return new Promise((resolve) => {
+                    canvas.toBlob(resolve, "image/png");
+                  });
+                })
             );
 
             // 复制到剪贴板
