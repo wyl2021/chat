@@ -174,7 +174,7 @@ export default {
         if (res.code === 1) {
           this.baseList = res.data;
           this.current.pageTotal = res.total;
-          this.form.title = "";
+          // this.form.title = "";
         } else {
           this.$message.error(res.msg);
         }
