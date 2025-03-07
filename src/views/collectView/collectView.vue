@@ -25,7 +25,7 @@
               v-if="item.data[0].type === 'question'"
               class="content"
               :ref="'contentElement'+index"
-              :class="{'gradient-text': isOverflow('contentElement'+index)}">
+              :class="{'gradient-text': item.data[0].content.length>150}">
             
               {{
                 item.data[0].content || "-"
