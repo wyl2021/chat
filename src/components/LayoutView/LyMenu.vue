@@ -189,22 +189,22 @@ export default {
     handleSelect1(item) {
       console.log(item);
       // 341011739171858
-      this.$router.replace({
-        path: "/recentlyGenerated",
-        query: {
-          collect: 0,
-          sessionId: 829211741315623,
-          type: 'video',
-        },
-      });
       // this.$router.replace({
       //   path: "/recentlyGenerated",
       //   query: {
       //     collect: 0,
-      //     sessionId: item.id,
-      //     type: item.type,
+      //     sessionId: 829211741315623,
+      //     type: 'video',
       //   },
       // });
+      this.$router.replace({
+        path: "/recentlyGenerated",
+        query: {
+          collect: 0,
+          sessionId: item.id,
+          type: item.type,
+        },
+      });
       this.setActivePath("");
     },
     handleOpen(key, keyPath) {

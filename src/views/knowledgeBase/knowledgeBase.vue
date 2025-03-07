@@ -20,7 +20,7 @@
     </el-header>
     <el-main>
       <el-table :data="baseList" style="background: transparent">
-        <el-table-column prop="Title" label="标签" />
+        <el-table-column prop="Title" label="标题" />
         <el-table-column prop="AddTime" label="添加时间">
           <template slot-scope="scope">
             <span>{{ scope.row.AddTime.substring(0, 10) }}</span>
