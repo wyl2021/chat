@@ -26,9 +26,9 @@
               class="content"
               :ref="'contentElement'+index"
               :class="{'gradient-text': isOverflow('contentElement'+index)}">
-            >
+            
               {{
-                item.data[0].content  || "-"
+                item.data[0].content || "-"
               }}
             </div>
             <div v-if="item.data[0].type === 'imageUrl'">
