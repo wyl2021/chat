@@ -94,8 +94,8 @@ export default {
       console.log('token',token)
       if (loginType === "sws") {
         swsLogin({ token: token }).then((swsRes) => {
-          if (swsRes.msg === 0) {
-            if (swsRes.msg) {
+          if (swsRes.code === 1) {
+            if (swsRes.data) {
               this.setToken(swsRes.data.token);
               this.$router.push({
                 path: "/",
@@ -110,8 +110,8 @@ export default {
         });
       } else if (loginType === "oa") {
         oaLogin({ token: token }).then((oaRes) => {
-          if (oaRes.code === 0) {
-            if (oaRes.msg) {
+          if (oaRes.code === 1) {
+            if (oaRes.data) {
               this.setToken(oaRes.data.token);
               this.$router.push({
                 path: "/",
