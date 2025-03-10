@@ -19,7 +19,7 @@
       <AIinput
         ref="aiInput"
         v-model="ctxVal"
-        placeholder="请输入您的问题，限3000字"
+        placeholder="请输入您的问题"
         @sendMsg="handleSendMsg"
         @changeAnswer="changeAnswer"
       ></AIinput>

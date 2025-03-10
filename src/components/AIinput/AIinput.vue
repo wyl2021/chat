@@ -214,6 +214,8 @@ export default {
         str = this.$refs.ine.innerHTML;
       }
       let ctx = this.getHtmlContents(str);
+
+      console.log(ctx,str)
       let b = this.vaildateForm();
       if (ctx && b) {
         this.$emit("sendMsg", this.handleData(ctx));

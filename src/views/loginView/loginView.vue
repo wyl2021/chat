@@ -91,6 +91,7 @@ export default {
       return value ? value.replace(/['"]/g, "") : null;
     },
     aoAndswsLogin(token, loginType) {
+      console.log('token',token)
       if (loginType === "sws") {
         swsLogin({ token: token }).then((swsRes) => {
           if (swsRes.msg === 0) {

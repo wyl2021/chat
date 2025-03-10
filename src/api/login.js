@@ -16,19 +16,20 @@ export const sendLogCode=(data)=>{
     })
 }
 // oa登录
-export const oaLogin=(data)=>{
+export const oaLogin=(params)=>{
     return request({
         method:'get',
         action:'oaLogin',
-        data
+        params
     })
 }
 // sws登录
-export const swsLogin=(data)=>{
+export const swsLogin=(params)=>{
     return request({
         method:'get',
         action:'swsLogin',
-        data
+        params,
+
     })
 }
 // 用户注册

@@ -49,6 +49,7 @@ export default {
     // 发送消息
     handleSendMsg(val) {
       this.changeInputStyle = "absolute";
+      console.log(val)
       this.answerText = { templetId: 1,type:'video', count:val.count, content: val.data };
       this.$refs.aiInput.canSend = false;
       this.$refs.aiInput.value = "";

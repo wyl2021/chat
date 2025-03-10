@@ -26,9 +26,9 @@ service.interceptors.request.use(config => {
     }
     
   } else {
+    // token: token,
     config.params = {
       ...config.params,
-      token: token,
       action: config.action
     };
   }
