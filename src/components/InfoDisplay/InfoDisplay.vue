@@ -123,7 +123,7 @@
         </div>
       </div>
       <LoadingView
-        v-show="loading && txtIndex === 0 && index === messages.length - 1"
+        v-show="loading && messages.length%2!==0 && index === messages.length - 1"
       ></LoadingView>
     </div>
     <el-dialog

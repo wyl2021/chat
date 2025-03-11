@@ -94,15 +94,22 @@
           <div style="justify-content: space-between; display: flex">
             <TooltipTxt
               :text="item2.remark"
-              :len="20"
+              :len="12"
               color="#757575"
             ></TooltipTxt>
-            <span @click.stop="handleCancel(item2.id, index2)">
+            <span style="width: 50px;display: flex;justify-content: space-around;align-items: center;">
               <img
-                style="width: 15px; height: 15px"
+              @click.stop="handleCancel(item2.id, index2)"
+                style="width: 15px; height: 15px;pointer-events: auto;"
                 src="@/assets/images/del.png"
               />
+              <img
+              @click.stop="handleCollect(item2.id)"
+                style="width: 15px; height: 15px;pointer-events: auto;"
+                src="@/assets/images/collect.png"
+              />
             </span>
+            
           </div>
         </el-menu-item>
       </el-submenu>
@@ -141,7 +148,7 @@ import TooltipTxt from "@/components/TooltipTxt/TooltipTxt.vue";
 import MenuIcon from "./LaMenuIcon";
 import { Session } from "@/utils/storage";
 import { mapGetters } from "vuex";
-import { DelChat } from "@/api/chat";
+import { DelChat,SaveChatCollect } from "@/api/chat";
 export default {
   props: {
     isCollapse: {
@@ -162,15 +169,19 @@ export default {
   created() {
     this.recentlyChatList = this.getChatList;
   },
+  
   computed: {
     ...mapGetters(["getChatList"]),
   },
+ 
   watch: {
     getChatList(newList) {
       this.recentlyChatList = newList;
     },
+  
   },
   methods: {
+  
     handleSelect(index) {
       // console.log(Session.get('sessionId'))
       if (index.includes("6-")) return;
@@ -197,6 +208,7 @@ export default {
       //     type: 'video',
       //   },
       // });
+     
       this.$router.replace({
         path: "/recentlyGenerated",
         query: {
@@ -205,6 +217,7 @@ export default {
           type: item.type,
         },
       });
+      // this.setActivePath("/recentlyGenerated");
       this.setActivePath("");
     },
     handleOpen(key, keyPath) {
@@ -224,7 +237,9 @@ export default {
             this.setActivePath("/home");
             this.$router.push("/home");
           } else {
-            this.handleSelect1(this.recentlyChatList[index - 1]);
+            console.log(this.getActivePath)
+            if(this.getActivePath!=="") return 
+            this.handleSelect1(this.recentlyChatList[0].data[index - 1]);
           }
 
           this.$message.success("删除成功");
@@ -233,6 +248,18 @@ export default {
         }
       });
     },
+   async handleCollect(id){
+      const res = await SaveChatCollect({
+        sessionId: id,
+        collect: 1,
+      });
+      if (res.code === 1) {
+        this.setChatList();
+        this.$message.success("收藏成功");
+      } else {
+        this.$message.error(res.msg);
+      }
+    }
   },
 };
 </script>

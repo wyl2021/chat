@@ -254,7 +254,8 @@ export default {
           content: ctx,
         });
         const regex = /分裂数量(\d+)/;
-        const count = ctx.match(regex)[1] || "1";
+        console.log(ctx.match(regex))
+          const count = ctx.match(regex)?ctx.match(regex)[1] || "1":"1"
 
         parameter = {
           count: count,

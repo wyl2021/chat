@@ -2,10 +2,12 @@ import moment from "moment";
 import { Session } from "@/utils/storage";
 export default {
   async aiAnswer ({ templetId = 0, txt = "" }) {
+   
     // 创建对话  只针对文本会话
     const url = "http://www.swsai.com:5003/api/v1";
     this.loading = true; // 标记正在加载
     this.isDel = false;
+    this.result = ""; 
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -30,11 +32,12 @@ export default {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
+      
       this.setChatList();
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let chunk = "";
-
+     
       /* eslint-disable */
       while (true) {
         const { done, value } = await reader.read();
@@ -48,7 +51,9 @@ export default {
         }
         // 尝试逐块解析 JSON
         let boundary = chunk.indexOf("}{");
+     
         while (boundary !== -1) {
+         
           const jsonChunk = chunk.slice(0, boundary + 1);
           this.processJsonChunk(jsonChunk);
 
@@ -56,8 +61,10 @@ export default {
           chunk = chunk.slice(boundary + 1);
           boundary = chunk.indexOf("}{");
         }
+        
         // 尝试解析剩余的完整 JSON
         try {
+          
           const jsonChunk = JSON.parse(chunk);
           this.processJsonChunk(jsonChunk);
           chunk = ""; // 清空 chunk
@@ -92,7 +99,9 @@ export default {
         this.result += content; // 拼接内容
 
         Session.set("sessionId", chunk?.data?.sessionId); // 更新会话 ID
-        if (this.txtIndex === 0) {
+
+        if (!this.messages.length || this.messages[this.messages.length - 1].type !== "answer") {
+          // 关键：确保每次新回复都会正确 push
           this.messages.push({
             type: "answer",
             dataType: "text",
@@ -101,9 +110,10 @@ export default {
           });
           this.txtIndex = this.messages.length - 1;
         }
-        // 每次的返回
+  
         this.messages[this.txtIndex].content = this.result;
         this.scrollToBottom(); // ���动到底部
+      
       } else if (chunk.code === 0) {
         this.$message.error("请求失败：" + chunk.msg);
       } else if (chunk.code === -1) {
