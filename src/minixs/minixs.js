@@ -33,11 +33,12 @@ Vue.mixin({
       'getUserInfo',
       'clearUserInfo',
       'getActivePath',
-      'getChatList'
+      'getChatList',
+      'getTheme'
     ])
   },
   methods: {
-    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath', 'setChatList']),
+    ...mapActions(['setToken', 'setUserInfo', 'logout', 'setActivePath', 'setChatList','setTheme']),
     createAiScript (arr = []) {
       let result = '<form id="myForm">';
       arr.forEach(item => {

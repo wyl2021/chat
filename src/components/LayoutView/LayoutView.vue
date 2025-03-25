@@ -37,10 +37,11 @@
       >
         <LyMenu :isCollapse="collose"></LyMenu>
       </div>
-      <!-- <el-button @click="toggleTheme" class="theme-toggle">
+      <!-- 显示主题切换按钮 -->
+      <el-button @click="toggleTheme" class="theme-toggle">
         <span v-if="isDarkMode" class="moon-icon">🌙</span>
         <span v-else class="sun-icon">🌞</span>
-      </el-button> -->
+      </el-button> 
       <!-- <el-switch
       class="ly-switch"
   v-model="value"
@@ -91,26 +92,9 @@ export default {
       console.log(this.isDarkMode);
     },
     applyTheme() {
-      const rootElement = document.body;
-
-      if (this.isDarkMode) {
-        // 切换到暗色主题
-        rootElement.classList.add("dark-theme");
-        rootElement.classList.remove("light-theme");
-      } else {
-        // 切换到亮色主题
-        rootElement.classList.add("light-theme");
-        rootElement.classList.remove("dark-theme");
-      }
+      const styleType=this.isDarkMode?'dark':'light'
+      this.setTheme(styleType)
     },
-    // handleTheme(e){
-    //   console.log(e)
-    //   if(e){
-
-    //   }else{
-
-    //   }
-    // },
     handleCollose() {
       this.collose = !this.collose;
       if (this.collose) {
@@ -126,7 +110,7 @@ export default {
 <style lang="less" scoped>
 @import url("@/assets/styles/variable.less");
 
-/* 太阳和月亮按钮样式 */
+/* 太阳和月亮按钮样式 */ 
 .theme-toggle {
   background: transparent;
   border: none;

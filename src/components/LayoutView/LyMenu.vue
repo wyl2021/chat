@@ -231,8 +231,7 @@ export default {
       console.log(id, index);
       DelChat({ sessionId: id }).then((res) => {
         if (res.code === 1) {
-          this.setChatList();
-
+          this.setChatList()
           if (index === 0) {
             this.setActivePath("/home");
             this.$router.push("/home");
